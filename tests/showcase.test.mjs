@@ -26,7 +26,7 @@ await settle();
 test('abas exibem painéis interativos e dados fictícios identificados', async () => {
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   assert.equal(tabs.length, 5);
-  assert.match(document.querySelector('#showcase-panel').textContent, /Copa TR E-SPORTS/);
+  assert.match(document.querySelector('#showcase-panel').textContent, /Copa TR Demonstração/);
   tabs[2].click();
   await settle();
   assert.equal(tabs[2].getAttribute('aria-selected'), 'true');

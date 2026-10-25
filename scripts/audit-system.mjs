@@ -37,7 +37,7 @@ try {
       await page.locator(`[data-tr-page="${systemPage}"]`).click();
       if (systemPage === 'classification') {
         await page.locator('.tr-standings-card tbody tr').first().click();
-        assert.match(await page.locator('.tr-team-hero').innerText(), /Falcões FC/i, `${width}px: seleção da equipe`);
+        assert.match(await page.locator('.tr-team-hero').innerText(), /BONOCO CITY/i, `${width}px: seleção da equipe`);
       } else {
         await page.locator('.tr-page').waitFor();
         assert.ok((await page.locator('.tr-page h1').innerText()).length > 2, `${width}px: título ausente em ${systemPage}`);

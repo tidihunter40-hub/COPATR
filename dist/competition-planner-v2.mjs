@@ -1,5 +1,6 @@
 import { corujaoPlan, groupPlan, knockoutPlan, recommendCorujao, roundRobinPlan, scheduleFixtures } from './tr-competition-engine.mjs';
 import { ESPORTS_TEAMS } from './esports-demo.mjs';
+import { DEMO_TEAMS, DEMO_TEAM_NAMES } from './demo-teams.mjs';
 
 const form = document.querySelector('#planner-form');
 const sportInput = document.querySelector('#planner-sport');
@@ -10,19 +11,8 @@ const result = document.querySelector('#plan-result');
 const layout = document.querySelector('.planner-layout');
 const errorBox = document.querySelector('#form-error');
 const formatNames = { round_robin: 'Pontos corridos', groups: 'Fase de grupos', groups_knockout: 'Grupos + mata-mata', knockout: 'Mata-mata direto', corujao: 'Corujão' };
-const demoNames = [
-  'Falcões FC', 'Real Sports', 'União Atlético', 'Pombal City', 'Vila Operária', 'Atlético RS', 'Aurora FC', 'Estrela Azul',
-  'Náutico Central', 'Monte Verde', 'Cruzeiro do Sul', 'Leões da Serra', 'Olimpo FC', 'Riviera Atlético', 'Guardiões FC', 'Horizonte SC',
-  'Pioneiros', 'Nova Era FC', 'Esporte Clube Norte', 'Águia Branca', 'Tempestade FC', 'Imperial SC', 'Maré Alta', 'Arena Azul',
-  'Vanguarda FC', 'Porto Real', 'Cidade Nova', 'Vila Norte', 'Aço Azul', 'Atlético Solar', 'Trovão FC', 'Central United',
-];
-const esportsNames = [
-  ...ESPORTS_TEAMS.map((team) => team.name), 'Orbit E-Sports', 'Crown Gaming', 'Nova Squad', 'Thunder Crew', 'Blue Titans',
-  'Silver Wolves', 'Vertex E-Sports', 'Zero Gravity', 'Pulse Gaming', 'Atlas Squad', 'Vortex E-Sports', 'North Stars',
-  'Pixel Lions', 'Omega Team', 'Hyper Nova', 'Rival X', 'Prime Arena', 'Neon Falcons', 'Digital Knights', 'Phoenix Play',
-  'Echo Squad', 'Storm Unit', 'Infinity E-Sports', 'Alpha Circuit', 'Night Owls', 'Solar Gaming',
-];
-const demoCrests = ['falcon', 'crown', 'union', 'comet', 'summit', 'thunder', 'orbit', 'tide'];
+const demoNames = DEMO_TEAM_NAMES;
+const esportsNames = ESPORTS_TEAMS.map((team) => team.name);
 const escape = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 const initials = (name) => name.split(/\s+/).filter((word) => !['FC', 'SC', 'E-SPORTS'].includes(word)).slice(0, 2).map((word) => word[0]).join('').toUpperCase();
 const readable = (date) => new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(date));
@@ -33,8 +23,8 @@ function demoTeams(size, sport) {
   const esports = sport === 'E-sports';
   return Array.from({ length: size }, (_, index) => ({
     id: `demo-${index + 1}`,
-    name: (esports ? esportsNames : demoNames)[index],
-    crest: esports ? ESPORTS_TEAMS[index]?.demoAsset || null : index < demoCrests.length ? `/assets/demo-crests/${demoCrests[index]}.svg` : null,
+    name: (esports ? esportsNames : demoNames)[index] || `Participante demonstrativo ${String(index + 1).padStart(2, '0')}`,
+    crest: esports ? ESPORTS_TEAMS[index]?.demoAsset || null : DEMO_TEAMS[index]?.demoAsset || null,
     color: ['#2786c7', '#7698b0', '#425d90', '#2685a4', '#637fa6', '#5a94a9'][index % 6],
   }));
 }

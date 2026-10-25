@@ -4,6 +4,7 @@ export const DEMO_CRESTS = Object.freeze([
 
 export function demoCrestPath(team) {
   if (!team) return null;
+  if (team.demoAsset?.startsWith('/assets/demo-teams/')) return team.demoAsset;
   const name = String(team.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const known = [
     [/falco/, 'falcon'],

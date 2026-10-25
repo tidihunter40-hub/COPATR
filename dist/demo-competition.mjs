@@ -19,8 +19,8 @@ const matches = getInteractiveFixtures().map((fixture, index) => ({
   updated_at: '2026-10-23T12:00:00.000Z',
 }));
 const records = {
-  competitions: [{ id: competitionId, name: ESPORTS_DEMO.name, sport: 'E-sports', status: 'active', visibility: 'public' }],
-  competition_seasons: [{ id: seasonId, label: '2026 · Futebol virtual', format: 'round_robin', status: 'active' }],
+  competitions: [{ id: competitionId, name: ESPORTS_DEMO.name, sport: ESPORTS_DEMO.sport, status: 'active', visibility: 'public' }],
+  competition_seasons: [{ id: seasonId, label: '2026 · Demonstração', format: 'round_robin', status: 'active' }],
   competition_entries: entries,
   matches,
   competition_titles: [],

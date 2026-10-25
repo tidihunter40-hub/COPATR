@@ -51,7 +51,7 @@ if (page === 'demonstracao') {
     const link = document.createElement('a');
     link.className = 'button button-primary';
     link.href = '/demonstracao/copa-tr-esports';
-    link.textContent = 'Explorar Copa TR E-Sports 2026 →';
+    link.textContent = 'Explorar Copa TR Demonstração 2026 →';
     link.style.marginTop = '18px';
     banner.append(link);
   }

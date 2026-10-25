@@ -50,7 +50,7 @@ try {
   assert.equal(report.offline['/demonstracao'].status, 200);
   assert.equal(report.offline['/demonstracao/copa-tr-esports'].status, 200);
   assert.equal(report.offline['/demonstracao/copa-exemplo'].status, 200);
-  assert.match(report.offline['/demonstracao/copa-tr-esports'].text, /COPA TR E-SPORTS 2026/);
+  assert.match(report.offline['/demonstracao/copa-tr-esports'].text, /COPA TR DEMONSTRAÇÃO 2026/);
   assert.doesNotMatch(report.offline['/demonstracao/copa-tr-esports'].text, /Carregando demonstração/);
   for (const path of ['/painel', '/minha-conta', '/c/00000000-0000-0000-0000-000000000000', '/campeonatos', '/entrar']) {
     assert.equal(report.offline[path].status, 503, `${path}: must not serve stale private or official data`);

@@ -2,18 +2,14 @@ import { calculateStandings, generateFixtures, updateResult } from './engine.mjs
 import { safeCrestUrl } from './club.mjs';
 import { demoCrestPath } from './demo-crests.mjs';
 import { ESPORTS_DEMO } from './esports-demo.mjs';
+import { DEMO_TEAMS } from './demo-teams.mjs';
 
 const STORAGE_KEY = 'tr-campeonatos-demo-v1';
 const ZONES_KEY = 'tr-campeonatos-preview-zones-v1';
-const SAMPLE_TEAMS = [
-  { id: 'sample-fal', name: 'Falcões FC' },
-  { id: 'sample-atl', name: 'Atlético RS' },
-  { id: 'sample-rea', name: 'Real Sports' },
-  { id: 'sample-uni', name: 'União FC' },
-];
+const SAMPLE_TEAMS = DEMO_TEAMS.map((team) => ({ ...team, id: `sample-${team.id}` }));
 const sampleSchedule = generateFixtures(SAMPLE_TEAMS);
 const SAMPLE = {
-  name: 'Campeonato de exemplo', sport: 'Futebol', season: '', teams: SAMPLE_TEAMS,
+  name: 'Copa TR Demonstração', sport: 'Futebol', season: '', teams: SAMPLE_TEAMS,
   fixtures: updateResult(updateResult(sampleSchedule, sampleSchedule[0].id, 2, 1), sampleSchedule[1].id, 1, 1),
 };
 
@@ -37,7 +33,7 @@ function readDemo() {
 function crest(team) {
   const src = safeCrestUrl(team?.crest);
   if (src) return `<img class="home-crest" src="${esc(src)}" alt="Escudo de ${esc(team.name)}">`;
-  if (team?.demoAsset && /^\/assets\/demo-esports\/[a-z-]+\.(?:png|jpe|jpeg|webp)$/.test(team.demoAsset)) return `<img class="home-crest home-crest-esports" src="${team.demoAsset}" alt="Escudo de ${esc(team.name)}">`;
+  if (team?.demoAsset && /^\/assets\/demo-(?:esports|teams)\/[A-Za-z0-9_-]+\.(?:png|jpe|jpeg|webp)$/.test(team.demoAsset)) return `<img class="home-crest home-crest-esports" src="${team.demoAsset}" alt="Escudo de ${esc(team.name)}">`;
   const illustrative = demoCrestPath(team);
   if (illustrative) return `<span class="home-crest home-crest-demo" role="img" aria-label="Escudo fictício demonstrativo para ${esc(team.name)}; nenhum escudo cadastrado"><img src="${illustrative}" alt="" aria-hidden="true"><small>DEMO</small></span>`;
   return '<span class="home-crest home-crest-placeholder" role="img" aria-label="Equipe removida, sem escudo">?</span>';
@@ -114,7 +110,7 @@ function renderPanel() {
     const zone = index < qualified ? ' qualified' : index >= standings.length - eliminated ? ' eliminated' : '';
     return `<tr class="${index === 0 ? 'leader' : ''}${zone}"><td>${index + 1}</td><td><span class="home-table-team">${crest(team)}<span>${teamName(team)}</span></span></td><td class="pts">${row.points}</td><td>${row.played}</td><td>${row.wins}</td><td>${row.draws}</td><td>${row.losses}</td><td>${row.goalsFor}</td><td>${row.goalsAgainst}</td><td>${row.goalDifference > 0 ? '+' : ''}${row.goalDifference}</td></tr>`;
   }).join('') : '<tr><td colspan="10">Cadastre equipes para iniciar a classificação.</td></tr>';
-  document.querySelector('#home-dashboard-footer').textContent = esports ? 'Copa TR E-SPORTS: cenário exclusivamente visual, com resultados simulados. As seis logomarcas originais foram fornecidas pelo usuário. Nada foi gravado no Supabase ou no laboratório.' : `Placares e classificação atualizados pelos dados da ${local ? 'demonstração deste navegador' : 'amostra fictícia'}. Escudos marcados DEMO são fictícios e aparecem somente quando não há imagem cadastrada. Faixas coloridas são apenas destaques visuais configuráveis.`;
+  document.querySelector('#home-dashboard-footer').textContent = esports ? 'Copa TR Demonstração: cenário exclusivamente visual, com resultados simulados. Os seis escudos foram fornecidos pelo usuário. Nada foi gravado no Supabase ou no laboratório.' : `Placares e classificação atualizados pelos dados da ${local ? 'demonstração deste navegador' : 'amostra fictícia'}. Escudos marcados DEMO são fictícios e aparecem somente quando não há imagem cadastrada. Faixas coloridas são apenas destaques visuais configuráveis.`;
   const eligible = standings.filter((row) => row.played > 0);
   const leader = played.length ? standings[0] : null;
   const attack = eligible.reduce((best, row) => !best || row.goalsFor > best.goalsFor ? row : best, null);

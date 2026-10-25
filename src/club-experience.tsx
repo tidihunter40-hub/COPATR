@@ -53,7 +53,7 @@ function Experience({ clubId, data, kind, participations, titles = [], lifetime,
   if (!team) return <div className="club-profile club-profile-stage04"><div className="profile-empty">Equipe não encontrada nesta edição.</div></div>;
   const profileTeam = { ...team, publicCrest: crestOverride || team.publicCrest };
   return <article className="club-profile club-profile-stage04" style={{ '--club-accent': /^#[0-9a-fA-F]{6}$/.test(team.color || '') ? team.color : '#087cff' } as React.CSSProperties}>
-    <a className="profile-back" href={kind === 'sample' ? '#previa-sistema' : '#demonstracao'}>← Voltar à {kind === 'sample' ? 'Copa TR E-SPORTS' : 'demonstração'}</a>
+    <a className="profile-back" href={kind === 'sample' ? '#previa-sistema' : '#demonstracao'}>← Voltar à {kind === 'sample' ? 'Copa TR Demonstração' : 'demonstração'}</a>
     <header className="profile-hero"><div className="profile-hero-copy"><span className="profile-kicker">PERFIL DO CLUBE · {official ? 'DADOS OFICIAIS PÚBLICOS' : kind === 'sample' ? 'SIMULAÇÃO VISUAL' : 'DEMONSTRAÇÃO LOCAL'}</span><div className="profile-identity"><div className="profile-crest-stage"><Crest team={profileTeam} className="profile-hero-crest"/></div><div><p>{data.name}{data.season ? ` · ${data.season}` : ''}</p><h3>{team.name}</h3><span>{[team.shortName, team.category, data.sport].filter(Boolean).join(' · ')}</span></div></div>{team.notes && <p className="profile-notes">{team.notes}</p>}</div><div className="profile-rank"><small>{official ? 'POSIÇÃO NA EDIÇÃO' : 'CLASSIFICAÇÃO ATUAL'}</small><strong>{position > 0 && matches.length && (!official || data.format === 'round_robin') ? `${position}º` : '—'}</strong><span>{official && data.format !== 'round_robin' ? 'Sem tabela de pontos nesta edição' : `${row?.points ?? 0} pontos nesta edição`}</span></div></header>
     <div className="profile-stats" aria-label={official ? 'Estatísticas acumuladas oficiais do clube' : 'Estatísticas da demonstração'}>{labels.map((label, index) => <div className="profile-stat" key={label}><strong>{numbers[index] ?? '—'}{index === 6 && numbers[index] != null ? '%' : ''}</strong><span>{label}</span></div>)}<div className="profile-stat"><strong>{official ? lifetime?.titles ?? titles.filter((title) => title.place === 1).length : '—'}</strong><span>Títulos oficiais</span></div><div className="profile-stat"><strong>{official ? lifetime?.runner_ups ?? titles.filter((title) => title.place === 2).length : '—'}</strong><span>Vice-campeonatos</span></div></div>
     <div className="profile-body"><div className="profile-section-head"><div><span className="profile-kicker">TRAJETÓRIA NA COMPETIÇÃO</span><h4>{data.name}</h4><p>{official ? 'Fases e resultados da edição pública selecionada.' : 'Confrontos desta demonstração; resultados sem validade oficial.'}</p></div><span className="profile-progress">{journey.filter((item) => item.played).length} de {journey.length} partidas disputadas</span></div>
@@ -91,8 +91,8 @@ function OfficialView({ id }: { id: string }) {
 
 export function ClubProfileView({ id, localData }: { id: string; localData: Competition }) {
   if (UUID.test(id)) return <OfficialView key={id} id={id}/>;
-  const sample = id.startsWith('esports-');
-  const data = sample ? ESPORTS_DEMO as Competition : localData;
+  const sample = id.startsWith('demo-');
+  const data = sample ? ESPORTS_DEMO as unknown as Competition : localData;
   const team = data.teams.find((entry) => entry.id === id);
   if (!team) return <div className="club-profile club-profile-stage04"><a className="profile-back" href="#demonstracao">← Voltar ao laboratório</a><div className="profile-empty"><h3>Equipe não encontrada</h3><p>O cadastro pode ter sido removido deste navegador.</p></div></div>;
   const participation: Participation = { id: `${sample ? 'sample' : 'local'}-${data.name}`, name: data.name || 'Demonstração local', season: data.season || '', sport: data.sport };

@@ -4,6 +4,7 @@ import { calculateStandings, generateFixtures, updateResult } from '../dist/engi
 import { safeCrestUrl } from '../dist/club.mjs';
 import { demoCrestPath } from '../dist/demo-crests.mjs';
 import { ESPORTS_DEMO } from '../dist/esports-demo.mjs';
+import { DEMO_TEAMS } from '../dist/demo-teams.mjs';
 import './club-profile';
 
 type Team = { id: string; name: string; crest?: string | null; demoAsset?: string; shortName?: string; category?: string };
@@ -23,19 +24,14 @@ type GlyphName = 'trophy' | 'team' | 'calendar' | 'chart' | 'ball' | 'basket' | 
 
 const STORAGE_KEY = 'tr-campeonatos-demo-v1';
 const OFFICIAL_SYMBOL = '/assets/official/02_simbolo_sem_bola_transparente.png';
-const SAMPLE_TEAMS: Team[] = [
-  { id: 'fal', name: 'Falcões FC' },
-  { id: 'rea', name: 'Real Sports' },
-  { id: 'uni', name: 'União FC' },
-  { id: 'atl', name: 'Atlético RS' },
-];
+const SAMPLE_TEAMS: Team[] = DEMO_TEAMS.map((team) => ({ ...team }));
 const sampleSchedule = generateFixtures(SAMPLE_TEAMS) as Fixture[];
 const SAMPLE_FIXTURES = updateResult(
   updateResult(sampleSchedule, sampleSchedule[0].id, 2, 1),
   sampleSchedule[1].id, 1, 1,
 ) as Fixture[];
 const SAMPLE_STATE: DemoState = {
-  name: 'Copa TR de Verão', sport: 'Futebol', format: 'single',
+  name: 'Copa TR Demonstração', sport: 'Futebol', format: 'single',
   teams: SAMPLE_TEAMS, fixtures: SAMPLE_FIXTURES,
 };
 
@@ -74,10 +70,10 @@ function useLocalDemo() {
 function usePresentation(source: 'esports' | 'local') {
   const local = useLocalDemo();
   const hasLocal = Boolean(local.name || local.teams.length || local.fixtures.length);
-  const data = source === 'esports' ? ESPORTS_DEMO as DemoState : hasLocal ? local : SAMPLE_STATE;
+  const data = source === 'esports' ? ESPORTS_DEMO as unknown as DemoState : hasLocal ? local : SAMPLE_STATE;
   let standings: Standing[] = [];
   try { standings = calculateStandings(data.teams, data.fixtures); } catch { /* Keep the presentation available if browser data was corrupted. */ }
-  return { data, standings, hasLocal: source === 'local' && hasLocal, label: source === 'esports' ? 'Copa TR E-SPORTS · simulação visual' : hasLocal ? 'Dados da demonstração neste navegador' : 'Exemplo fictício' };
+  return { data, standings, hasLocal: source === 'local' && hasLocal, label: source === 'esports' ? 'Copa TR Demonstração · simulação visual' : hasLocal ? 'Dados da demonstração neste navegador' : 'Exemplo fictício' };
 }
 
 function Glyph({ name, size = 24 }: { name: GlyphName; size?: number }) {

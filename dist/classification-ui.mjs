@@ -1,21 +1,17 @@
-const teams = [
-  { id: 'falcoes', name: 'Falcões FC', crest: 'eagle', motto: 'TRADIÇÃO EM CADA JOGO' },
-  { id: 'real', name: 'Real Sports', crest: 'real', motto: 'COMPETIÇÃO EM ALTO NÍVEL' },
-  { id: 'uniao', name: 'União FC', crest: 'union', motto: 'FORÇA QUE UNE O CAMPO' },
-  { id: 'atletico', name: 'Atlético RS', crest: 'atletico', motto: 'RAÇA EM CADA DISPUTA' },
-  { id: 'vila', name: 'Vila Operária', crest: 'vila', motto: 'O CLUBE DA COMUNIDADE' },
-  { id: 'pombal', name: 'Pombal City', crest: 'pombal', motto: 'VOANDO MAIS ALTO' },
-];
+import { DEMO_TEAMS } from './demo-teams.mjs';
+
+const mottos = ['TRADIÇÃO EM CADA JOGO', 'COMPETIÇÃO EM ALTO NÍVEL', 'FORÇA QUE UNE O CAMPO', 'RAÇA EM CADA DISPUTA', 'ENERGIA PARA DISPUTAR', 'ORGULHO DE REPRESENTAR'];
+const teams = DEMO_TEAMS.map((team, index) => ({ ...team, motto: mottos[index] }));
 
 const results = [
-  ['falcoes', 'real', 1, 1], ['falcoes', 'uniao', 3, 0], ['falcoes', 'atletico', 3, 0], ['falcoes', 'vila', 2, 1], ['falcoes', 'pombal', 3, 1],
-  ['real', 'uniao', 2, 1], ['real', 'atletico', 3, 1], ['real', 'vila', 3, 0], ['real', 'pombal', 0, 1],
-  ['uniao', 'atletico', 2, 1], ['uniao', 'vila', 2, 1], ['uniao', 'pombal', 2, 1],
-  ['atletico', 'vila', 1, 0], ['atletico', 'pombal', 1, 1], ['vila', 'pombal', 1, 2],
+  ['demo-bonoco-city', 'demo-resenha-clube', 1, 1], ['demo-bonoco-city', 'demo-irmandade-es', 3, 0], ['demo-bonoco-city', 'demo-aguia-es', 3, 0], ['demo-bonoco-city', 'demo-os-superstais', 2, 1], ['demo-bonoco-city', 'demo-garotos-pombal', 3, 1],
+  ['demo-resenha-clube', 'demo-irmandade-es', 2, 1], ['demo-resenha-clube', 'demo-aguia-es', 3, 1], ['demo-resenha-clube', 'demo-os-superstais', 3, 0], ['demo-resenha-clube', 'demo-garotos-pombal', 0, 1],
+  ['demo-irmandade-es', 'demo-aguia-es', 2, 1], ['demo-irmandade-es', 'demo-os-superstais', 2, 1], ['demo-irmandade-es', 'demo-garotos-pombal', 2, 1],
+  ['demo-aguia-es', 'demo-os-superstais', 1, 0], ['demo-aguia-es', 'demo-garotos-pombal', 1, 1], ['demo-os-superstais', 'demo-garotos-pombal', 1, 2],
 ];
 
 const byId = new Map(teams.map((team) => [team.id, team]));
-const crest = (team, big = false) => `<span class="tr-crest ${team.crest}${big ? ' big' : ''}" aria-hidden="true">${team.name[0]}</span>`;
+const crest = (team, big = false) => `<span class="tr-crest${big ? ' big' : ''}"><img src="${team.demoAsset}" alt="Escudo de ${team.name}"></span>`;
 
 function standingData() {
   const rows = new Map(teams.map((team) => [team.id, { ...team, played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, form: [], games: [] }]));

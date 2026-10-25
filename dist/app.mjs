@@ -1,6 +1,7 @@
 import { MAX_TEAMS, normalizeName, validateTeamName, generateFixtures, updateResult, calculateStandings } from './engine.mjs';
 import { readCrestFile, safeCrestUrl } from './club.mjs';
 import { getRealModeStatus } from './supabase-real-mode.mjs';
+import { DEMO_TEAMS } from './demo-teams.mjs';
 
 const STORAGE_KEY = 'tr-campeonatos-demo-v1';
 const emptyState = () => ({ name: '', season: '', sport: 'Futebol', format: 'single', teams: [], fixtures: [] });
@@ -39,7 +40,7 @@ function esc(value) {
   return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
 }
 function crest(team, className = 'club-crest') {
-  const src = safeCrestUrl(team?.crest);
+  const src = safeCrestUrl(team?.crest) || team?.demoAsset;
   return src ? `<img class="${className}" src="${src}" alt="Escudo de ${esc(team.name)}">` : `<span class="${className} club-crest-empty" aria-label="Sem escudo cadastrado">◇</span>`;
 }
 function clubLink(id, label) { return `<a class="club-link" href="#clube-${encodeURIComponent(id)}">${label}</a>`; }
@@ -70,28 +71,29 @@ function updatePreview() {
 function renderHeroPreview() {
   if (!document.querySelector('#hero-data-source')) return;
   const hasLocalDemo = Boolean(state.name || state.teams.length || state.fixtures.length);
-  const sampleNames = ['Falcões FC', 'União FC', 'Atlético RS', 'Real Sports'];
-  const sampleStandings = [3, 1, 1, 0];
+  const sampleNames = ['BONOCO CITY', 'RESENHA CLUBE', 'IRMANDADE ES', 'ÁGUIA ES', 'OS SUPERSTAIS', 'GAROTOS DE POMBAL'];
+  const sampleStandings = [3, 1, 1, 0, 0, 0];
   const rows = hasLocalDemo ? calculateStandings(state.teams, state.fixtures).slice(0, 4) : sampleNames.map((name, index) => ({ name, points: sampleStandings[index] }));
   const games = hasLocalDemo ? [...state.fixtures.filter((match) => match.homeScore === null), ...state.fixtures.filter((match) => match.homeScore !== null)].slice(0, 3).map((match) => ({
     home: teamName(match.homeId), away: teamName(match.awayId),
     detail: match.homeScore === null ? `Rodada ${match.round}` : `${match.homeScore} × ${match.awayScore}`,
   })) : [
-    { home: 'Falcões FC', away: 'Real Sports', detail: 'Próximo jogo' },
-    { home: 'União FC', away: 'Atlético RS', detail: 'Próximo jogo' },
+    { home: 'BONOCO CITY', away: 'RESENHA CLUBE', detail: 'Próximo jogo' },
+    { home: 'IRMANDADE ES', away: 'ÁGUIA ES', detail: 'Próximo jogo' },
+    { home: 'OS SUPERSTAIS', away: 'GAROTOS DE POMBAL', detail: 'Próximo jogo' },
   ];
   document.querySelector('#hero-data-source').textContent = hasLocalDemo ? 'Dados deste navegador' : 'Exemplo fictício';
   document.querySelector('#hero-championship-count').textContent = hasLocalDemo ? (state.name ? '01' : '00') : '01';
-  document.querySelector('#hero-team-count').textContent = String(hasLocalDemo ? state.teams.length : 4).padStart(2, '0');
-  document.querySelector('#hero-game-count').textContent = String(hasLocalDemo ? state.fixtures.length : 6).padStart(2, '0');
+  document.querySelector('#hero-team-count').textContent = String(hasLocalDemo ? state.teams.length : 6).padStart(2, '0');
+  document.querySelector('#hero-game-count').textContent = String(hasLocalDemo ? state.fixtures.length : 15).padStart(2, '0');
   document.querySelector('#hero-matches').innerHTML = games.length ? games.map((game) => `<div class="system-match"><div><strong>${esc(game.home)}</strong><small> × ${esc(game.away)}</small></div><span class="system-match-score">${esc(game.detail)}</span></div>`).join('') : '<div class="system-match"><small>Gere confrontos no laboratório.</small></div>';
   document.querySelector('#hero-standings').innerHTML = rows.length ? rows.map((row, index) => `<div class="system-standing"><span><b>${index + 1}</b>${esc(row.name)}</span><strong>${row.points}</strong></div>`).join('') : '<div class="system-standing"><span>Cadastre as equipes.</span></div>';
-  document.querySelector('#hero-float-title').textContent = hasLocalDemo ? (state.name || 'Campeonato de demonstração') : 'Copa TR de Verão';
-  document.querySelector('#hero-float-subtitle').textContent = `${hasLocalDemo ? state.sport : 'Futebol'} • ${hasLocalDemo ? state.teams.length : 4} equipes`;
+  document.querySelector('#hero-float-title').textContent = hasLocalDemo ? (state.name || 'Campeonato de demonstração') : 'Copa TR Demonstração';
+  document.querySelector('#hero-float-subtitle').textContent = `${hasLocalDemo ? state.sport : 'Futebol'} • ${hasLocalDemo ? state.teams.length : 6} equipes`;
   const featured = hasLocalDemo ? state.fixtures[0] : null;
-  document.querySelector('#hero-float-match').innerHTML = featured ? `${esc(teamName(featured.homeId))} <b>${featured.homeScore === null ? '×' : `${featured.homeScore} × ${featured.awayScore}`}</b> ${esc(teamName(featured.awayId))}` : hasLocalDemo ? 'Aguardando confrontos' : 'Falcões FC <b>2 × 1</b> Real Sports';
-  const liveHome = featured ? teamName(featured.homeId) : 'Galatasarrafo';
-  const liveAway = featured ? teamName(featured.awayId) : 'Real Sports';
+  document.querySelector('#hero-float-match').innerHTML = featured ? `${esc(teamName(featured.homeId))} <b>${featured.homeScore === null ? '×' : `${featured.homeScore} × ${featured.awayScore}`}</b> ${esc(teamName(featured.awayId))}` : hasLocalDemo ? 'Aguardando confrontos' : 'BONOCO CITY <b>2 × 1</b> RESENHA CLUBE';
+  const liveHome = featured ? teamName(featured.homeId) : 'BONOCO CITY';
+  const liveAway = featured ? teamName(featured.awayId) : 'RESENHA CLUBE';
   const liveScore = featured && featured.homeScore !== null ? `${featured.homeScore} <span>×</span> ${featured.awayScore}` : '3 <span>×</span> 2';
   document.querySelector('#hero-live-home').textContent = liveHome;
   document.querySelector('#hero-live-away').textContent = liveAway;
@@ -300,7 +302,7 @@ content.addEventListener('click', (event) => {
       selectedRound = 1; saveState(); setTab('matches'); notify(`${state.fixtures.length} confrontos gerados.`);
     } else if (button.id === 'load-example') {
       if ((state.teams.length || state.fixtures.length) && !window.confirm('Substituir os dados atuais por um exemplo fictício?')) return;
-      state = { name: 'Copa TR de Verão', sport: 'Futebol', format: 'single', teams: ['Falcões FC','Real Sports','União FC','Atlético RS'].map((name) => ({ id: crypto.randomUUID(), name })), fixtures: [] };
+      state = { name: 'Copa TR Demonstração', sport: 'Futebol', format: 'single', teams: DEMO_TEAMS.map((team) => ({ ...team, id: crypto.randomUUID() })), fixtures: [] };
       editingId = null; saveState(); render(); notify('Exemplo fictício carregado. Gere os confrontos.');
     } else if (button.id === 'simulate-round') {
       if (!window.confirm('Gerar placares fictícios para todas as partidas desta rodada? Os placares existentes serão substituídos.')) return;
@@ -316,6 +318,38 @@ content.addEventListener('click', (event) => {
 });
 
 document.querySelector('#year').textContent = new Date().getFullYear();
+
+function refreshStaticDemoIdentity() {
+  const [bonoco, resenha] = DEMO_TEAMS;
+  document.querySelectorAll('.hero-live-team').forEach((node, index) => {
+    const team = index === 0 ? bonoco : resenha;
+    const image = node.querySelector('img');
+    if (image) { image.src = team.demoAsset; image.alt = `Escudo do ${team.name}`; }
+    const name = node.querySelector('span');
+    if (name) name.textContent = team.name;
+  });
+  const source = document.querySelector('#home-panel-source');
+  if (source) source.textContent = 'COPA TR DEMONSTRAÇÃO · simulação visual';
+  const champion = document.querySelector('.champion-demo-card');
+  if (champion) {
+    const image = champion.querySelector('img');
+    if (image) { image.src = bonoco.demoAsset; image.alt = `Escudo do ${bonoco.name}`; }
+    champion.querySelector('.champion-card-kicker')?.replaceChildren('Copa TR Demonstração · vitrine');
+    champion.querySelector('h4')?.replaceChildren(bonoco.name);
+  }
+  const publicMatch = document.querySelector('.public-demo-match');
+  if (publicMatch) {
+    const images = publicMatch.querySelectorAll('img');
+    [bonoco, resenha].forEach((team, index) => {
+      const image = images[index];
+      if (image) { image.src = team.demoAsset; image.alt = `Escudo do ${team.name}`; }
+    });
+    const label = publicMatch.querySelector('p');
+    if (label) label.innerHTML = `${esc(bonoco.name)} <span>·</span> ${esc(resenha.name)}`;
+  }
+}
+
+refreshStaticDemoIdentity();
 render();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
