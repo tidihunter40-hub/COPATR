@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild src/showcase.tsx --bundle --minify --sourcemap --format=esm --target=es2022 --jsx=automatic --outfile=dist/showcase.js && esbuild src/real-app.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/real-app.js && esbuild src/auth-header.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/auth-header.js && esbuild src/planner-official.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/planner-official.js",
+    "build": "esbuild src/showcase.tsx --bundle --minify --sourcemap --format=esm --target=es2022 --jsx=automatic --outfile=dist/showcase.js && esbuild src/smart-shield.ts --bundle --minify --format=esm --target=es2022 --outfile=dist/smart-shield.mjs && esbuild src/real-app.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/real-app.js && esbuild src/auth-header.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/auth-header.js && esbuild src/planner-official.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/planner-official.js",
     "typecheck": "tsc --noEmit",
     "visual:qa": "node scripts/visual-qa.mjs",
     "pretest": "npm run build",

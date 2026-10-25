@@ -13,8 +13,8 @@ const match = (status, home_score, away_score) => ({ id: 'match', phase: 'league
 
 test('a confirmed win highlights only the winning crest', () => {
   const html = publicFixture(match('confirmed', 3, 0), entries, crests);
-  assert.match(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><img src="https:\/\/example.test\/home.png"/);
-  assert.doesNotMatch(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><img src="https:\/\/example.test\/away.png"/);
+  assert.match(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><span class="team-shield team-shield--large"><img src="https:\/\/example.test\/home.png"/);
+  assert.doesNotMatch(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><span class="team-shield team-shield--large"><img src="https:\/\/example.test\/away.png"/);
   assert.match(html, /Placar 3 a 0/);
 });
 
@@ -31,7 +31,7 @@ test('a shootout separates penalty goals and highlights the qualified team', () 
   const html = publicFixture(match('confirmed', 1, 1), entries, crests, { home_score: 3, away_score: 4, winning_entry_id: 'away' });
   assert.match(html, /Placar 1 a 1/);
   assert.match(html, /Pênaltis: 3 × 4/);
-  assert.match(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><img src="https:\/\/example.test\/away.png"/);
+  assert.match(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><span class="team-shield team-shield--large"><img src="https:\/\/example.test\/away.png"/);
 });
 
 test('match card links to its public detail without changing the official result', () => {

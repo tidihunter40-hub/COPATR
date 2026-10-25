@@ -2,7 +2,7 @@
 
 O laboratório continua local e fictício. A pasta `migrations/` define o banco do modo real, que preserva clubes, participações, resultados confirmados e títulos após o encerramento de uma temporada.
 
-> A migration `202610230003_authorization_and_publication.sql` ainda precisa ser revisada e aplicada no ambiente Supabase de destino. O painel atualizado depende das funções `create_competition_with_season`, `set_competition_publication` e `set_penalty_shootout`; sem essa migration, essas ações retornarão erro. Consulte [o estado da implementação](../docs/implementacao-painel-portal-2026-10-23.md) antes de liberar o modo oficial.
+> As migrations `202610230003_authorization_and_publication.sql` e `202610250004_tr_smart_shield.sql` ainda precisam ser revisadas e aplicadas no ambiente Supabase de destino. O painel atualizado depende das funções `create_competition_with_season`, `set_competition_publication` e `set_penalty_shootout`; sem essas migrations, ações oficiais podem retornar erro. Consulte [o estado da implementação](../docs/implementacao-painel-portal-2026-10-23.md) antes de liberar o modo oficial.
 
 ## Configuração
 
@@ -41,7 +41,13 @@ Quando as duas variáveis estão ausentes, a interface mantém o aviso “Modo d
 
 As tabelas usam RLS. Pessoas ligadas a uma organização podem administrar somente suas competições; responsáveis do clube administram somente sua identidade. Clubes e competições públicos têm leitura pública, mas isso não cria direito de edição.
 
-O bucket privado `club-crests` aceita PNG, JPG e WEBP até 3 MB. A pasta de cada objeto começa com o UUID do clube, e as políticas conferem a associação do usuário ao clube. Use `getSignedCrestUrl` para mostrar um escudo privado.
+O bucket privado `club-crests` aceita PNG, JPG, JPEG e WEBP até 3 MB. A pasta de cada objeto começa com o UUID do clube, e as políticas conferem a associação do usuário ao clube. Use `getSignedCrestUrl` para mostrar um escudo privado.
+
+## TR Smart Shield
+
+Ao cadastrar um escudo, o navegador verifica a assinatura real do arquivo, limita as dimensões a 4096 px e preserva o upload original. Em seguida, cria um PNG transparente de 512 px somente quando já há transparência ou quando o fundo é conectado à borda, dominante e de baixa variação. Não há regra especial para branco ou preto. Em imagem complexa, pequena ou ambígua, o sistema mantém o original e registra `original_fallback`; não inventa um recorte.
+
+Depois de aplicar `202610250004_tr_smart_shield.sql`, `clubs` guarda `crest_original_path`, `crest_processed_path`, status e metadados, enquanto `club_crest_jobs` fornece a trilha de auditoria. O `crest_path` corrente passa a apontar para o derivado seguro quando ele existe. `competition_entries.crest_path_snapshot` não é reescrito: temporadas concluídas preservam a identidade que já registraram. Para reprocessar escudos antigos, reenvie o original por uma sessão autenticada de editor; não use uma chave administrativa no navegador.
 
 ## Serviço no navegador
 

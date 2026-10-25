@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const migration = readFileSync(resolve('supabase/migrations/202610220001_sports_memory.sql'), 'utf8');
+const smartShieldMigration = readFileSync(resolve('supabase/migrations/202610250004_tr_smart_shield.sql'), 'utf8');
 const realMode = await import('../dist/supabase-real-mode.mjs');
 
 test('migration preserva identidade, participações, auditoria e políticas de acesso', () => {
@@ -24,6 +25,15 @@ test('migration preserva identidade, participações, auditoria e políticas de 
   assert.match(migration, /grant execute on function public\.set_match_result\(uuid, smallint, smallint, text\) to authenticated/);
   assert.match(migration, /create policy clubs_public_read on public\.clubs for select to anon, authenticated/);
   assert.doesNotMatch(migration, /service_role/i);
+});
+
+test('TR Smart Shield mantém original, derivado e trilha de auditoria sob RLS', () => {
+  assert.match(smartShieldMigration, /crest_original_path text/);
+  assert.match(smartShieldMigration, /crest_processed_path text/);
+  assert.match(smartShieldMigration, /create table if not exists public\.club_crest_jobs/);
+  assert.match(smartShieldMigration, /alter table public\.club_crest_jobs enable row level security/);
+  assert.match(smartShieldMigration, /historical competition snapshot/i);
+  assert.doesNotMatch(smartShieldMigration, /service_role/i);
 });
 
 test('cliente real permanece inativo sem configuração e não depende da chave administrativa', () => {

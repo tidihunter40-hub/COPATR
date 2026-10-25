@@ -1,5 +1,7 @@
 import { supabaseConfig } from './runtime-config.mjs';
 
+import { prepareSmartShield } from './smart-shield.mjs';
+
 const SESSION_KEY = 'tr-campeonatos-supabase-session-v1';
 
 function configuration() {
@@ -74,14 +76,36 @@ export async function createPermanentClub(club) {
 
 export async function uploadClubCrest(clubId, file) {
   if (!(file instanceof File)) throw new Error('Selecione um arquivo de escudo válido.');
-  const extension = String(file.name).split('.').pop()?.toLowerCase();
-  if (!['png', 'jpg', 'jpeg', 'webp'].includes(extension)) throw new Error('Use PNG, JPG ou WEBP.');
-  const path = `${clubId}/${crypto.randomUUID()}.${extension === 'jpeg' ? 'jpg' : extension}`;
-  await request(`/storage/v1/object/club-crests/${path}`, { method: 'POST', headers: { 'Content-Type': file.type, 'x-upsert': 'false' }, body: file });
-  await request(`${query('clubs', { id: `eq.${clubId}` })}`, {
-    method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify({ crest_path: path }),
-  });
-  return path;
+  const prepared = await prepareSmartShield(file);
+  const jobId = crypto.randomUUID();
+  const extension = prepared.source.mime === 'image/jpeg' ? 'jpg' : prepared.source.mime.split('/')[1];
+  const originalPath = `${clubId}/original/${jobId}.${extension}`;
+  const processedPath = prepared.processed ? `${clubId}/processed/${jobId}.png` : null;
+  await request(`/storage/v1/object/club-crests/${originalPath}`, { method: 'POST', headers: { 'Content-Type': prepared.source.mime, 'x-upsert': 'false' }, body: file });
+  if (prepared.processed && processedPath) await request(`/storage/v1/object/club-crests/${processedPath}`, { method: 'POST', headers: { 'Content-Type': 'image/png', 'x-upsert': 'false' }, body: prepared.processed });
+  const path = processedPath || originalPath;
+  const payload = { crest_path: path, crest_original_path: originalPath, crest_processed_path: processedPath, crest_processing_status: prepared.status, crest_processing_version: 1, crest_processing_meta: prepared.meta };
+  try {
+    await request(`${query('clubs', { id: `eq.${clubId}` })}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(payload) });
+    await request('/rest/v1/club_crest_jobs', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ id: jobId, club_id: clubId, source_path: originalPath, processed_path: processedPath, status: prepared.status, processing_meta: prepared.meta }) });
+  } catch (error) {
+    // Database migration not applied yet: preserve a working canonical crest path.
+    await request(`${query('clubs', { id: `eq.${clubId}` })}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify({ crest_path: path }) });
+  }
+  return { path, status: prepared.status, originalPath, processedPath };
+}
+
+/** Reprocesses a retained original through the same safe browser pipeline. */
+export async function reprocessClubCrest(clubId, originalPath) {
+  if (!clubId || !originalPath) throw new Error('Informe o clube e o caminho do original para reprocessar.');
+  const signedUrl = await getSignedCrestUrl(originalPath, 300);
+  if (!signedUrl) throw new Error('Não foi possível assinar o original do escudo.');
+  const response = await fetch(signedUrl);
+  if (!response.ok) throw new Error('Não foi possível acessar o original do escudo.');
+  const blob = await response.blob();
+  const mime = blob.type || 'image/png';
+  const extension = mime === 'image/jpeg' ? 'jpg' : mime === 'image/webp' ? 'webp' : 'png';
+  return uploadClubCrest(clubId, new File([blob], `reprocessar-escudo.${extension}`, { type: mime }));
 }
 
 export async function getSignedCrestUrl(path, expiresIn = 3600) {
