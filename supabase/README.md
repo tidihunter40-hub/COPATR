@@ -2,7 +2,7 @@
 
 O laboratório continua local e fictício. A pasta `migrations/` define o banco do modo real, que preserva clubes, participações, resultados confirmados e títulos após o encerramento de uma temporada.
 
-> As migrations `202610230003_authorization_and_publication.sql` e `202610250004_tr_smart_shield.sql` ainda precisam ser revisadas e aplicadas no ambiente Supabase de destino. O painel atualizado depende das funções `create_competition_with_season`, `set_competition_publication` e `set_penalty_shootout`; sem essas migrations, ações oficiais podem retornar erro. Consulte [o estado da implementação](../docs/implementacao-painel-portal-2026-10-23.md) antes de liberar o modo oficial.
+> A migration `202610250005_team_directory_and_access.sql` precisa ser aplicada depois da `202610250004_tr_smart_shield.sql`. Ela vincula o catálogo administrativo de equipes à organização, impede participações entre assinantes e preserva todos os registros anteriores. Consulte [o estado da implementação](../docs/implementacao-painel-portal-2026-10-23.md) antes de liberar o modo oficial.
 
 ## Configuração
 
@@ -27,6 +27,10 @@ O laboratório continua local e fictício. A pasta `migrations/` define o banco 
 
 Quando as duas variáveis estão ausentes, a interface mantém o aviso “Modo demonstração local” e não faz chamadas ao Supabase.
 
+### Acesso por convite
+
+A interface não chama `auth.signUp` e não mostra cadastro público: o visitante só pode entrar ou solicitar acesso pelo WhatsApp. Para impedir também solicitações diretas ao endpoint de Auth, desative **Allow new users to sign up** nas configurações de Authentication do projeto Supabase. Depois, crie cada credencial manualmente no painel do Supabase e use `review_organizer` com uma conta `platform_admin` para aprovar o organizador. A proteção do painel continua validada por sessão, perfil aprovado e RLS; ela não depende de botão oculto no navegador.
+
 ## Modelo e integridade
 
 - `clubs` é a identidade permanente. O UUID nunca depende de nome ou escudo.
@@ -48,6 +52,12 @@ O bucket privado `club-crests` aceita PNG, JPG, JPEG e WEBP até 3 MB. A pasta d
 Ao cadastrar um escudo, o navegador verifica a assinatura real do arquivo, limita as dimensões a 4096 px e preserva o upload original. Em seguida, cria um PNG transparente de 512 px somente quando já há transparência ou quando o fundo é conectado à borda, dominante e de baixa variação. Não há regra especial para branco ou preto. Em imagem complexa, pequena ou ambígua, o sistema mantém o original e registra `original_fallback`; não inventa um recorte.
 
 Depois de aplicar `202610250004_tr_smart_shield.sql`, `clubs` guarda `crest_original_path`, `crest_processed_path`, status e metadados, enquanto `club_crest_jobs` fornece a trilha de auditoria. O `crest_path` corrente passa a apontar para o derivado seguro quando ele existe. `competition_entries.crest_path_snapshot` não é reescrito: temporadas concluídas preservam a identidade que já registraram. Para reprocessar escudos antigos, reenvie o original por uma sessão autenticada de editor; não use uma chave administrativa no navegador.
+
+## Diretório de equipes
+
+Depois de aplicar `202610250005_team_directory_and_access.sql`, `/painel/equipes` é o cadastro permanente e privado da organização. O formulário exige apenas nome e escudo; a modalidade usada por registros legados deixa de filtrar o catálogo, pois a participação é vinculada à modalidade do campeonato. A seleção de participantes pesquisa por nome sem diferenciar caixa ou acentuação, não oferece equipes arquivadas e a restrição `unique (season_id, club_id)` continua impedindo duplicidade.
+
+Uma equipe pode ser arquivada, nunca é apagada pelo painel. O histórico administrativo é derivado de participações, placares confirmados e títulos registrados, portanto correções oficiais são refletidas sem inventar estatísticas. A nova migration também bloqueia, no banco, a entrada de uma equipe em competição de outra organização.
 
 ## Serviço no navegador
 

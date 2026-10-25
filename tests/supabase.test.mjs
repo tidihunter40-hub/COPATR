@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 
 const migration = readFileSync(resolve('supabase/migrations/202610220001_sports_memory.sql'), 'utf8');
 const smartShieldMigration = readFileSync(resolve('supabase/migrations/202610250004_tr_smart_shield.sql'), 'utf8');
+const teamDirectoryMigration = readFileSync(resolve('supabase/migrations/202610250005_team_directory_and_access.sql'), 'utf8');
 const realMode = await import('../dist/supabase-real-mode.mjs');
 
 test('migration preserva identidade, participações, auditoria e políticas de acesso', () => {
@@ -34,6 +35,15 @@ test('TR Smart Shield mantém original, derivado e trilha de auditoria sob RLS',
   assert.match(smartShieldMigration, /alter table public\.club_crest_jobs enable row level security/);
   assert.match(smartShieldMigration, /historical competition snapshot/i);
   assert.doesNotMatch(smartShieldMigration, /service_role/i);
+});
+
+test('catálogo de equipes é separado por organização e protege participações cruzadas', () => {
+  assert.match(teamDirectoryMigration, /add column if not exists organization_id uuid/);
+  assert.match(teamDirectoryMigration, /clubs_organization_name_active_unique/);
+  assert.match(teamDirectoryMigration, /ensure_entry_organization_matches_club/);
+  assert.match(teamDirectoryMigration, /A team can only be entered in competitions of its organization/);
+  assert.match(teamDirectoryMigration, /public\.is_organization_member\(organization_id, 'editor'\)/);
+  assert.doesNotMatch(teamDirectoryMigration, /delete from public\.clubs/i);
 });
 
 test('cliente real permanece inativo sem configuração e não depende da chave administrativa', () => {

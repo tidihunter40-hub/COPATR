@@ -14,6 +14,11 @@ const slug = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/
 const fail = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 const editor = (role: string) => ['owner', 'admin', 'editor'].includes(role);
 const approvedOrganizer = (profile: ProfileAuthorization | null) => Boolean(profile && profile.organizer_status === 'approved' && ['organizer', 'platform_admin'].includes(profile.account_role));
+export const normalizeTeamSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
+export const filterTeamDirectory = <T extends { official_name: string; status?: string }>(teams: T[], query: string) => {
+  const needle = normalizeTeamSearch(query);
+  return teams.filter((team) => team.status !== 'archived' && (!needle || normalizeTeamSearch(team.official_name).includes(needle)));
+};
 
 type StoredShield = { path: string; status: 'processed' | 'original_fallback'; notice: string };
 
@@ -95,7 +100,6 @@ async function loginPage(client: SupabaseClient) {
   const status = document.querySelector<HTMLElement>('#account-status')!;
   const form = document.querySelector<HTMLFormElement>('#login-form')!;
   const recovery = document.querySelector<HTMLButtonElement>('#password-recovery')!;
-  const signup = document.querySelector<HTMLButtonElement>('#signup-toggle')!;
   const requestedReturn = new URLSearchParams(location.search).get('retorno');
   const returnTo = requestedReturn && (/^\/painel(?:\/|$)/.test(requestedReturn) || requestedReturn === '/minha-conta') ? requestedReturn : '/painel';
   const recoveryMode = location.hash.includes('type=recovery');
@@ -131,40 +135,22 @@ async function loginPage(client: SupabaseClient) {
   form.hidden = false;
   installPasswordVisibilityToggle(form);
   recovery.hidden = false;
-  signup.hidden = false;
-  let registering = false;
-  signup.addEventListener('click', () => {
-    registering = !registering;
-    form.querySelector('[data-signup-name]')?.remove();
-    if (registering) {
-      form.insertAdjacentHTML('afterbegin', '<label data-signup-name>Seu nome<input name="display_name" minlength="2" maxlength="80" autocomplete="name" required></label>');
-      form.querySelector<HTMLInputElement>('input[name="password"]')!.minLength = 8;
-      form.querySelector<HTMLButtonElement>('button[type="submit"]')!.textContent = 'Criar conta';
-      signup.textContent = 'Já tenho uma conta';
-      recovery.hidden = true;
-      status.textContent = 'Crie sua conta e solicite acesso para organizar campeonatos oficiais.';
-    } else {
-      form.querySelector<HTMLInputElement>('input[name="password"]')!.minLength = 0;
-      form.querySelector<HTMLButtonElement>('button[type="submit"]')!.textContent = 'Entrar';
-      signup.textContent = 'Criar conta';
-      recovery.hidden = false;
-      status.textContent = 'Use o e-mail e a senha da sua conta de organizador.';
-    }
-  });
+  if (!document.querySelector('#request-access')) {
+    const requestAccess = document.createElement('a');
+    requestAccess.id = 'request-access'; requestAccess.className = 'text-button';
+    requestAccess.href = 'https://wa.me/?text=Olá%2C%20quero%20solicitar%20acesso%20ao%20TR%20Campeonatos.';
+    requestAccess.target = '_blank'; requestAccess.rel = 'noopener noreferrer';
+    requestAccess.textContent = 'Solicitar acesso pelo WhatsApp';
+    recovery.insertAdjacentElement('afterend', requestAccess);
+  }
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const fields = new FormData(form);
     const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     submit.disabled = true;
-    status.textContent = registering ? 'Criando conta…' : 'Entrando…';
-    if (registering) {
-      const result = await client.auth.signUp({ email: String(fields.get('email') || ''), password: String(fields.get('password') || ''), options: { data: { display_name: String(fields.get('display_name') || '').trim() }, emailRedirectTo: `${location.origin}/entrar` } });
-      if (result.error) { status.textContent = result.error.message; submit.disabled = false; return; }
-      if (!result.data.session) { status.textContent = 'Conta criada. Confirme seu e-mail; o acesso de organizador será liberado após aprovação.'; submit.disabled = false; return; }
-    } else {
-      const { error } = await client.auth.signInWithPassword({ email: String(fields.get('email') || ''), password: String(fields.get('password') || '') });
-      if (error) { status.textContent = error.message; submit.disabled = false; return; }
-    }
+    status.textContent = 'Entrando…';
+    const { error } = await client.auth.signInWithPassword({ email: String(fields.get('email') || ''), password: String(fields.get('password') || '') });
+    if (error) { status.textContent = error.message; submit.disabled = false; return; }
     location.assign(returnTo);
   });
   recovery.addEventListener('click', async () => {
@@ -220,7 +206,7 @@ async function panelPage(client: SupabaseClient) {
   const selected = available.find((item) => item.id === sessionStorage.getItem('tr-selected-organization')) || available[0];
   const ctx: Context = { client, user: { id: user.id, email: user.email }, organization: { id: selected.id, name: selected.name }, role: selected.role };
   target.removeAttribute('role');
-  target.innerHTML = `<div class="panel-layout"><aside class="panel-side"><a href="/" class="panel-logo"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><div class="panel-org">${escapeHtml(selected.name)}<small>${escapeHtml(selected.role)}</small></div><nav aria-label="Painel do organizador"><a href="/painel" ${location.pathname === '/painel' ? 'aria-current="page"' : ''}>Visão geral</a><a href="/painel/campeonatos" ${location.pathname.startsWith('/painel/campeonatos') ? 'aria-current="page"' : ''}>Campeonatos</a><a href="/minha-conta">Minha conta</a><a href="/campeonatos" target="_blank" rel="noopener noreferrer">Vitrine pública</a><a href="/demonstracao/copa-tr-esports" target="_blank" rel="noopener noreferrer">Demonstração esportiva</a></nav><button id="sign-out" type="button">Sair</button></aside><div class="panel-content"><header class="panel-header"><span>Painel do Organizador</span><div><span>${escapeHtml(preferredAccountName(profile, user))}</span>${available.length > 1 ? `<label>Organização<select id="organization-select">${available.map((item) => `<option value="${item.id}" ${item.id === selected.id ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('')}</select></label>` : ''}</div></header><main id="panel-main" aria-live="polite">Carregando dados oficiais…</main></div></div>`;
+  target.innerHTML = `<div class="panel-layout"><aside class="panel-side"><a href="/" class="panel-logo"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><div class="panel-org">${escapeHtml(selected.name)}<small>${escapeHtml(selected.role)}</small></div><nav aria-label="Painel do organizador"><a href="/painel" ${location.pathname === '/painel' ? 'aria-current="page"' : ''}>Visão geral</a><a href="/painel/campeonatos" ${location.pathname.startsWith('/painel/campeonatos') ? 'aria-current="page"' : ''}>Campeonatos</a><a href="/painel/equipes" ${location.pathname.startsWith('/painel/equipes') ? 'aria-current="page"' : ''}>Equipes</a><a href="/minha-conta">Minha conta</a><a href="/campeonatos" target="_blank" rel="noopener noreferrer">Vitrine pública</a><a href="/demonstracao/copa-tr-esports" target="_blank" rel="noopener noreferrer">Demonstração esportiva</a></nav><button id="sign-out" type="button">Sair</button></aside><div class="panel-content"><header class="panel-header"><span>Painel do Organizador</span><div><span>${escapeHtml(preferredAccountName(profile, user))}</span>${available.length > 1 ? `<label>Organização<select id="organization-select">${available.map((item) => `<option value="${item.id}" ${item.id === selected.id ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('')}</select></label>` : ''}</div></header><main id="panel-main" aria-live="polite">Carregando dados oficiais…</main></div></div>`;
   target.querySelector('#sign-out')?.addEventListener('click', async () => {
     const { error } = await client.auth.signOut();
     if (error) { window.alert('Não foi possível encerrar a sessão. Tente novamente.'); return; }
@@ -233,6 +219,9 @@ async function panelPage(client: SupabaseClient) {
   });
   const path = location.pathname;
   if (path === '/painel') return dashboard(ctx);
+  if (path === '/painel/equipes') return teamsPage(ctx);
+  const teamMatch = /^\/painel\/equipes\/([0-9a-f-]{36})$/i.exec(path);
+  if (teamMatch && safeId(teamMatch[1])) return teamHistoryPage(ctx, teamMatch[1]);
   if (path === '/painel/campeonatos') return competitionList(ctx);
   if (path === '/painel/campeonatos/novo') return newCompetition(ctx);
   const match = /^\/painel\/campeonatos\/([0-9a-f-]{36})(?:\/(resultados))?$/i.exec(path);
@@ -273,6 +262,104 @@ function organizationSetup(client: SupabaseClient, userId: string) {
     if (error) target.querySelector<HTMLElement>('#setup-message')!.textContent = error.message;
     else location.assign('/painel');
   });
+}
+
+const safePanelReturn = (value: string | null) => value && /^\/painel\/campeonatos\/[0-9a-f-]{36}\/resultados(?:\?[^\s]*)?$/i.test(value) ? value : null;
+
+async function teamCrestUrls(client: SupabaseClient, teams: any[]) {
+  const pairs = await Promise.all(teams.map(async (team) => {
+    if (!team.crest_path) return [team.id, null] as const;
+    const result = await client.storage.from('club-crests').createSignedUrl(team.crest_path, 900);
+    return [team.id, result.error ? null : result.data.signedUrl] as const;
+  }));
+  return new Map(pairs);
+}
+
+async function teamsPage(ctx: Context) {
+  const result = await ctx.client.from('clubs').select('id,official_name,crest_path,status,created_at,updated_at').eq('organization_id', ctx.organization.id).order('updated_at', { ascending: false });
+  fail(result.error);
+  const teams = result.data || [];
+  const crestUrls = await teamCrestUrls(ctx.client, teams);
+  const returnTo = safePanelReturn(new URLSearchParams(location.search).get('retorno'));
+  const createForm = editor(ctx.role) ? `<section class="panel-card team-create-card"><div><span class="eyebrow">BANCO PERMANENTE</span><h2>Cadastrar equipe</h2><p>A equipe continua disponível mesmo após o fim de um campeonato.</p></div><form id="team-create-form" class="team-create-form"><label>Nome da equipe<input name="name" minlength="2" maxlength="100" required></label><label>Escudo da equipe<input name="crest" type="file" accept="image/png,image/jpeg,image/webp" required></label><p class="form-hint">PNG, JPG, JPEG ou WEBP · até 3 MB. O TR Smart Shield preserva o original e só remove o fundo quando for seguro.</p><button class="primary-action" type="submit">Salvar equipe</button><p role="status"></p></form></section>` : '';
+  const cards = teams.map((team) => {
+    const crest = crestUrls.get(team.id) || null;
+    const archived = team.status === 'archived';
+    return `<article class="team-directory-card" data-team-name="${escapeHtml(normalizeTeamSearch(team.official_name))}" data-team-status="${escapeHtml(team.status)}"><div class="team-directory-crest">${teamShieldMarkup(crest, team.official_name, 'medium')}</div><div class="team-directory-copy"><span class="pill">${archived ? 'Arquivada' : 'Ativa'}</span><h2>${escapeHtml(team.official_name)}</h2><p>Identidade permanente da organização.</p></div><div class="team-directory-actions"><a class="secondary-action" href="/painel/equipes/${team.id}">Histórico</a>${editor(ctx.role) ? `<button class="text-button team-edit-toggle" type="button" data-team-id="${team.id}">Editar</button><button class="text-button team-archive" type="button" data-team-id="${team.id}" data-next-status="${archived ? 'pending' : 'archived'}">${archived ? 'Reativar' : 'Arquivar'}</button>` : ''}</div>${editor(ctx.role) ? `<form class="team-edit-form" data-team-id="${team.id}" hidden><label>Nome da equipe<input name="name" minlength="2" maxlength="100" value="${escapeHtml(team.official_name)}" required></label><label>Novo escudo <small>(opcional)</small><input name="crest" type="file" accept="image/png,image/jpeg,image/webp"></label><button class="secondary-action">Salvar alterações</button><p role="status"></p></form>` : ''}</article>`;
+  }).join('');
+  panelMain().innerHTML = `${panelHeading('EQUIPES', 'Banco de equipes', 'Cadastre uma vez e selecione em quantas temporadas forem necessárias.', returnTo ? `<a class="secondary-action" href="${escapeHtml(returnTo)}">← Voltar à seleção</a>` : '')}${createForm}<section class="panel-card team-directory"><div class="card-head"><div><h2>Suas equipes</h2><p>${teams.length} ${teams.length === 1 ? 'equipe cadastrada' : 'equipes cadastradas'}</p></div><label class="team-search-label">Buscar equipe<input id="team-directory-search" type="search" placeholder="Digite um nome" autocomplete="off"></label></div><p id="team-directory-empty" class="data-note" ${teams.length ? 'hidden' : ''}>Nenhuma equipe cadastrada nesta organização.</p><div id="team-directory-list" class="team-directory-list">${cards}</div><p id="team-search-empty" class="data-note" hidden>Nenhuma equipe encontrada.</p></section>`;
+  const search = panelMain().querySelector<HTMLInputElement>('#team-directory-search');
+  const applySearch = () => {
+    const needle = normalizeTeamSearch(search?.value || ''); let visible = 0;
+    panelMain().querySelectorAll<HTMLElement>('.team-directory-card').forEach((card) => { const show = !needle || (card.dataset.teamName || '').includes(needle); card.hidden = !show; if (show) visible += 1; });
+    const empty = panelMain().querySelector<HTMLElement>('#team-search-empty'); if (empty) empty.hidden = visible > 0 || !teams.length;
+  };
+  search?.addEventListener('input', applySearch);
+  if (!editor(ctx.role)) return;
+  panelMain().querySelector<HTMLFormElement>('#team-create-form')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement, data = new FormData(form), name = String(data.get('name') || '').trim(), crest = data.get('crest');
+    const message = form.querySelector<HTMLElement>('[role="status"]')!;
+    if (name.length < 2 || !(crest instanceof File) || !crest.size) { message.textContent = 'Informe o nome e o escudo da equipe.'; return; }
+    let prepared: SmartShieldResult;
+    try { message.textContent = 'Validando o escudo…'; prepared = await prepareSmartShield(crest); }
+    catch (error) { message.textContent = error instanceof Error ? error.message : 'Não foi possível validar o escudo.'; return; }
+    const submit = form.querySelector<HTMLButtonElement>('button')!; submit.disabled = true;
+    const created = await ctx.client.from('clubs').insert({ official_name: name, slug: `${slug(name)}-${Math.random().toString(36).slice(2, 8)}`, sport: 'Futebol', organization_id: ctx.organization.id, created_by: ctx.user.id, status: 'pending' }).select('id').single();
+    if (created.error) { message.textContent = created.error.message.includes('clubs_organization_name_active_unique') ? 'Já existe uma equipe com esse nome nesta organização.' : created.error.message; submit.disabled = false; return; }
+    try {
+      const saved = await storeSmartShield(ctx.client, created.data.id, crest, prepared);
+      message.textContent = saved.notice;
+      location.assign(returnTo || '/painel/equipes');
+    } catch (error) { message.textContent = error instanceof Error ? error.message : 'Equipe criada, mas o escudo não foi salvo.'; submit.disabled = false; }
+  });
+  panelMain().querySelectorAll<HTMLButtonElement>('.team-edit-toggle').forEach((button) => button.addEventListener('click', () => {
+    const form = panelMain().querySelector<HTMLFormElement>(`.team-edit-form[data-team-id="${button.dataset.teamId}"]`); if (form) form.hidden = !form.hidden;
+  }));
+  panelMain().querySelectorAll<HTMLButtonElement>('.team-archive').forEach((button) => button.addEventListener('click', async () => {
+    const teamId = button.dataset.teamId || '', next = button.dataset.nextStatus || 'archived';
+    if (!safeId(teamId) || !window.confirm(next === 'archived' ? 'Arquivar esta equipe? O histórico não será apagado.' : 'Reativar esta equipe?')) return;
+    button.disabled = true;
+    const updated = await ctx.client.from('clubs').update({ status: next }).eq('id', teamId).eq('organization_id', ctx.organization.id);
+    if (updated.error) { window.alert(updated.error.message); button.disabled = false; } else location.reload();
+  }));
+  panelMain().querySelectorAll<HTMLFormElement>('.team-edit-form').forEach((form) => form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const teamId = form.dataset.teamId || '', data = new FormData(form), name = String(data.get('name') || '').trim(), crest = data.get('crest'), message = form.querySelector<HTMLElement>('[role="status"]')!;
+    if (!safeId(teamId) || name.length < 2) { message.textContent = 'Informe um nome válido.'; return; }
+    const update = await ctx.client.from('clubs').update({ official_name: name }).eq('id', teamId).eq('organization_id', ctx.organization.id);
+    if (update.error) { message.textContent = update.error.message; return; }
+    if (crest instanceof File && crest.size) {
+      try { message.textContent = 'Atualizando o escudo…'; await storeSmartShield(ctx.client, teamId, crest); }
+      catch (error) { message.textContent = error instanceof Error ? error.message : 'Nome salvo, mas o escudo não foi atualizado.'; return; }
+    }
+    location.reload();
+  }));
+}
+
+async function teamHistoryPage(ctx: Context, id: string) {
+  const clubResult = await ctx.client.from('clubs').select('id,official_name,crest_path,status,created_at').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
+  fail(clubResult.error); const club = clubResult.data;
+  if (!club) { panelMain().innerHTML = empty('Equipe não encontrada', 'Ela não pertence a esta organização ou não está disponível.'); return; }
+  const entriesResult = await ctx.client.from('competition_entries').select('id,season_id,final_position,final_phase,status').eq('club_id', id).order('registered_at', { ascending: false });
+  fail(entriesResult.error); const entries = entriesResult.data || [], entryIds = new Set(entries.map((entry) => entry.id)), seasonIds = [...new Set(entries.map((entry) => entry.season_id))];
+  const [seasonResult, titleResult, matchResult, crestUrls] = await Promise.all([
+    seasonIds.length ? ctx.client.from('competition_seasons').select('id,label,competition:competitions(id,name,sport,organization_id)').in('id', seasonIds) : Promise.resolve({ data: [], error: null } as any),
+    seasonIds.length ? ctx.client.from('competition_titles').select('season_id,place,title_type').eq('club_id', id).in('season_id', seasonIds) : Promise.resolve({ data: [], error: null } as any),
+    seasonIds.length ? ctx.client.from('matches').select('id,season_id,scheduled_at,home_entry_id,away_entry_id,home_score,away_score,status').in('season_id', seasonIds).eq('status', 'confirmed').order('scheduled_at', { ascending: false, nullsFirst: false }) : Promise.resolve({ data: [], error: null } as any),
+    teamCrestUrls(ctx.client, [club]),
+  ]);
+  fail(seasonResult.error); fail(titleResult.error); fail(matchResult.error);
+  const seasons = new Map((seasonResult.data || []).filter((season: any) => season.competition?.organization_id === ctx.organization.id).map((season: any) => [season.id, season]));
+  const ownEntries = entries.filter((entry) => seasons.has(entry.season_id));
+  const ownEntryIds = new Set(ownEntries.map((entry) => entry.id));
+  const matches = (matchResult.data || []).filter((match: any) => ownEntryIds.has(match.home_entry_id) || ownEntryIds.has(match.away_entry_id));
+  const summary = matches.reduce((stats: any, match: any) => { const home = ownEntryIds.has(match.home_entry_id), scored = home ? match.home_score : match.away_score, conceded = home ? match.away_score : match.home_score; stats.played += 1; stats.scored += scored; stats.conceded += conceded; if (scored > conceded) stats.wins += 1; else if (scored === conceded) stats.draws += 1; else stats.losses += 1; return stats; }, { played: 0, wins: 0, draws: 0, losses: 0, scored: 0, conceded: 0 });
+  const titles = (titleResult.data || []).filter((title: any) => seasons.has(title.season_id));
+  const crest = crestUrls.get(club.id) || null;
+  const historyRows = ownEntries.map((entry) => { const season: any = seasons.get(entry.season_id); return `<article class="history-row"><strong>${escapeHtml(season?.competition?.name || 'Competição registrada')}</strong><span>${escapeHtml(season?.label || 'Temporada')} · ${entry.final_position ? `${entry.final_position}º lugar` : entry.final_phase ? escapeHtml(entry.final_phase) : 'Participação confirmada'}</span></article>`; }).join('');
+  const matchRows = matches.slice(0, 12).map((match: any) => { const home = ownEntryIds.has(match.home_entry_id), score = home ? `${match.home_score} × ${match.away_score}` : `${match.away_score} × ${match.home_score}`, season: any = seasons.get(match.season_id); return `<article class="history-row"><strong>${escapeHtml(season?.competition?.name || 'Partida confirmada')}</strong><span>${score} · ${escapeHtml(readableDate(match.scheduled_at))}</span></article>`; }).join('');
+  panelMain().innerHTML = `${panelHeading('HISTÓRICO DA EQUIPE', club.official_name, 'Dados calculados exclusivamente de registros oficiais confirmados.', '<a class="secondary-action" href="/painel/equipes">← Equipes</a>')}<section class="panel-card team-history-hero"><div>${teamShieldMarkup(crest, club.official_name, 'hero', 'eager')}</div><div><span class="pill">${club.status === 'archived' ? 'Arquivada' : 'Ativa'}</span><h2>${escapeHtml(club.official_name)}</h2><p>Cadastrada em ${escapeHtml(readableDate(club.created_at))}</p></div></section><section class="team-history-metrics">${[['Campeonatos', ownEntries.length], ['Partidas', summary.played], ['Vitórias', summary.wins], ['Empates', summary.draws], ['Derrotas', summary.losses], ['Gols pró', summary.scored], ['Gols contra', summary.conceded]].map(([label, value]) => `<article class="panel-card metric"><span>${label}</span><strong>${value}</strong></article>`).join('')}</section>${historyRows ? `<section class="panel-card"><h2>Campeonatos disputados</h2>${historyRows}</section>` : ''}${matchRows ? `<section class="panel-card"><h2>Partidas e resultados</h2>${matchRows}</section>` : ''}${titles.length ? `<section class="panel-card"><h2>Conquistas registradas</h2>${titles.map((title: any) => { const season: any = seasons.get(title.season_id); return `<div class="history-row"><strong>${title.place === 1 ? 'Campeão' : title.place === 2 ? 'Vice-campeão' : `${title.place}º lugar`}</strong><span>${escapeHtml(season?.competition?.name || 'Competição registrada')}</span></div>`; }).join('')}</section>` : ''}${!historyRows && !matchRows && !titles.length ? empty('Histórico em construção', 'A trajetória aparecerá automaticamente quando houver participações e resultados oficiais confirmados.') : ''}`;
 }
 
 async function organizationCompetitions(ctx: Context) {
@@ -418,7 +505,6 @@ async function resultEditor(ctx: Context, id: string) {
   const names = new Map(entries.map((entry) => [entry.id, entry.club_name_snapshot]));
   panelMain().innerHTML = `${panelHeading('CENTRAL DE PARTIDAS', competition.name, `Temporada ${selected.label} · resultados oficiais`)}<div class="panel-card"><div class="filter-row"><label>Temporada<select id="season-select">${seasons.map((season) => `<option value="${season.id}" ${season.id === selected.id ? 'selected' : ''}>${escapeHtml(season.label)}</option>`).join('')}</select></label><label>Situação<select id="status-filter"><option value="">Todas</option><option value="scheduled">Agendadas</option><option value="in_progress">Em andamento</option><option value="completed">Finalizadas</option><option value="confirmed">Confirmadas</option></select></label><label>Rodada<input id="round-filter" type="number" min="1" placeholder="Todas"></label><label>Equipe<select id="team-filter"><option value="">Todas</option>${entries.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.club_name_snapshot)}</option>`).join('')}</select></label><label>Fase<select id="phase-filter"><option value="">Todas</option><option value="league">Liga</option><option value="groups">Grupos</option><option value="round_of_16">Oitavas</option><option value="quarterfinal">Quartas</option><option value="semifinal">Semifinal</option><option value="final">Final</option></select></label><label>Data<input id="date-filter" type="date"></label></div></div><div id="match-list">${matches.length ? matches.map((match) => `<article class="panel-card match-row" data-status="${match.status}" data-round="${match.round_number ?? ''}" data-phase="${match.phase}" data-date="${match.scheduled_at?.slice(0, 10) || ''}" data-home="${match.home_entry_id}" data-away="${match.away_entry_id}"><div class="match-meta"><span>${escapeHtml(match.phase)} · Rodada ${match.round_number ?? '—'}</span><span>${escapeHtml(readableDate(match.scheduled_at))}</span><span class="pill">${escapeHtml(match.status)}</span></div><form data-match-id="${match.id}"><strong>${escapeHtml(names.get(match.home_entry_id) || 'Equipe indisponível')}</strong><input aria-label="Gols do mandante" name="home" type="number" min="0" max="32767" value="${match.home_score ?? ''}" required ${editor(ctx.role) ? '' : 'disabled'}><b>×</b><input aria-label="Gols do visitante" name="away" type="number" min="0" max="32767" value="${match.away_score ?? ''}" required ${editor(ctx.role) ? '' : 'disabled'}><strong>${escapeHtml(names.get(match.away_entry_id) || 'Equipe indisponível')}</strong><select name="status" aria-label="Situação do resultado" ${editor(ctx.role) ? '' : 'disabled'}><option value="completed" ${match.status === 'completed' ? 'selected' : ''}>Finalizado</option><option value="confirmed" ${match.status === 'confirmed' ? 'selected' : ''}>Confirmado</option></select>${editor(ctx.role) ? '<button class="primary-action" type="submit">Salvar</button>' : ''}</form><p role="status"></p></article>`).join('') : empty('Nenhuma partida cadastrada', 'Cadastre equipes e partidas para lançar resultados.')}</div>${editor(ctx.role) ? `<div class="panel-card"><h2>Adicionar equipe existente</h2><form id="entry-form"><label>Clube<select name="club" id="club-select" required><option value="">Carregando clubes…</option></select></label><button class="secondary-action">Adicionar à temporada</button><p role="status"></p></form></div><div class="panel-card"><h2>Agendar partida</h2><form id="match-form" class="fixture-form"><label>Mandante<select name="home" required>${entries.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.club_name_snapshot)}</option>`).join('')}</select></label><label>Visitante<select name="away" required>${entries.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.club_name_snapshot)}</option>`).join('')}</select></label><label>Rodada<input name="round" type="number" min="1" required></label><label>Data e horário<input name="date" type="datetime-local"></label><button class="primary-action" ${entries.length < 2 ? 'disabled' : ''}>Agendar</button><p role="status"></p></form></div>` : ''}`;
   panelMain().querySelector('#match-list')?.insertAdjacentHTML('beforebegin', `<div class="panel-card"><h2>Montar estrutura</h2><p>Use as ${entries.length} equipes confirmadas desta temporada para sortear grupos e visualizar confrontos. Esta prévia não altera os resultados oficiais.</p><a class="secondary-action" href="/planejador?temporada=${encodeURIComponent(selected.id)}">Abrir planejador com estas equipes →</a></div>`);
-  if (editor(ctx.role)) panelMain().insertAdjacentHTML('beforeend', '<div class="panel-card"><h2>Cadastrar novo clube</h2><p>O clube terá identidade permanente e poderá participar de outras temporadas.</p><form id="club-form"><label>Nome oficial<input name="name" minlength="2" maxlength="100" required></label><label>Escudo (opcional, PNG, JPG, JPEG ou WEBP · até 3 MB)<input name="crest" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="form-hint">TR Smart Shield preserva o original e cria um PNG 512 px quando a transparência ou o fundo uniforme forem seguros. Imagens duvidosas continuam intactas.</p><button class="secondary-action">Cadastrar e adicionar</button><p role="status"></p></form></div>');
   panelMain().querySelector<HTMLSelectElement>('#season-select')!.addEventListener('change', (event) => { location.assign(`?temporada=${(event.target as HTMLSelectElement).value}`); });
   const filter = () => {
     const status = panelMain().querySelector<HTMLSelectElement>('#status-filter')!.value;
@@ -461,51 +547,24 @@ async function resultEditor(ctx: Context, id: string) {
     else { message.textContent = 'Disputa por pênaltis salva.'; setTimeout(() => location.reload(), 500); }
   }));
   if (editor(ctx.role)) {
-    panelMain().querySelector<HTMLFormElement>('#club-form')?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const form = event.currentTarget as HTMLFormElement;
-      const fields = new FormData(form);
-      const name = String(fields.get('name') || '').trim();
-      const file = fields.get('crest');
-      const crest = file instanceof File && file.size ? file : null;
-      const message = form.querySelector<HTMLElement>('[role="status"]')!;
-      if (name.length < 2) { message.textContent = 'Informe o nome oficial do clube.'; return; }
-      if (crest && crest.size > 3 * 1024 * 1024) { message.textContent = 'Use PNG, JPG, JPEG ou WEBP de até 3 MB.'; return; }
-      let preparedCrest: SmartShieldResult | undefined;
-      if (crest) {
-        message.textContent = 'Validando e preparando o escudo…';
-        try { preparedCrest = await prepareSmartShield(crest); }
-        catch (error) { message.textContent = error instanceof Error ? error.message : 'Não foi possível processar o escudo.'; return; }
-      }
-      const created = await ctx.client.from('clubs').insert({ official_name: name, slug: `${slug(name)}-${Math.random().toString(36).slice(2, 8)}`, sport: competition.sport, created_by: ctx.user.id, status: 'pending' }).select('id').single();
-      if (created.error) { message.textContent = created.error.message; return; }
-      let crestPath: string | null = null;
-      if (crest) {
-        message.textContent = 'Salvando original e versão padronizada…';
-        try {
-          const saved = await storeSmartShield(ctx.client, created.data.id, crest, preparedCrest);
-          crestPath = saved.path; message.textContent = saved.notice;
-        } catch (error) {
-          message.textContent = error instanceof Error ? error.message : 'Não foi possível processar o escudo.';
-        }
-      }
-      const entry = await ctx.client.from('competition_entries').insert({ season_id: selected.id, club_id: created.data.id, club_name_snapshot: name, crest_path_snapshot: crestPath, status: 'confirmed' });
-      if (entry.error) { message.textContent = `Clube criado, mas não adicionado à temporada: ${entry.error.message}. Atualize a página para selecioná-lo.`; return; }
-      if (crest && !crestPath) { message.textContent = 'Clube adicionado, mas o escudo não foi salvo. Atualize a página para continuar.'; return; }
-      location.reload();
-    });
-    const clubs = await ctx.client.from('clubs').select('id,official_name,sport,crest_path').eq('sport', competition.sport).order('official_name');
-    const clubSelect = panelMain().querySelector<HTMLSelectElement>('#club-select');
-    if (clubSelect) clubSelect.innerHTML = clubs.error ? '<option value="">Clubes indisponíveis</option>' : `<option value="">Selecione um clube</option>${(clubs.data || []).filter((club) => !entries.some((entry) => entry.club_id === club.id)).map((club) => `<option value="${club.id}">${escapeHtml(club.official_name)}</option>`).join('')}`;
-    panelMain().querySelector<HTMLFormElement>('#entry-form')?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const form = event.currentTarget as HTMLFormElement;
-      const club = (clubs.data || []).find((item) => item.id === new FormData(form).get('club'));
-      if (!club) return;
-      const result = await ctx.client.from('competition_entries').insert({ season_id: selected.id, club_id: club.id, club_name_snapshot: club.official_name, crest_path_snapshot: club.crest_path, status: 'confirmed' });
-      if (result.error) form.querySelector<HTMLElement>('[role="status"]')!.textContent = result.error.message;
-      else location.reload();
-    });
+    const entryPanel = panelMain().querySelector<HTMLFormElement>('#entry-form')?.closest('.panel-card');
+    if (entryPanel) entryPanel.innerHTML = `<h2>Selecionar equipes participantes</h2><p>Pesquise no banco permanente da sua organização e adicione cada equipe uma única vez.</p><label>Buscar equipe<input id="club-search" type="search" placeholder="Ex.: A, AR, ARE" autocomplete="off"></label><div id="club-search-results" class="team-select-results"></div><a class="secondary-action" href="/painel/equipes?retorno=${encodeURIComponent(`/painel/campeonatos/${id}/resultados?temporada=${selected.id}`)}">Cadastrar nova equipe</a><p id="entry-search-status" role="status"></p>`;
+    const clubs = await ctx.client.from('clubs').select('id,official_name,crest_path,status').eq('organization_id', ctx.organization.id).order('official_name');
+    const candidateTeams = (clubs.data || []).filter((club) => club.status !== 'archived' && !entries.some((entry) => entry.club_id === club.id));
+    const search = panelMain().querySelector<HTMLInputElement>('#club-search');
+    const searchResults = panelMain().querySelector<HTMLElement>('#club-search-results');
+    const renderCandidates = () => {
+      if (!searchResults) return;
+      const found = filterTeamDirectory(candidateTeams, search?.value || '');
+      searchResults.innerHTML = found.length ? found.map((club) => `<button type="button" class="team-select-result" data-club-id="${club.id}"><span>${escapeHtml(club.official_name)}</span><small>Adicionar à temporada</small></button>`).join('') : '<p class="data-note">Nenhuma equipe encontrada. Cadastre uma nova para continuar.</p>';
+      searchResults.querySelectorAll<HTMLButtonElement>('.team-select-result').forEach((button) => button.addEventListener('click', async () => {
+        const club = candidateTeams.find((item) => item.id === button.dataset.clubId); if (!club) return;
+        button.disabled = true;
+        const entry = await ctx.client.from('competition_entries').insert({ season_id: selected.id, club_id: club.id, club_name_snapshot: club.official_name, crest_path_snapshot: club.crest_path, status: 'confirmed' });
+        if (entry.error) { const message = panelMain().querySelector<HTMLElement>('#entry-search-status'); if (message) message.textContent = entry.error.message; button.disabled = false; } else location.reload();
+      }));
+    };
+    search?.addEventListener('input', renderCandidates); renderCandidates();
     panelMain().querySelector<HTMLFormElement>('#match-form')?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = event.currentTarget as HTMLFormElement;
