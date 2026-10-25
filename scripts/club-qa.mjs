@@ -1,0 +1,65 @@
+import assert from 'node:assert/strict';
+import { chromium } from 'playwright-core';
+import { resolve } from 'node:path';
+
+const chrome = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const browser = await chromium.launch({ executablePath: chrome, headless: true });
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAN0lEQVR4nO3QQREAMAgDQYoG7GK3NspUBZ+Ngcvsqb4vFpebcQcIECBAgAABAgQIECBAgACBLzC9iwK255I0agAAAABJRU5ErkJggg==', 'base64');
+const errors = [];
+try {
+  for (const width of [1440, 390]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    page.on('pageerror', (error) => errors.push(`${width}: ${error.message}`));
+    await page.goto('http://127.0.0.1:45321/', { waitUntil: 'domcontentloaded' });
+    await page.locator('#competition-name').fill('Copa dos Clubes');
+    await page.locator('#competition-season').fill('2026');
+    await page.locator('#competition-form button[type=submit]').click();
+    await page.locator('#team-name').fill('Águias FC');
+    await page.locator('[name=category]').fill('Adulto');
+    await page.locator('[name=shortName]').fill('AFC');
+    await page.locator('#team-crest').setInputFiles({ name: 'aguias.png', mimeType: 'image/png', buffer: png });
+    await page.locator('#team-form button[type=submit]').click();
+    await page.locator('.teams-list li').first().locator('img.club-crest').waitFor();
+    await page.locator('#team-name').fill('Leões FC');
+    await page.locator('#team-form button[type=submit]').click();
+    await page.locator('.teams-list li').nth(1).locator('.club-crest-empty').waitFor();
+    await page.locator('#generate').click();
+    const match = page.locator('.match-card').first();
+    await match.locator('[name=homeScore]').fill('2');
+    await match.locator('[name=awayScore]').fill('1');
+    await match.locator('.match-save').click();
+    await page.locator('.lab-tab[data-tab=standings]').click();
+    assert.equal(await page.locator('.standings-table .club-link').count(), 2);
+    await page.locator('.standings-table .club-link').first().click();
+    await page.locator('.profile-hero h3').waitFor();
+    assert.equal(await page.locator('#lab-app').isHidden(), true);
+    assert.match(await page.locator('.profile-hero').innerText(), /Copa dos Clubes.*2026/s);
+    assert.equal(await page.locator('.profile-hero-crest').evaluate((el) => el.tagName), 'IMG');
+    assert.match(await page.locator('.journey-list').innerText(), /RODADA 01/);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    assert.ok(overflow <= 1, `${width}: perfil excede viewport por ${overflow}px`);
+    await page.evaluate(() => document.querySelector('.feedback')?.remove());
+    await page.locator('#club-profile-root').screenshot({ path: resolve(`preview-stage05-profile-${width}.png`), animations: 'disabled' });
+    await page.locator('.journey-list summary').first().click();
+    assert.match(await page.locator('.journey-detail').first().innerText(), /Resultado:/);
+    await page.locator('.profile-back').click();
+    assert.equal(await page.locator('#lab-app').isVisible(), true);
+    await page.locator('#showcase-tab-standings').click();
+    await page.locator('#showcase-panel .showcase-club-link').first().click();
+    await page.locator('.profile-hero h3').waitFor();
+    assert.equal(await page.locator('#club-profile-root').isVisible(), true);
+    await page.locator('.profile-back').click();
+    await page.locator('.lab-tab[data-tab=matches]').click();
+    await page.locator('.match-card').first().locator('[name=homeScore]').fill('1');
+    await page.locator('.match-card').first().locator('[name=awayScore]').fill('1');
+    await page.locator('.match-card').first().locator('.match-save').click();
+    await page.locator('.match-card').first().locator('.club-link').first().click();
+    await page.locator('.journey-list').waitFor();
+    assert.match(await page.locator('.journey-list').textContent(), /Empate/);
+    assert.match(await page.locator('.profile-stats').innerText(), /EMPATES/);
+    await context.close();
+    console.log(`${width}px: upload, placeholder, perfil, correção, navegação e largura ok`);
+  }
+  assert.deepEqual(errors, []);
+} finally { await browser.close(); }

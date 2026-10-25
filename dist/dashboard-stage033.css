@@ -1,0 +1,39 @@
+/* Six user supplied identities, kept intact on a dark inset inside the white dashboard. */
+.home-preview-switch,.showcase-source-switch{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.home-preview-switch button,.showcase-source-switch button{border:1px solid #b8cbdc;border-radius:7px;background:#fff;color:#14334e;padding:7px 11px;font:700 12px/1.2 Inter,'Segoe UI',sans-serif;cursor:pointer}
+.home-preview-switch button[aria-pressed="true"],.showcase-source-switch button[aria-pressed="true"]{border-color:#087cff;background:#087cff;color:#fff}
+.home-preview-switch a{margin-left:auto;color:#075ea9;font:700 12px Inter,'Segoe UI',sans-serif}
+.showcase-source-switch{padding:12px 18px;background:#f5f7fb;border-bottom:1px solid #d4e1ec}
+.showcase-source-switch small{color:#35546e;font-size:11px}
+.home-club-link{color:inherit;text-decoration:none}
+.home-club-link:hover,.home-club-link:focus-visible{color:#006de0;text-decoration:underline;text-underline-offset:2px}
+.home-fixture .home-crest-esports{width:78px;height:82px;max-width:100%;padding:5px;background:#071522;border:1px solid #52718a;border-radius:8px;object-fit:contain;object-position:center;box-shadow:0 2px 8px #102d4b30}
+.home-fixture-main{grid-template-columns:minmax(0,1fr) 65px minmax(0,1fr)}
+.home-fixture-side,.home-fixture-side.away{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.home-fixture-side.away .home-crest{order:0}
+.home-fixture-side strong{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.home-fixture-center strong{font-size:30px}
+.home-table-scroll table{min-width:0;font-size:11px;table-layout:fixed}
+.home-table-scroll th,.home-table-scroll td{padding:8px 2px}
+.home-table-scroll th:nth-child(2),.home-table-scroll td:nth-child(2){width:33%}
+.home-table-scroll th:first-child,.home-table-scroll td:first-child{width:5%}
+.home-table-team{gap:5px;font-size:12px;line-height:1.15}
+.home-table-team span:last-child{min-width:0;overflow-wrap:anywhere}
+.home-table-team .home-crest-esports{width:40px;height:44px;max-width:none;flex:none;padding:3px;background:#071522;border:1px solid #52718a;border-radius:5px;object-fit:contain}
+#plataforma .demo-crest-esports{width:60px;height:64px;max-width:none;flex:none;padding:4px;background:#071522;border:1px solid #52718a;border-radius:7px;object-fit:contain}
+#plataforma .showcase-match-main>span{white-space:normal;overflow:visible;font-size:13px}
+#plataforma .showcase-match-main strong{font-size:22px}
+#plataforma .showcase-table .demo-crest-esports{width:40px;height:44px}
+#plataforma .showcase-table{font-size:12px}
+#plataforma .showcase-table td{white-space:normal}
+#plataforma .roster-items{grid-template-columns:repeat(3,minmax(0,1fr))}
+#plataforma .roster-items>span{min-height:150px;justify-content:center;text-align:center;white-space:normal;font-size:13px}
+#plataforma .roster-items .showcase-club-link{display:flex;flex-direction:column;gap:8px}
+#plataforma .roster-items .demo-crest-esports{width:116px;height:116px}
+.profile-hero-crest[src*="/demo-esports/"]{width:128px;height:136px;padding:6px;background:#071522;border:1px solid #52718a;border-radius:10px;object-fit:contain}
+.journey-opponent .profile-crest[src*="/demo-esports/"]{width:42px;height:46px;padding:2px;background:#071522;border-radius:5px;object-fit:contain}
+@media(max-width:1250px){.home-fixture .home-crest-esports{width:70px;height:76px}.home-table-team .home-crest-esports{width:38px;height:42px}}
+@media(max-width:850px){.home-table-scroll table{min-width:670px}}
+@media(max-width:700px){.home-fixture .home-crest-esports{width:58px;height:64px}.home-fixture-side{font-size:13px}#plataforma .roster-items{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.home-preview-switch{gap:5px}.home-preview-switch button{font-size:10px;padding:6px 7px}.home-preview-switch a{width:100%;margin-left:0}.home-fixture-main{grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:2px}.home-fixture-side{gap:3px;font-size:11px}.home-fixture .home-crest-esports{width:52px;height:58px;padding:2px}.home-fixture-center strong{font-size:18px}.home-table-team .home-crest-esports{width:36px;height:40px}#plataforma .showcase-match-main>span{font-size:10px}#plataforma .showcase-match .demo-crest-esports{width:36px;height:40px;padding:2px}#plataforma .showcase-table .demo-crest-esports{width:34px;height:38px}#plataforma .roster-items .demo-crest-esports{width:104px;height:108px}.profile-hero-crest[src*="/demo-esports/"]{width:104px;height:112px}}
+@media(max-width:350px){.home-fixture .home-crest-esports{width:46px;height:52px}.home-fixture-side{font-size:11px}}

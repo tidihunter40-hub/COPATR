@@ -1,0 +1,12 @@
+node_modules/
+*.tsbuildinfo
+.env
+.env.local
+.env.*
+!.env.example
+.vercel/
+vercel-dist/
+captures/
+artifacts/
+/*.png
+dist/*.js.map

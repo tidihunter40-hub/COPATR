@@ -1,0 +1,79 @@
+/* Stage 04: a readable club profile with a real, interactive HTML pitch. */
+.club-profile-stage04{color:#18334d;border:1px solid #bfcedd;border-radius:16px;background:#f5f7fb;box-shadow:0 24px 55px #02122365}
+.club-profile-stage04 .profile-back{color:#0067c4;font-size:13px;margin:18px 26px}
+.club-profile-stage04 .profile-hero{border-color:#cad8e6;background:linear-gradient(125deg,#fff 0%,#fff 63%,#eaf2f8 100%);box-shadow:0 8px 24px #12375014;padding:28px;grid-template-columns:minmax(0,1fr) 155px}
+.club-profile-stage04 .profile-kicker{color:#086cbd;font-size:11px;letter-spacing:1.1px}
+.club-profile-stage04 .profile-crest-stage{display:grid;place-items:center;width:146px;height:146px;flex:none;padding:8px;border:1px solid #9db7cb;border-radius:16px;background:#071523;box-shadow:inset 0 1px #e3f3ff50,0 8px 18px #0a315036}
+.club-profile-stage04 .profile-hero-crest{width:100%;height:100%;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;filter:none;object-fit:contain}
+.club-profile-stage04 .profile-identity p{color:#48657d;font-size:13px}
+.club-profile-stage04 .profile-identity h3{color:#102b46;background:none;font-size:clamp(32px,3.3vw,49px);line-height:1.03}
+.club-profile-stage04 .profile-identity span{color:#41617a;font-size:13px}
+.club-profile-stage04 .profile-notes{color:#35536d}
+.club-profile-stage04 .profile-rank{border-color:#b9cddd;background:#eff5fa}
+.club-profile-stage04 .profile-rank small{color:#345c79}
+.club-profile-stage04 .profile-rank strong{color:#006ee6;text-shadow:none}
+.club-profile-stage04 .profile-rank span{color:#244965}
+.club-profile-stage04 .profile-stats{grid-template-columns:repeat(9,minmax(0,1fr));gap:7px}
+.club-profile-stage04 .profile-stat{border-color:#d0dce8;background:#fff;box-shadow:0 3px 9px #123a5110}
+.club-profile-stage04 .profile-stat strong{color:#0c3151;font-size:27px}
+.club-profile-stage04 .profile-stat span{color:#41617b;font-size:10px;font-weight:750;line-height:1.25}
+.club-profile-stage04 .profile-section-head{border-top-color:#ccdbe7;align-items:end}
+.club-profile-stage04 .profile-section-head h4{color:#0b2d49;font-size:32px;line-height:1.07}
+.club-profile-stage04 .profile-section-head p{color:#44617b;font-size:13px}
+.club-profile-stage04 .profile-progress{border-color:#b8cddd;color:#2e5879;font-size:12px}
+.trajectory-phases{display:flex;gap:8px;overflow-x:auto;padding-bottom:9px;margin-bottom:9px}
+.trajectory-phases button{min-height:42px;flex:none;padding:8px 13px;border:1px solid #bfd0df;border-radius:7px;background:#fff;color:#173b58;font:750 13px Inter,'Segoe UI',sans-serif;cursor:pointer}
+.trajectory-phases button[aria-pressed="true"]{border-color:#087cff;background:#087cff;color:#fff}
+.trajectory-phases button span{display:inline-grid;place-items:center;min-width:22px;height:22px;margin-left:5px;padding:1px 5px;border-radius:100px;background:#e7f2fc;color:#0b5ea9}
+.trajectory-phases button[aria-pressed="true"] span{background:#fff;color:#0754a0}
+.trajectory-layout{display:grid;grid-template-columns:minmax(285px,.88fr) minmax(0,1.12fr);gap:16px;align-items:start}
+.trajectory-timeline,.trajectory-field-section{min-width:0;border:1px solid #c9d9e6;border-radius:12px;background:#fff;padding:17px;box-shadow:0 6px 17px #123d5510}
+.trajectory-timeline-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
+.trajectory-timeline-head h5{margin:0;color:#123b5c;font-size:18px}
+.trajectory-timeline-head span{color:#5b7b94;font-size:10px;font-weight:800;letter-spacing:.5px}
+.club-profile-stage04 .journey-list{margin-left:9px;border-left-color:#a7c6dd}
+.club-profile-stage04 .journey-list li{margin:0 0 9px 18px}
+.club-profile-stage04 .journey-node{top:25px;left:-38px;box-shadow:none;background:#087cff}
+.club-profile-stage04 .journey-pending .journey-node{background:#7d9ab1}
+.journey-select{display:grid;grid-template-columns:70px minmax(0,1fr) 60px;gap:8px;align-items:center;width:100%;min-height:68px;text-align:left;padding:8px 10px;border:1px solid #d0dce7;border-radius:8px;background:#f9fbfd;color:#18364e;cursor:pointer;position:relative;transition:border-color .15s,background .15s,transform .15s}
+.journey-select:hover,.journey-select:focus-visible{border-color:#087cff;background:#f0f7ff;transform:translateY(-1px)}
+.journey-select.is-selected{border-color:#087cff;background:#eaf5ff;box-shadow:inset 3px 0 #087cff}
+.club-profile-stage04 .journey-round{color:#396783;font-size:10px}
+.club-profile-stage04 .journey-opponent{gap:7px}
+.club-profile-stage04 .journey-opponent .profile-crest{width:36px;height:39px;object-fit:contain;padding:2px;border-radius:5px;background:#071523}
+.club-profile-stage04 .journey-opponent strong{font-size:12px;line-height:1.2}
+.club-profile-stage04 .journey-result{color:#0865bc;font-size:16px}
+.club-profile-stage04 .journey-outcome{grid-column:2/4;color:#546e83;text-align:left;font-size:11px}
+.club-profile-stage04 .journey-outcome.vitoria{color:#14815b}.club-profile-stage04 .journey-outcome.derrota{color:#af3a45}.club-profile-stage04 .journey-outcome.empate{color:#566983}
+.trajectory-field-heading{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-bottom:13px}
+.trajectory-field-heading h4{margin:4px 0 0;color:#0b2f4e;font-size:21px}
+.trajectory-field-heading>span{color:#4c6b84;font-size:12px;text-align:right}
+.trajectory-pitch{position:relative;min-height:350px;overflow:hidden;border:6px solid #123f27;border-radius:12px;background:radial-gradient(ellipse at 50% 0,#a5dbaa36,transparent 55%),repeating-linear-gradient(90deg,#2e874d 0,#2e874d 11%,#277f47 11%,#277f47 22%);box-shadow:inset 0 0 45px #062d1690,0 10px 22px #063d2450}
+.pitch-markings{position:absolute;inset:16px;pointer-events:none}
+.pitch-markings i{position:absolute;display:block;border:2px solid #edfce9ad}
+.pitch-border{inset:0}.pitch-halfway{top:0;bottom:0;left:50%;width:0;border-width:0 0 0 2px!important}.pitch-center-circle{width:25%;aspect-ratio:1;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%}.pitch-left-box,.pitch-right-box{top:22%;bottom:22%;width:16%}.pitch-left-box{left:0}.pitch-right-box{right:0}.pitch-left-goal,.pitch-right-goal{top:37%;bottom:37%;width:6%}.pitch-left-goal{left:0}.pitch-right-goal{right:0}
+.pitch-content{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:space-between;min-height:350px;padding:20px 18px;color:#fff;text-align:center;text-shadow:0 2px 5px #042512}
+.pitch-match-kicker{align-self:center;padding:6px 10px;border:1px solid #e7fff885;border-radius:100px;background:#052a1dbd;font-size:11px;font-weight:850;letter-spacing:.7px}.pitch-match-kicker span{color:#a9efca}
+.pitch-matchup{display:grid;grid-template-columns:minmax(0,1fr) 102px minmax(0,1fr);grid-template-areas:"home score away";gap:8px;align-items:center}
+.pitch-club:first-child{grid-area:home}.pitch-club:nth-child(2){grid-area:away}
+.pitch-club{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:12px 5px;border:1px solid #f0fff07d;border-radius:11px;background:#032a1acb;color:#fff;text-decoration:none;transition:transform .15s,border-color .15s,background .15s}
+.pitch-club:hover,.pitch-club:focus-visible{transform:translateY(-3px);border-color:#fff;background:#063c26}
+.pitch-club.is-profile-club{border-color:#85c9ff;box-shadow:inset 0 0 0 1px #a3dcff}
+.pitch-club .profile-crest{width:98px;height:98px;max-width:100%;object-fit:contain;padding:4px;border-radius:8px;background:#071523}
+.pitch-club strong{max-width:100%;font-size:14px;line-height:1.18;overflow-wrap:anywhere}.pitch-club small{font-size:9px;color:#c4e8d1;font-weight:800}
+.pitch-score{grid-area:score;display:flex;flex-direction:column;gap:5px;align-items:center;padding:8px 2px;border:1px solid #d8f8e6a8;border-radius:9px;background:#052d1ed9}
+.pitch-score strong{font:900 26px/1.1 'Barlow Condensed',Impact,sans-serif;white-space:nowrap}.pitch-score span,.pitch-score small{font-size:9px;font-weight:800;letter-spacing:.3px}
+.pitch-help{margin:10px 2px 0;color:#4a6982;font-size:11px;line-height:1.45}
+.profile-history{margin-top:20px}.profile-history .profile-section-head a{color:#0870cc;font-size:12px;font-weight:800}
+.profile-history-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.profile-history-card{min-width:0;padding:17px;border:1px solid #c9d9e6;border-radius:10px;background:#fff}
+.profile-history-card h5{margin:0 0 13px;color:#113a59;font-size:16px}.profile-history-card p{color:#49677f;font-size:13px;line-height:1.5}
+.profile-history-card ul{list-style:none;margin:0;padding:0}.profile-history-card li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #dce7ee}.profile-history-card li:first-child{border-top:0}.profile-history-card strong{display:block;color:#173d5a;font-size:13px}.profile-history-card small{display:block;color:#56738b;font-size:11px;margin-top:2px}.profile-history-card em{color:#0a6ebb;font-size:10px;font-style:normal;font-weight:800;text-align:right;white-space:nowrap}
+.club-profile-stage04 .profile-scope{color:#59758b;font-size:12px}
+.official-season-select{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:10px 15px;border:1px solid #c1d3e0;border-radius:9px;background:#fff;color:#163c5b}.official-season-select label{font-size:12px;font-weight:800}.official-season-select select{min-width:0;padding:8px;border:1px solid #8aafcb;border-radius:6px;background:#fff;color:#163c5b}
+.club-profile-stage04 .profile-empty{margin:20px;background:#fff;border-color:#a9c0d2}.club-profile-stage04 .profile-empty h3,.club-profile-stage04 .profile-empty h5{color:#153a57}.club-profile-stage04 .profile-empty p{color:#56738b}
+.champions-empty.has-champions{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.champion-record{border-color:#8baabd;background:linear-gradient(145deg,#f8fbfe,#e6eff7);color:#102f4d;box-shadow:0 7px 20px #0003}.champion-record a{color:#0b3960;text-decoration:none}.champion-record a:hover{text-decoration:underline}.champion-record span{color:#355973}.champion-record small{color:#276a9d}.champion-record .champion-confirmed{color:#0870b2;font-weight:850}.champion-record .champion-crest{width:92px;height:102px;object-fit:contain;padding:6px;border-radius:8px;background:#071523}
+.champions-empty:not(.has-champions) a{width:max-content;max-width:100%;margin-top:6px;color:#7ed0ff;font-size:13px;font-weight:800;text-decoration:none}.champions-empty:not(.has-champions) a:hover{text-decoration:underline}
+@media(max-width:1100px){.club-profile-stage04 .profile-stats{grid-template-columns:repeat(5,minmax(0,1fr))}.trajectory-layout{grid-template-columns:minmax(0,1fr)}.trajectory-pitch{min-height:410px}.pitch-content{min-height:410px}}
+@media(max-width:650px){.club-profile-stage04 .profile-hero{grid-template-columns:1fr;gap:12px;margin:0 12px 15px;padding:17px}.club-profile-stage04 .profile-crest-stage{width:112px;height:118px;padding:5px;margin-bottom:10px}.club-profile-stage04 .profile-identity{display:block}.club-profile-stage04 .profile-identity h3{font-size:29px;overflow-wrap:anywhere}.club-profile-stage04 .profile-rank{display:flex;align-items:center;justify-content:space-between;padding:8px 13px}.club-profile-stage04 .profile-rank strong{font-size:34px}.club-profile-stage04 .profile-stats{grid-template-columns:repeat(3,minmax(0,1fr));margin:0 12px 15px;gap:6px}.club-profile-stage04 .profile-stat{padding:9px 4px}.club-profile-stage04 .profile-stat strong{font-size:23px}.club-profile-stage04 .profile-stat span{font-size:9px}.club-profile-stage04 .profile-body{padding:0 12px 22px}.club-profile-stage04 .profile-section-head h4{font-size:27px}.trajectory-timeline,.trajectory-field-section{padding:11px}.trajectory-layout{gap:11px}.journey-select{grid-template-columns:minmax(0,1fr) 60px;grid-template-rows:auto auto auto;gap:5px;padding:9px}.club-profile-stage04 .journey-round{grid-column:1/3;grid-row:1}.club-profile-stage04 .journey-opponent{grid-column:1;grid-row:2}.club-profile-stage04 .journey-result{grid-column:2;grid-row:2}.club-profile-stage04 .journey-outcome{grid-column:1/3;grid-row:3}.trajectory-field-heading h4{font-size:18px}.trajectory-pitch,.pitch-content{min-height:350px}.pitch-content{padding:13px 8px}.pitch-markings{inset:12px}.pitch-matchup{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"score score" "home away";gap:7px}.pitch-club{padding:8px 3px;min-height:115px}.pitch-club .profile-crest{width:72px;height:74px}.pitch-club strong{font-size:11px}.pitch-club small{font-size:8px}.pitch-score{justify-self:center;min-width:95px}.pitch-score strong{font-size:21px}.pitch-score span,.pitch-score small{font-size:8px}.pitch-match-kicker{font-size:8px}.profile-history-grid{grid-template-columns:1fr}.official-season-select{display:block}.official-season-select select{display:block;width:100%;margin-top:7px}}
+@media(max-width:360px){.club-profile-stage04 .profile-identity h3{font-size:27px}.club-profile-stage04 .journey-opponent strong{font-size:11px}.club-profile-stage04 .journey-result{font-size:13px}.trajectory-field-heading>span{font-size:10px}}

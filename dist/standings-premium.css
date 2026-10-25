@@ -1,0 +1,83 @@
+/* Classificação oficial: a apresentação usa somente os dados calculados. */
+#classificacao{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#071d32,#020e1d 70%)!important;border-color:#2589bc!important}
+#classificacao::before{content:'';position:absolute;z-index:-1;inset:0 0 auto;height:110px;background:linear-gradient(180deg,#05204366,#02101b00),url('/assets/stadium-night.webp') center top/100% auto;opacity:.35;pointer-events:none}
+#classificacao .public-section-heading{position:relative;padding:7px 4px 15px;border-bottom:1px solid #5792b955}
+#classificacao .public-section-heading h2{font-family:'Barlow Condensed',Arial,sans-serif;font-weight:900;font-size:clamp(25px,2.4vw,35px);letter-spacing:.025em}
+#classificacao .public-section-heading>span{padding:5px 9px;border:1px solid #3d7798;border-radius:5px;background:#041a2c;color:#bfd9eb;white-space:nowrap}
+#classificacao .standings-scroll{border:1px solid #1e608c;border-radius:9px;background:#041525;box-shadow:inset 0 0 20px #0879ca1d}
+#classificacao .standings-scroll table{min-width:1030px;table-layout:auto}
+#classificacao .standings-scroll th{height:40px;padding:8px 10px;background:linear-gradient(#0c3760,#082542);color:#ccecff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:.08em;border-bottom:1px solid #2c779f}
+#classificacao .standings-scroll th:first-child,#classificacao .standings-scroll td:first-child{width:70px}
+#classificacao .standings-scroll th:nth-child(2),#classificacao .standings-scroll td:nth-child(2){min-width:220px}
+#classificacao .standings-scroll td{height:75px;padding:9px 10px;border-bottom:1px solid #24506e;color:#e8f4ff;font-size:14px;font-weight:650;font-variant-numeric:tabular-nums}
+#classificacao .standings-scroll tbody tr:not(.standing-desktop-expanded):hover{background:#0b34539e}
+#classificacao .standings-scroll tbody tr.standing-leader{background:linear-gradient(90deg,#0b497b,#083253 28%,#052034);box-shadow:inset 4px 0 #8de6ff,inset 0 1px #88d7ff2a}
+#classificacao .standings-scroll tbody tr.standing-leader td:first-child{border-left:0}
+.standing-position{display:inline-grid;place-items:center;width:29px;height:29px;border:1px solid #397ca8;border-radius:50%;background:#071f35;color:#ccedff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:19px;font-weight:800}
+.standing-leader .standing-position{border-color:#9adfff;background:linear-gradient(#1966a5,#06345c);color:#fff;box-shadow:0 0 11px #2eb3ff8c}
+#classificacao .standing-team{display:inline-flex;align-items:center;gap:12px;min-width:0;max-width:100%}
+.standing-crest{display:grid;place-items:center;flex:none;width:54px;height:54px;padding:3px;border:1px solid #3e7193;border-radius:8px;background:linear-gradient(145deg,#214263,#0a1d32);box-shadow:inset 0 1px #ffffff2b}
+.standing-crest img,.standing-crest-empty{display:block;width:100%!important;height:100%!important;max-width:100%;object-fit:contain;filter:none!important}
+.standing-crest-empty{border:1px dashed #79a8c0;border-radius:5px}
+.standing-team-label{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+#classificacao .standing-team-label a,#classificacao .standing-team-label strong{font-family:'Barlow Condensed',Arial,sans-serif;font-size:18px;font-weight:800;line-height:1.05;color:#fff;text-transform:uppercase;overflow-wrap:anywhere}
+.standing-leader-tag{display:inline-block;padding:2px 7px;border:1px solid #81d1f5;border-radius:4px;background:#bee9ff1f;color:#cfecff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+#classificacao .standing-points strong{display:inline-grid;place-items:center;min-width:35px;min-height:35px;padding:3px 5px;border:1px solid #266f9a;border-radius:6px;background:#062a4b;color:#e9faff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:24px;line-height:1}
+#classificacao .standing-leader .standing-points strong{border-color:#62c8ff;background:linear-gradient(#0969b0,#064371);box-shadow:0 0 10px #149aff68;color:white}
+#classificacao .recent-form{gap:4px;align-items:center}
+#classificacao .recent-form span:not(.form-empty){width:23px;height:23px;border-radius:50%;font-size:11px;box-shadow:inset 0 1px #ffffff40}
+#classificacao .recent-form .form-empty{color:#95aec0}
+.standing-expand{display:block;margin:3px 0 0;padding:0;border:0;background:none;color:#8ed6ff;text-align:left;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.standing-expand:hover,.standing-expand:focus-visible{color:white}
+.standing-desktop-expanded[hidden]{display:none!important}
+#classificacao .standings-scroll tr.standing-desktop-expanded td{padding:0;background:#08233d;text-align:left}
+.standing-expanded{padding:15px 17px;color:#d5e9f6;text-align:left;animation:standing-open .18s ease-out}
+.standing-expanded-stats{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:7px}
+.standing-expanded-stats>span{display:grid;gap:2px;align-content:center;min-height:54px;padding:8px;border:1px solid #285a7c;border-radius:6px;background:#061b30;color:#aaccdf;text-align:center;font-size:11px;font-weight:700}
+.standing-expanded-stats b{display:block;color:#fff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:21px;line-height:1}
+.standing-expanded-bottom{display:grid;grid-template-columns:minmax(165px,.7fr) minmax(0,2fr);gap:12px;margin-top:12px}
+.standing-expanded-bottom>div{padding:12px;border:1px solid #285a7c;border-radius:7px;background:#061b30}
+.standing-expanded-bottom h3{margin:0 0 8px;color:#9fdfff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:15px;letter-spacing:.05em;text-transform:uppercase}
+.standing-history{display:grid;gap:3px;margin:0;padding:0;list-style:none}
+.standing-history a{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:4px 0;border-top:1px solid #1a4b6b;color:#e5f5ff;text-decoration:none;font-size:12px}
+.standing-history a:hover{text-decoration:underline}
+.standing-history strong{color:#fff;font-variant-numeric:tabular-nums}
+.standing-history small{color:#9fbdd1;white-space:nowrap}
+.standing-expanded-bottom p{margin:0;color:#b3ccdc;font-size:12px}
+@keyframes standing-open{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:760px){
+  #classificacao{padding:11px!important}
+  #classificacao .public-section-heading{padding:5px 1px 10px}
+  #classificacao .public-section-heading h2{font-size:23px}
+  #classificacao .standings-scroll{display:none}
+  #classificacao .standings-mobile{display:grid;gap:0;border:1px solid #23618a;border-radius:8px;overflow:hidden;background:#031525}
+  #classificacao .standings-mobile-head{grid-template-columns:22px minmax(0,1fr) 39px 29px 37px;gap:3px;padding:8px 7px;background:#0b3458;color:#b9e3f8;font-size:10px;letter-spacing:.03em}
+  #classificacao .standing-mobile-row{grid-template-columns:22px minmax(0,1fr) 39px 29px 37px;gap:3px;padding:8px 7px 4px;border:0;border-bottom:1px solid #24506e;border-radius:0;background:#041a2d;align-items:center}
+  #classificacao .standing-mobile-row:last-child{border-bottom:0}
+  #classificacao .standing-mobile-row.standing-leader{background:linear-gradient(90deg,#10517e,#072944);box-shadow:inset 3px 0 #92dfff}
+  #classificacao .standing-mobile-position{display:grid;place-items:center;width:20px;height:24px;color:#d9f5ff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:18px;font-weight:800}
+  #classificacao .standing-leader .standing-mobile-position{border-radius:4px;background:#0d70ba;box-shadow:0 0 7px #168fff8a}
+  #classificacao .standing-team{gap:6px}
+  #classificacao .standing-crest{width:42px;height:42px;padding:2px;border-radius:6px}
+  #classificacao .standing-team-label a,#classificacao .standing-team-label strong{font-size:clamp(12px,3.65vw,16px);line-height:1.05}
+  #classificacao .standing-leader-tag{padding:1px 4px;font-size:8px}
+  #classificacao .standing-mobile-row .standing-points{display:grid;place-items:center;min-height:27px;border-radius:5px;background:#0b375c;color:#fff;font-family:'Barlow Condensed',Arial,sans-serif;font-size:21px;font-weight:800;text-align:center}
+  #classificacao .standing-mobile-row.standing-leader .standing-points{background:#126fac;box-shadow:0 0 8px #239fff77}
+  #classificacao .standing-played,#classificacao .standing-difference{font-variant-numeric:tabular-nums;font-size:12px;font-weight:800;color:#e6f5ff;text-align:center}
+  #classificacao .standing-mobile-details{grid-column:2/6;margin-top:1px;color:#b4d7ea}
+  #classificacao .standing-mobile-details summary{display:flex;justify-content:space-between;align-items:center;width:100%;padding:3px 2px 4px 0;cursor:pointer;color:#9bdcff;font-size:11px;font-weight:700;list-style:none}
+  #classificacao .standing-mobile-details summary::-webkit-details-marker{display:none}
+  #classificacao .standing-mobile-details[open] summary span{transform:rotate(180deg)}
+  #classificacao .standing-mobile-details .standing-expanded{margin:4px 0 8px -27px;padding:11px;border:1px solid #2c749d;border-radius:7px;background:#061e33}
+  #classificacao .standing-expanded-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  #classificacao .standing-expanded-stats>span{min-height:47px;padding:5px;font-size:10px}
+  #classificacao .standing-expanded-stats b{font-size:18px}
+  #classificacao .standing-expanded-bottom{grid-template-columns:1fr;gap:7px;margin-top:7px}
+  #classificacao .standing-expanded-bottom>div{padding:9px}
+  #classificacao .standing-history a{grid-template-columns:minmax(0,1fr) auto;gap:4px}
+  #classificacao .standing-history small{grid-column:1/3}
+  #classificacao .data-note{margin:10px 2px 0;font-size:11px}
+}
+@media(max-width:350px){#classificacao .standings-mobile-head,#classificacao .standing-mobile-row{grid-template-columns:20px minmax(0,1fr) 34px 24px 32px;padding-left:5px;padding-right:5px}#classificacao .standing-crest{width:38px;height:38px}#classificacao .standing-team-label a,#classificacao .standing-team-label strong{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.standing-expanded{animation:none}}

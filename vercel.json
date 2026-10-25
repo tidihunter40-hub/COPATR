@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build && node scripts/prepare-vercel-output.mjs",
+  "outputDirectory": "vercel-dist",
+  "functions": {
+    "api/login.mjs": { "includeFiles": "dist/index.html" },
+    "api/competition.mjs": { "includeFiles": "dist/competition.html" }
+  },
+  "redirects": [
+    { "source": "/dashboard", "destination": "/painel", "permanent": false },
+    { "source": "/organizador", "destination": "/painel", "permanent": false },
+    { "source": "/admin", "destination": "/painel", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/runtime-config.mjs", "destination": "/api/runtime-config" },
+    { "source": "/entrar", "destination": "/api/login" },
+    { "source": "/c/:id", "destination": "/api/competition?id=:id" },
+    { "source": "/clubes/:id", "destination": "/club.html" },
+    { "source": "/painel", "destination": "/panel.html" },
+    { "source": "/painel/:path*", "destination": "/panel.html" },
+    { "source": "/minha-conta", "destination": "/account.html" },
+    { "source": "/demonstracao/copa-tr-esports", "destination": "/demo-competition.html" },
+    { "source": "/demonstracao/copa-exemplo", "destination": "/complete-demo.html" },
+    { "source": "/demonstracao", "destination": "/interactive-demo.html" },
+    { "source": "/planejador", "destination": "/competition-planner.html" },
+    { "source": "/funcionalidades", "destination": "/index.html" },
+    { "source": "/como-funciona", "destination": "/index.html" },
+    { "source": "/campeonatos", "destination": "/index.html" },
+    { "source": "/laboratorio", "destination": "/index.html" },
+    { "source": "/planos", "destination": "/index.html" }
+  ],
+  "headers": [
+    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+  ]
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#061426">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Experimente uma competição fictícia na TR Campeonatos: acompanhe jogos, simule placares e veja a classificação mudar.">
+  <link rel="icon" href="/assets/official/03_icone_app_transparente.png" type="image/png">
+  <link rel="stylesheet" href="/interactive-demo.css">
+  <link rel="stylesheet" href="/interactive-match-design.css">
+  <link rel="stylesheet" href="/auth-header.css">
+  <title>Demonstração interativa | TR Campeonatos</title>
+<link rel="manifest" href="/manifest.webmanifest"><script type="module" src="/pwa-register.mjs"></script></head>
+<body>
+  <a class="skip-link" href="#demonstracao">Pular para a demonstração</a>
+  <header class="demo-header">
+    <a class="demo-brand" href="/" aria-label="TR Campeonatos, voltar ao início"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos" width="954" height="567"></a>
+    <nav aria-label="Navegação da demonstração"><a href="/">Início</a><a href="/demonstracao/copa-exemplo">Exemplo com grupos</a><a href="/demonstracao/copa-tr-esports">Vitrine E-Sports</a><a class="header-action" href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">Criar campeonato <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="demonstracao">
+    <section class="demo-hero" aria-labelledby="demo-title">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> EXPERIÊNCIA PÚBLICA · DADOS FICTÍCIOS · SEM LOGIN</p>
+        <h1 id="demo-title">TR CAMPEONATOS <span>DEMONSTRAÇÃO INTERATIVA</span></h1>
+        <p class="hero-subtitle">Veja como é fácil organizar, acompanhar e administrar uma competição.</p>
+        <div class="hero-cup"><div class="cup-emblem" aria-hidden="true">TR<span>★</span></div><div><small>CAMPEONATO EM ANDAMENTO</small><strong>COPA TR E-SPORTS 2026</strong><span>6 equipes · pontos corridos · 5 rodadas</span></div></div>
+        <div id="team-strip" class="team-strip" aria-label="Equipes participantes"></div>
+      </div>
+    </section>
+    <div class="demo-shell">
+      <div class="demo-intro"><div><span class="section-kicker">DENTRO DA COMPETIÇÃO</span><h2>O campeonato acontece aqui.</h2><p>Escolha um confronto, simule um placar e veja a classificação mudar na hora.</p></div><div class="demo-intro-links"><a class="outline-link" href="/planejador">PLANEJAR FORMATO <span aria-hidden="true">↗</span></a><a class="outline-link" href="/demonstracao/copa-exemplo">VER GRUPOS E MATA-MATA <span aria-hidden="true">↗</span></a><a class="outline-link" href="/demonstracao/copa-tr-esports">VER VITRINE PÚBLICA <span aria-hidden="true">↗</span></a></div></div>
+      <div class="demo-grid">
+        <section class="demo-panel matches-panel" aria-labelledby="matches-heading"><div class="panel-heading"><div><span class="section-kicker">RODADA INTERATIVA</span><h2 id="matches-heading">Confrontos</h2></div><span class="round-pill">RODADA 2</span></div><div id="upcoming-matches" class="match-list"></div><div class="panel-subheading"><h3>Últimos resultados</h3><span>PLACARES CONFIRMADOS</span></div><div id="recent-matches" class="results-list"></div></section>
+        <section class="demo-panel standings-panel" aria-labelledby="standings-heading"><div class="panel-heading"><div><span class="section-kicker">ATUALIZAÇÃO AUTOMÁTICA</span><h2 id="standings-heading">Classificação</h2></div><span class="standings-icon" aria-hidden="true">🏆</span></div><p class="table-caption">Os pontos e critérios são calculados a partir dos placares confirmados nesta demonstração.</p><div class="standings-head" aria-hidden="true"><span>EQUIPE</span><span>PTS</span><span>J</span><span>V</span><span>E</span><span>D</span><span>SG</span></div><div id="standings-rows" class="standings-rows" aria-live="polite"></div><p class="standings-note">Toque em uma equipe para ver todas as estatísticas. Critérios: pontos, vitórias, saldo de gols, gols marcados e nome.</p></section>
+      </div>
+      <section class="demo-explain" id="demo-explain" aria-live="polite"><span class="explain-icon" aria-hidden="true">✦</span><div><strong>Experimente administrar uma rodada</strong><p>Simule um resultado para ver os jogos e a tabela se atualizarem automaticamente.</p></div></section>
+      <section class="demo-cta" aria-labelledby="cta-heading"><span class="section-kicker">PRONTO PARA O SEU CAMPEONATO?</span><h2 id="cta-heading">Gostou? Agora imagine tudo isso no seu campeonato.</h2><p>Organize suas equipes e partidas na plataforma real quando quiser começar.</p><div class="cta-actions"><a class="primary-button" href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">CRIAR MEU CAMPEONATO <span aria-hidden="true">→</span></a><button type="button" id="reset-demo" class="secondary-button">RECOMEÇAR DEMONSTRAÇÃO</button></div></section>
+    </div>
+  </main>
+  <footer class="demo-footer"><span>TR CAMPEONATOS · DEMONSTRAÇÃO FICTÍCIA</span><a href="/">Voltar ao início</a></footer>
+  <dialog id="score-dialog" class="score-dialog" aria-labelledby="dialog-heading"><form id="score-form"><div class="dialog-top"><span class="section-kicker">SIMULAÇÃO LOCAL</span><button type="button" id="close-dialog" class="close-dialog" aria-label="Fechar editor">×</button></div><h2 id="dialog-heading">Simular resultado</h2><p>Informe o placar. A classificação será recalculada sem alterar campeonatos reais.</p><div id="dialog-teams" class="dialog-teams"></div><div class="score-inputs"><label><span id="home-label">Mandante</span><input id="home-score" name="homeScore" type="number" min="0" max="99" step="1" inputmode="numeric" required></label><strong>×</strong><label><span id="away-label">Visitante</span><input id="away-score" name="awayScore" type="number" min="0" max="99" step="1" inputmode="numeric" required></label></div><p id="form-error" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-dialog" class="secondary-button">Cancelar</button><button type="submit" class="primary-button">Confirmar resultado</button></div></form></dialog>
+  <script type="module" src="/interactive-demo.mjs"></script>
+  <script type="module" src="/auth-header-bootstrap.mjs"></script>
+</body>
+</html>

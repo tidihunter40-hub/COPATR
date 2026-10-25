@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#061426">
+  <meta name="description" content="Monte grupos e confrontos com o planejador do TR Campeonatos.">
+  <link rel="icon" href="/assets/official/03_icone_app_transparente.png" type="image/png">
+  <link rel="stylesheet" href="/competition-planner-v3.css">
+  <link rel="stylesheet" href="/auth-header.css">
+  <title>Montar campeonato | TR Campeonatos</title>
+<link rel="manifest" href="/manifest.webmanifest"><script type="module" src="/pwa-register.mjs"></script></head>
+<body>
+  <header class="planner-header"><a href="/" aria-label="TR Campeonatos, início"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><nav aria-label="Navegação"><a href="/demonstracao">Demonstração</a><a href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">Painel do organizador</a></nav></header>
+  <main class="planner-shell">
+    <div class="planner-layout">
+      <form id="planner-form" class="planner-panel">
+        <div class="form-head"><span>TR CAMPEONATOS · PLANEJADOR</span><h1>Monte seu campeonato</h1><p>Escolha o formato. O TR organiza o resto.</p></div>
+        <label>Modalidade<select name="sport" id="planner-sport"><option>Futebol</option><option>Futsal</option><option>Futebol society</option><option>Basquete</option><option>Vôlei</option><option>Handebol</option><option>E-sports</option></select></label>
+        <label>Quantidade de participantes<input name="count" id="planner-count" type="number" min="2" max="32" value="8" required></label>
+        <label>Formato do campeonato<select name="format" id="planner-format"><option value="groups_knockout">Grupos + mata-mata</option><option value="round_robin">Pontos corridos</option><option value="groups">Fase de grupos</option><option value="knockout">Mata-mata direto</option></select></label>
+        <details id="advanced-settings"><summary>Configurações avançadas</summary><div class="advanced-fields">
+          <label data-for="groups">Equipes por grupo<select name="groupSize"><option value="auto">Automático</option><option value="3">3 equipes</option><option value="4">4 equipes</option><option value="5">5 equipes</option></select></label>
+          <label data-for="legs">Turnos<select name="legs"><option value="1">Turno único</option><option value="2">Turno e returno</option><option value="3">Três turnos</option><option value="4">Quatro turnos</option></select></label>
+          <label data-for="knockout"><span class="check-row"><input name="allowByes" type="checkbox"> Permitir preliminar e avanços diretos</span></label>
+          <label data-for="corujao">Estações simultâneas<input name="stations" type="number" min="1" max="32" placeholder="Informe se quiser agendar"></label>
+          <label data-for="corujao">Data e horário<input name="start" type="datetime-local"></label>
+          <label data-for="corujao">Minutos por partida<input name="duration" type="number" min="1" max="300" value="20"></label>
+          <label data-for="corujao">Intervalo entre rodadas<input name="interval" type="number" min="0" max="120" value="10"></label>
+        </div></details>
+        <button class="primary-button" type="submit">MONTAR CAMPEONATO <span aria-hidden="true">→</span></button>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+      </form>
+      <section class="planner-output" aria-label="Visualização do campeonato" aria-live="polite"><div id="plan-result" class="initial-state"><div class="field-atmosphere" aria-hidden="true"><div class="field-surface"><span class="field-midline"></span><span class="field-circle"></span><span class="field-spot"></span><span class="field-box field-box-left"></span><span class="field-box field-box-right"></span><span class="field-goal field-goal-left"></span><span class="field-goal field-goal-right"></span></div></div><span class="field-caption">O palco está pronto para o seu campeonato.</span></div></section>
+    </div>
+  </main>
+  <script type="module" src="/competition-planner-v2.mjs"></script>
+  <script type="module" src="/auth-header-bootstrap.mjs"></script>
+</body>
+</html>

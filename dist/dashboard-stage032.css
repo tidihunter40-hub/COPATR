@@ -1,0 +1,24 @@
+/* Prompt 03.2: escudos ilustrativos somente como fallback da demonstração. */
+.home-fixture .home-crest{width:60px;height:67px}
+.home-fixture-side{font-size:17px;color:#112b45}
+.home-fixture-center strong{min-height:49px;font-size:30px}
+.home-fixture.is-upcoming .home-fixture-center strong{font-size:20px}
+.home-fixture-meta{color:#334e65}
+.home-fixture-schedule{color:#3e586e}
+.home-table-team .home-crest{width:36px;height:40px}
+.home-table-team{font-size:15px;color:#102a44}
+.home-table-scroll td{color:#19344d}
+.home-table-scroll th{color:#294a65}
+.home-crest-demo,#plataforma .demo-crest-illustrative{position:relative;display:inline-grid;place-items:center;flex:none;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.home-crest-demo img,#plataforma .demo-crest-illustrative img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+.home-crest-demo small,#plataforma .demo-crest-illustrative small{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);padding:1px 3px;border:1px solid #a7c9dc;border-radius:3px;background:#e8f5fd;color:#16486c;font:800 8px/1 Inter,'Segoe UI',sans-serif;letter-spacing:.02em;white-space:nowrap;box-shadow:0 1px 3px #123a581f}
+.home-table-team .home-crest-demo small{font-size:7px;bottom:-3px}
+.home-fixture img.home-crest,.home-table-team img.home-crest{object-fit:contain}
+#plataforma img.demo-crest{object-fit:contain;background:transparent;border:0;box-shadow:none}
+#plataforma .showcase-match .demo-crest{width:50px;height:56px}
+#plataforma .showcase-table .demo-crest{width:36px;height:40px}
+#plataforma .demo-crest-illustrative small{font-size:7px}
+@media(max-width:1400px){.home-fixture .home-crest{width:56px;height:63px}.home-fixture-side{font-size:16px}.home-table-team .home-crest{width:34px;height:38px}}
+@media(max-width:700px){.home-fixture .home-crest{width:44px;height:50px}.home-fixture-side{font-size:14px}.home-table-team .home-crest{width:34px;height:38px}}
+@media(max-width:480px){.home-fixture .home-crest{width:36px;height:42px}.home-fixture-side{font-size:12px}.home-fixture-center strong{min-height:34px;font-size:19px}.home-fixture.is-upcoming .home-fixture-center strong{font-size:15px}.home-table-team .home-crest{width:32px;height:36px}.home-crest-demo small{font-size:6px;bottom:-2px}#plataforma .showcase-match .demo-crest{width:30px;height:34px}#plataforma .showcase-table .demo-crest{width:27px;height:31px}}
+@media(max-width:350px){.home-fixture .home-crest{width:32px;height:37px}.home-fixture-side{font-size:11px}}

@@ -1,0 +1,59 @@
+.champions-section{display:block;position:relative;isolation:isolate;overflow:hidden;padding-top:0;padding-bottom:68px;border-top:1px solid #315778;background:#061321;color:#f5f9ff}
+.champions-section::before{content:"";position:absolute;z-index:-2;inset:0 0 auto;height:660px;background:linear-gradient(90deg,#03101fe8 0%,#071528a8 48%,#03101fee 100%),linear-gradient(0deg,#061321 1%,transparent 48%),url('/assets/stadium-night.webp') center 55%/cover no-repeat}
+.champions-section::after{content:"";position:absolute;z-index:-1;inset:0 0 auto;height:580px;pointer-events:none;background:radial-gradient(ellipse at 34% 51%,#0089ff39,transparent 38%),linear-gradient(0deg,#061321 0%,transparent 36%)}
+.champions-stage{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);align-items:center;gap:clamp(18px,4vw,70px);min-height:555px;max-width:1280px;margin:auto}
+.champions-section .champions-art{display:grid;place-items:center;position:relative;align-self:stretch;height:auto;min-height:530px;filter:none}
+.champions-art-light{position:absolute;width:min(100%,470px);height:74%;bottom:0;border-radius:50%;background:radial-gradient(ellipse at center,#168fff5e 0%,#0c69ba32 34%,transparent 68%);filter:blur(20px)}
+.champions-section .champions-art img{position:relative;z-index:1;display:block;width:auto;height:clamp(390px,40vw,515px);max-width:100%;object-fit:contain;filter:drop-shadow(0 20px 20px #000b) drop-shadow(0 0 23px #2686db42);animation:champions-trophy-enter .75s ease-out both}
+.champions-art-plinth{position:absolute;bottom:24px;width:min(74%,380px);height:22px;border:1px solid #728da2;border-radius:50%;background:linear-gradient(90deg,#061420,#5b778b 31%,#d4e7f3 52%,#39556c 75%,#061420);box-shadow:0 2px 25px #17a9ff78,0 15px 32px #000e}
+.champions-section .champions-copy{max-width:660px;position:relative;z-index:1;padding:26px 0 40px}
+.champions-section .home-label{color:#90d7ff;font-size:11px;letter-spacing:2px}
+.champions-section .champions-copy h2{margin:16px 0 19px;color:#fff;font-size:clamp(35px,4.1vw,61px);line-height:1.03;letter-spacing:-2.3px;text-wrap:balance;text-shadow:0 4px 18px #000b}
+.champions-section .champions-copy h2 em{display:block;margin-top:6px;background:linear-gradient(170deg,#fff 7%,#c3d0df 32%,#677e91 52%,#f9fcff 68%,#9fb4c9 88%);background-clip:text;color:transparent;text-shadow:none}
+.champions-section .champions-copy p{max-width:550px;margin:0 0 25px;color:#e0ebf4;font-size:clamp(14px,1.25vw,17px);line-height:1.75;text-shadow:0 2px 8px #000a}
+.champions-primary{letter-spacing:.5px;box-shadow:0 10px 28px #0076ef57}
+.champions-archive{position:relative;max-width:1280px;margin:0 auto;padding:30px;border:1px solid #63839c7d;border-radius:16px;background:linear-gradient(150deg,#0a2138ee,#071726ed 60%,#0b2236ec);box-shadow:0 20px 55px #0008,inset 0 1px #cee9ff23;scroll-margin-top:90px}
+.champions-archive::before{content:"";position:absolute;top:0;left:28px;right:28px;height:1px;background:linear-gradient(90deg,transparent,#e0f1ffab,transparent)}
+.champions-archive-heading{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:19px}
+.champions-archive-heading h3,.champions-demo h3{margin:8px 0 0;color:#f9fcff;font:800 clamp(22px,2.2vw,31px)/1.15 Sora,Inter,sans-serif;letter-spacing:-.8px}
+.champions-archive-heading p{max-width:360px;margin:0;color:#c5d7e6;font-size:12px;line-height:1.55;text-align:right}
+.champions-section .champions-empty{display:grid;gap:11px;max-width:none;margin:0;padding:24px 27px;border:1px solid #7894aa8a;border-left:3px solid #c0d1df;border-radius:10px;background:linear-gradient(120deg,#0b2741,#0b2034 60%,#0b1b2c);color:#fff}
+.champions-section .champions-empty strong{max-width:610px;color:#f7fbff;font:800 clamp(19px,1.8vw,25px)/1.3 Sora,Inter,sans-serif}
+.champions-section .champions-empty span{max-width:670px;color:#d8e7f2;font-size:14px;line-height:1.6}
+.champions-section .champions-empty a{display:inline-flex;align-items:center;gap:10px;width:max-content;max-width:100%;margin-top:8px;padding:11px 16px;border:1px solid #26a1ff;border-radius:7px;background:#075dba;color:#fff;font-size:12px;font-weight:850;text-decoration:none;letter-spacing:.3px;transition:background .2s,transform .2s}
+.champions-section .champions-empty a:hover{background:#087ae6;transform:translateY(-2px);text-decoration:none}
+.champions-section .champions-empty a span{color:inherit}
+.champions-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.champions-filters[hidden]{display:none}
+.champions-filters label{display:grid;gap:6px;color:#d7e9f7;font-size:12px;font-weight:800}
+.champions-filters select{width:100%;min-width:0;height:41px;padding:0 10px;border:1px solid #7897ad;border-radius:7px;background:#102a43;color:#fff;cursor:pointer}
+.champions-section .champions-empty.has-champions{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:0;border:0;background:none}
+.champions-filter-empty{grid-column:1/-1;margin:0;padding:20px;border:1px solid #7894aa;border-radius:8px;color:#edf7ff;font-size:14px}
+.champions-section .champion-record{position:relative;display:flex;flex-direction:column;gap:0;min-width:0;padding:0;overflow:hidden;border:1px solid #587e9a;border-radius:12px;background:linear-gradient(145deg,#133552,#071d32 70%);color:#fff;box-shadow:0 12px 30px #0007;transition:transform .2s,border-color .2s,box-shadow .2s}
+.champions-section .champion-record:hover,.champions-section .champion-record:focus-within{transform:translateY(-4px);border-color:#6fc7ff;box-shadow:0 17px 35px #0009,0 0 0 1px #1687dc66}
+.champion-record .champion-card-crest{display:grid;place-items:center;min-height:186px;padding:16px;background:radial-gradient(circle at 50% 70%,#1477bd75,transparent 64%),linear-gradient(135deg,#071525,#173853)}
+.champion-record .champion-card-crest img{display:block;max-width:100%;width:165px;height:158px;object-fit:contain;filter:drop-shadow(0 6px 14px #0009)}
+.champion-record .champion-card-content{display:grid;gap:7px;padding:16px 18px 19px}
+.champion-record .champion-card-kicker{color:#a4ddff;font-size:11px;font-weight:800;letter-spacing:.4px;line-height:1.4}
+.champion-record .champion-card-content h4{margin:0;color:#fff;font:800 21px/1.2 Sora,Inter,sans-serif;overflow-wrap:anywhere}
+.champion-record .champion-card-content p{margin:0;color:#d5e5f0;font-size:12px;line-height:1.5}
+.champion-record .champion-card-content a{display:inline-flex;align-items:center;gap:5px;margin-top:6px;color:#8bd4ff;font-size:11px;font-weight:850;letter-spacing:.3px;text-decoration:none}
+.champion-record .champion-card-content a:hover{text-decoration:underline}
+.champion-record .champion-card-confirmed{color:#b8e8ff;font-size:10px;font-weight:850;letter-spacing:1px;text-transform:uppercase}
+.champion-record .champion-card-medal{position:absolute;top:13px;right:13px;width:42px;height:51px;object-fit:contain;filter:drop-shadow(0 4px 5px #0009)}
+.champion-record .champion-crest-placeholder{display:grid;place-items:center;width:110px;height:110px;border:1px solid #adc6d8;border-radius:50%;background:linear-gradient(135deg,#4f738e,#0b2f4d);color:#fff;font:900 27px Sora,sans-serif}
+.champions-demo{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,460px);align-items:center;gap:30px;max-width:1280px;margin:36px auto 0;padding:26px 32px;border:1px solid #315777;border-radius:14px;background:linear-gradient(100deg,#0b2034,#091a2c)}
+.champions-demo-intro p{max-width:550px;margin:12px 0 0;color:#ccdeec;font-size:13px;line-height:1.7}
+.champions-section .champion-demo-card{display:grid;grid-template-columns:155px minmax(0,1fr);grid-template-rows:auto 1fr;align-items:center;min-height:195px;background:linear-gradient(125deg,#143650,#0a2035)}
+.champion-demo-disclosure{grid-column:1/-1;padding:9px 12px;border-bottom:1px solid #5686a5;background:#102d49;font-size:11px;font-weight:850;letter-spacing:1px;text-align:center}
+.champion-record .champion-demo-disclosure{color:#d1eaff}
+.champion-demo-card .champion-card-crest{min-height:0;height:100%;padding:10px;background:#102944}
+.champion-demo-card .champion-card-crest img{width:130px;height:130px;border-radius:50%}
+.champion-demo-card .champion-card-content{padding:11px}
+.champion-demo-card .champion-card-content h4{font-size:18px}
+.champion-demo-card .champion-card-content p{font-size:11px}
+@keyframes champions-trophy-enter{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:900px){.champions-stage{min-height:475px;gap:15px}.champions-section .champions-art{min-height:430px}.champions-section .champions-art img{height:420px}.champions-section .champions-copy h2{font-size:clamp(32px,4.5vw,42px)}.champions-section .champions-empty.has-champions{grid-template-columns:repeat(2,minmax(0,1fr))}.champions-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.champions-section{padding-top:0;padding-bottom:44px}.champions-section::before{height:700px;background-position:center 55%}.champions-stage{grid-template-columns:1fr;gap:0;min-height:0}.champions-section .champions-art{grid-row:1;min-height:315px;max-height:335px}.champions-section .champions-art img{height:310px}.champions-art-plinth{bottom:9px;width:220px;height:15px}.champions-section .champions-copy{padding:18px 0 38px}.champions-section .champions-copy h2{max-width:590px;font-size:clamp(30px,7.6vw,45px);line-height:1.06}.champions-section .champions-copy p{font-size:14px;line-height:1.65}.champions-archive{padding:21px 16px}.champions-archive-heading{display:block}.champions-archive-heading p{margin-top:9px;text-align:left}.champions-demo{grid-template-columns:1fr;gap:17px;margin-top:20px;padding:20px 16px}.champions-section .champions-empty{padding:19px}.champions-section .champions-empty strong{font-size:19px}}
+@media(max-width:480px){.champions-section .champions-empty.has-champions{grid-template-columns:1fr}.champions-section .champions-art{min-height:285px;max-height:300px}.champions-section .champions-art img{height:285px}.champions-section .champions-copy h2{font-size:clamp(28px,8.4vw,36px)}.champions-primary{width:100%}.champions-section .champion-demo-card{grid-template-columns:98px minmax(0,1fr)}.champion-demo-card .champion-card-crest img{width:80px;height:80px}.champion-demo-card .champion-card-content h4{font-size:16px}.champion-demo-card .champion-card-content a{font-size:10px}.champions-filters{gap:8px}}
+@media(prefers-reduced-motion:reduce){.champions-section .champions-art img{animation:none}.champions-section .champion-record,.champions-section .champions-empty a{transition:none}}
