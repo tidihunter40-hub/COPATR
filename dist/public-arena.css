@@ -291,3 +291,35 @@
 }
 .public-competition .demo-return-bar a{min-height:44px}
 .public-competition .fixture-detail-link{min-height:44px;display:flex;align-items:center;justify-content:center}
+
+/* Jogos e resultados: a arena permanece, mas os dados assumem a prioridade. */
+.public-competition #jogos.panel-card{padding:clamp(14px,1.6vw,20px);border-color:#195b82;background:linear-gradient(145deg,#04111e,#020b15)}
+.public-competition #jogos .public-section-heading{border-bottom-color:#164969}
+.public-competition .public-fixtures{gap:14px}
+.public-competition .public-fixtures .public-fixture.match-arena{min-height:244px;padding:10px 13px 11px;border-color:#1c739f!important;background:linear-gradient(180deg,#02111dbd 0%,#03111ba8 47%,#020b13e8 78%,#04180fb8 100%),url('/assets/stadium-night.webp') center/cover!important;box-shadow:inset 0 1px #9adfff14,0 7px 18px #0008}
+.public-competition .public-fixtures .public-fixture.match-arena::after{left:22%;right:22%;top:33%;height:20%;background:radial-gradient(ellipse,#0d6fa026,transparent 72%)}
+.public-competition .public-fixtures .fixture-meta{padding-bottom:2px}
+.public-competition .public-fixtures .fixture-meta span:first-child{padding:5px 8px;border-color:#3e7d9e;background:#071b2d;box-shadow:none;color:#e7f5ff}
+.public-competition .public-fixtures .fixture-meta .fixture-status{padding:5px 8px;border-color:#397a68;background:#063428d9;color:#d6ffec;box-shadow:none}
+.public-competition .public-fixtures .match-arena--scheduled .fixture-status{border-color:#5d7891;background:#102333d9;color:#dcecf7}
+.public-competition .public-fixtures .fixture-main{grid-template-columns:minmax(0,1fr) minmax(112px,.54fr) minmax(0,1fr);gap:clamp(8px,1.6vw,21px);margin-top:4px}
+.public-competition .public-fixtures .fixture-crest-frame{width:clamp(94px,7.8vw,122px);height:clamp(94px,7.8vw,122px)}
+.public-competition .public-fixtures .fixture-crest-frame::before{inset:24%;background:#1c7db126;filter:blur(16px)}
+.public-competition .public-fixtures .fixture-winner .fixture-crest-frame{transform:none}
+.public-competition .public-fixtures .fixture-winner .fixture-crest-frame::before{background:#309d6b42}
+.public-competition .public-fixtures .fixture-winner .fixture-crest-frame img{filter:drop-shadow(0 0 8px #66d9a075) drop-shadow(0 5px 8px #000c)}
+.public-competition .public-fixtures .fixture-team{gap:7px}
+.public-competition .public-fixtures .fixture-team-name{min-height:2.15em}
+.public-competition .public-fixtures .fixture-team-name a,.public-competition .public-fixtures .fixture-team-name strong{font-size:clamp(15px,1.35vw,19px);letter-spacing:.01em}
+.public-competition .public-fixtures .fixture-team-name small{color:#9fe5bd;font-size:9px;letter-spacing:.07em;text-transform:uppercase}
+.public-competition .public-fixtures .fixture-score{min-width:112px;padding:7px 10px 9px;border-color:#5484a4;background:linear-gradient(180deg,#12355c,#06172a);box-shadow:inset 0 1px #b7e9ff2e,0 4px 11px #000a;font-size:clamp(42px,3.6vw,58px);text-shadow:0 2px 8px #001630}
+.public-competition .public-fixtures .fixture-score span{color:#b9e8ff}
+.public-competition .public-fixtures .match-arena--scheduled .fixture-score{border-color:#607a8d;background:linear-gradient(180deg,#132432,#071018);color:#bde5ff;text-shadow:none}
+.public-competition .public-fixtures .fixture-bottom{justify-content:flex-start;min-height:37px;margin:4px 0 0;padding:8px 176px 0 2px;border-top:1px solid #4aa1cc22;color:#dbeaf3;font-size:11px;text-shadow:none}
+.public-competition .public-fixtures .fixture-outcome{color:#99e7bd}
+.public-competition .public-fixtures .fixture-draw{color:#b9d4e7}
+.public-competition .public-fixtures .fixture-scheduled{color:#b9d4e7}
+.public-competition .public-fixtures .fixture-detail-link{position:absolute;right:12px;bottom:11px;width:auto;min-width:145px;min-height:34px;margin:0;padding:7px 10px;border-color:#2b78a1;border-radius:6px;background:#08233a;color:#dff4ff;box-shadow:none;font-size:12px;letter-spacing:.035em}
+.public-competition .public-fixtures .fixture-detail-link:hover,.public-competition .public-fixtures .fixture-detail-link:focus-visible{border-color:#57bde8;background:#0c3552;box-shadow:0 0 0 2px #2b9bd13d}
+@media(max-width:760px){.public-competition #jogos.panel-card{padding:12px}.public-competition .public-fixtures{gap:11px}.public-competition .public-fixtures .public-fixture.match-arena{min-height:255px;padding:10px}.public-competition .public-fixtures .fixture-main{grid-template-columns:minmax(0,1fr) minmax(74px,.55fr) minmax(0,1fr);gap:7px}.public-competition .public-fixtures .fixture-crest-frame{width:clamp(81px,24vw,112px);height:clamp(81px,24vw,112px)}.public-competition .public-fixtures .fixture-score{min-width:74px;font-size:clamp(38px,10vw,52px)}.public-competition .public-fixtures .fixture-team-name a,.public-competition .public-fixtures .fixture-team-name strong{font-size:clamp(13px,3.7vw,16px)}.public-competition .public-fixtures .fixture-bottom{min-height:32px;padding:7px 0 0;font-size:10px}.public-competition .public-fixtures .fixture-detail-link{position:static;width:100%;min-height:44px;margin:5px 0 0;padding:9px 12px;font-size:13px}}
+@media(max-width:350px){.public-competition .public-fixtures .fixture-main{grid-template-columns:minmax(0,1fr) 67px minmax(0,1fr);gap:3px}.public-competition .public-fixtures .fixture-crest-frame{width:76px;height:76px}.public-competition .public-fixtures .fixture-score{min-width:67px;font-size:34px}.public-competition .public-fixtures .fixture-team-name a,.public-competition .public-fixtures .fixture-team-name strong{font-size:12px}}

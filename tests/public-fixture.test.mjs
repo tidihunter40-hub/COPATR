@@ -16,6 +16,8 @@ test('a confirmed win highlights only the winning crest', () => {
   assert.match(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><span class="team-shield team-shield--large"><img src="https:\/\/example.test\/home.png"/);
   assert.doesNotMatch(html, /fixture-team fixture-winner[^>]*><div class="fixture-crest-frame"><span class="team-shield team-shield--large"><img src="https:\/\/example.test\/away.png"/);
   assert.match(html, /Placar 3 a 0/);
+  assert.match(html, /match-arena--decisive/);
+  assert.match(html, /Resultado definido/);
 });
 
 test('a draw and an unplayed match have no winner', () => {
@@ -23,8 +25,10 @@ test('a draw and an unplayed match have no winner', () => {
   const scheduled = publicFixture(match('scheduled', null, null), entries, crests);
   assert.doesNotMatch(draw, /fixture-winner/);
   assert.match(draw, /Empate/);
+  assert.match(draw, /match-arena--draw/);
   assert.doesNotMatch(scheduled, /fixture-winner|Vencedor/);
   assert.match(scheduled, /Sem placar/);
+  assert.match(scheduled, /match-arena--scheduled/);
 });
 
 test('a shootout separates penalty goals and highlights the qualified team', () => {
