@@ -1,5 +1,5 @@
 /* Institutional routes share the established TR visual language and sections. */
-html[data-page="inicio"] main > :not(#inicio):not(.intro-strip):not(.home-route-cards):not(#campeonatos),
+html[data-page="inicio"] main > :not(#inicio):not(.intro-strip):not(.home-route-cards):not(#funcionalidades):not(#modalidades):not(#historia):not(#campeonatos),
 html[data-page="funcionalidades"] main > :not(#route-banner):not(#funcionalidades):not(#modalidades):not(#historia),
 html[data-page="como-funciona"] main > :not(#route-banner):not(#como-funciona):not(.faq-section),
 html[data-page="campeonatos"] main > :not(#route-banner):not(#campeonatos):not(#galeria),

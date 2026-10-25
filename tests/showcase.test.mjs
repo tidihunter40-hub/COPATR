@@ -59,11 +59,11 @@ test('painel e campeonato refletem dados locais sem alterar o motor', async () =
 });
 
 test('modalidade futura é identificada e cards respondem ao clique', async () => {
-  const volleyball = [...document.querySelectorAll('.sport-card')].find((card) => card.textContent.includes('Vôlei'));
+  const volleyball = [...document.querySelectorAll('.sport-atlas-card')].find((card) => card.textContent.includes('Vôlei'));
   assert.ok(volleyball);
   volleyball.click();
   await settle();
   assert.equal(volleyball.getAttribute('aria-pressed'), 'true');
-  assert.match(document.querySelector('.sport-detail').textContent, /Sets, critérios específicos/);
-  assert.match(document.querySelector('.sport-detail').textContent, /Disponibilidade futura/);
+  assert.match(document.querySelector('.sport-spotlight').textContent, /Sets, critérios específicos/);
+  assert.match(document.querySelector('.sport-spotlight').textContent, /Disponibilidade futura/);
 });
