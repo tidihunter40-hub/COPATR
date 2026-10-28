@@ -22,6 +22,15 @@ if (page === 'campeonatos' && mount) {
 
   const date = (value) => value ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
   const render = (data) => {
+    if (data.competitionsStatus === 'error') {
+      count.textContent = 'Campeonatos indisponíveis no momento';
+      grid.replaceChildren();
+      const notice = document.createElement('p');
+      notice.className = 'catalog-empty catalog-error';
+      notice.textContent = 'Não foi possível carregar os campeonatos. Tente novamente em instantes.';
+      grid.append(notice);
+      return;
+    }
     const items = createCatalogItems(data);
     const statusSelect = form.elements.status;
     const sportSelect = form.elements.sport;

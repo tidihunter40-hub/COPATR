@@ -10,7 +10,7 @@
 | Banco | Objetos da migration `202610270004` confirmados pelas consultas anteriores; o painel Supabase mostrou “No migrations” no resumo do projeto, portanto o registro formal de histórico de migrations não está comprovado. |
 | Segurança entre organizações | **Pendente.** O projeto Auth tinha apenas a conta do proprietário quando consultado. As três contas temporárias autorizadas ainda não foram criadas e a matriz com quatro JWTs reais ainda não foi executada. `anon` e RLS foram verificados anteriormente, mas isso não substitui a matriz. |
 | `npm run typecheck`, `npm test`, `npm run build` | Passaram; 126 testes. Dois builds consecutivos foram executados para verificar a geração repetível das páginas. |
-| Interface Corujão local | `verify-corujao-advance-ui.mjs` passou a 390, 768 e 1440 px, sem rolagem horizontal ou erro de página. O script legado `verify-public-showcase.mjs` falhou ao esperar `.public-empty-state`: a vitrine atual usa o catálogo novo; o teste precisa ser atualizado antes de contar como aprovado. |
+| Interface Corujão local | `verify-corujao-advance-ui.mjs` passou a 390, 768 e 1440 px, sem rolagem horizontal ou erro de página. O teste `verify-public-showcase.mjs` foi atualizado e passou nas três larguras com catálogo vazio, campeonato publicado, dados da temporada, busca e falha da API. |
 | PWA local | Manifesto e ícones válidos, service worker controlador, cache `v67`, cache anterior removido, rotas públicas demonstrativas disponíveis offline e rotas privadas/oficiais retornando 503 offline. Zero erros JavaScript após corrigir a duplicação de `const mobile` no build. Aparelho físico pendente. |
 | Prévia Vercel | **Pendente.** A branch está no GitHub, mas o projeto Vercel não está conectado ao repositório; o push não criou deploy. A CLI oficial foi instalada temporariamente pelo npm, porém `vercel whoami` falhou por erro de rede. Não existe ID de deploy RC2 validado. |
 
@@ -33,9 +33,9 @@ Deploy anterior de prévia: `dpl_CUZsU4XpXNVNEWzhr1bQbS4gqjRR`. Deploy de produ�
 
 ## Para fechar a homologação
 
-1. Criar as três contas de QA autorizadas e duas organizações privadas de teste, sem credenciais em chat, logs ou Git. Testar a matriz de operações com quatro JWTs reais e verificar o estado após cada tentativa proibida.
+1. Criar as três contas de QA autorizadas e uma organização privada de teste para a conta externa, sem credenciais em chat, logs ou Git. Testar a matriz de operações com quatro JWTs reais e verificar o estado após cada tentativa proibida.
 2. Publicar **somente nova prévia** do commit versionado, registrar seu ID e verificar o hash do conteúdo servido contra o manifesto RC2.
 3. Repetir as cinco medições por rota no novo deploy, as verificações de interface a 390, 768 e 1440 px, e o PWA publicado.
-4. Atualizar o teste legado de vitrine e repetir o fluxo de integração; executar teste físico caso haja aparelho disponível.
+4. Executar teste físico caso haja aparelho disponível.
 
 Não solicitar autorização de produção até que os itens obrigatórios passem.

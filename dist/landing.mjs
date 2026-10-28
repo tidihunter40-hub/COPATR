@@ -42,8 +42,9 @@ function textElement(tag, className, value) {
   return element;
 }
 
-getPublicHomepageData(document.documentElement.dataset.page === 'campeonatos' ? 'full' : document.documentElement.dataset.page === 'inicio' ? 'summary' : 'none').then(({ competitions, champions, competitionsStatus, championsStatus }) => {
-  globalThis.TRPublicHomeData = { competitions, champions, competitionsStatus, championsStatus };
+getPublicHomepageData(document.documentElement.dataset.page === 'campeonatos' ? 'full' : document.documentElement.dataset.page === 'inicio' ? 'summary' : 'none').then((data) => {
+  const { competitions, champions, competitionsStatus, championsStatus } = data;
+  globalThis.TRPublicHomeData = data;
   window.dispatchEvent(new CustomEvent('tr:public-home-data', { detail: globalThis.TRPublicHomeData }));
   const mount = document.querySelector('#public-competitions');
   if (mount) {
