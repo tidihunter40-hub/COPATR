@@ -46,6 +46,7 @@
     "supabase/migrations/202610270002_competition_mode.sql": "2d3268ed4c4196a1ad0bc0f1e174aacb6615595341461e71fb9760ce39340851",
     "supabase/migrations/202610270003_restrict_anonymous_mutations.sql": "eebd94a5d09dfb6adcf53a25418ad2fb45040381d56a805bb8af1943a01526bc",
     "supabase/migrations/202610270004_corujao_eight_progression.sql": "32b81ab3c16362b5d15480f69a142795bd8030df8dcabf290f7b7a1953f980e9",
+    "supabase/migrations/202610280001_entry_organization_guard_rls.sql": "1cde71a2d72092ebadc10712b794e18b93354ed818200f8858b4b01f207a2904",
     "vercel.json": "94890245ff9beb2bcdebe5865675d9e98553cf9735c98d05371c81cb8e10f30f"
   },
   "deploymentFileSha256": {
