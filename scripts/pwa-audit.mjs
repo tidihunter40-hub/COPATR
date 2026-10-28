@@ -82,6 +82,7 @@ try {
   report.update = await updatePage.evaluate(async () => ({ keys: await caches.keys(), oldCacheRemoved: !(await caches.keys()).includes('tr-campeonatos-public-v47') }));
   assert.ok(report.update.oldCacheRemoved);
   await updateContext.close();
+  assert.deepEqual(report.errors, [], 'PWA sem erros JavaScript');
   await writeFile(resolve(out, 'pwa-report.json'), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ manifest: report.manifest.name, registration: report.registration, directEntry: report.directEntry, update: report.update, cacheEntries: report.cache.entries.length, offline: report.offline, errors: report.errors }, null, 2));
 } finally {

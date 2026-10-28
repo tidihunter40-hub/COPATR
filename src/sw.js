@@ -1,4 +1,4 @@
-const CACHE = 'tr-campeonatos-public-v66';
+const CACHE = 'tr-campeonatos-public-v67';
 const APP_SHELL = ['/index.html', '/pwa-register.mjs'];
 const OFFLINE = () => new Response('Esta página requer conexão. Tente novamente quando estiver online.', {
   status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },

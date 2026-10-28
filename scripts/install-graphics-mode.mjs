@@ -23,7 +23,7 @@ for (const file of (await readdir('dist')).filter((name) => name.endsWith('.html
   const path = `dist/${file}`;
   let html = await readFile(path, 'utf8');
   if (!html.includes('tr-campeonatos-graphics-mode')) html = html.replace('<head>', `<head>${boot}`);
-  if (html.includes('const pageImage=')) html = html.replace(/const pageImage=.*?<\/script>/s, pagePreload);
+  if (html.includes('const pageImage=')) html = html.replace(/(?:const mobile=matchMedia\('\(max-width:700px\)'\)\.matches;)*const pageImage=.*?<\/script>/s, pagePreload);
   if (file === 'competition.html') {
     html = html.replace(/<link rel="preload" as="image" href="\/assets\/stadium-night-(?:800|1600)\.avif"[^>]*>/g, '');
     html = html.replace('</head>', '<link rel="preload" as="image" href="/assets/stadium-night-800.avif" type="image/avif" media="(max-width:700px)" fetchpriority="high"><link rel="preload" as="image" href="/assets/stadium-night-1600.avif" type="image/avif" media="(min-width:701px)" fetchpriority="high"></head>');
