@@ -2,7 +2,7 @@
 
 Atualizado em 28 de outubro de 2026. Candidato `corujao-8-rc2` na branch `codex/corujao-8-rc2`.
 
-**Veredito: APROVADO COM RESSALVAS, aguardando decisão do proprietário para produção.** O motor esportivo, a matriz completa com quatro JWTs reais, os testes, a prévia corrigida e o PWA passaram. A brecha de RLS no gatilho de inscrição foi corrigida e validada. Restam o teste em aparelho físico, se disponível, e a ausência de histórico formal de migrations no projeto. Nenhuma publicação em produção ocorreu.
+**Veredito: RC2 PUBLICADO, APROVADO COM RESSALVAS.** O proprietário autorizou a promoção da prévia corrigida. O motor esportivo, a matriz completa com quatro JWTs reais, os testes, a prévia e as verificações posteriores no domínio oficial passaram. A brecha de RLS no gatilho de inscrição foi corrigida e validada. Restam o teste em aparelho físico, se disponível, e a ausência de histórico formal de migrations no projeto.
 
 | Área | Resultado |
 | --- | --- |
@@ -12,7 +12,8 @@ Atualizado em 28 de outubro de 2026. Candidato `corujao-8-rc2` na branch `codex/
 | `npm run typecheck`, `npm test`, `npm run build` | Passaram após a correção; 127 testes. Dois builds consecutivos foram executados para verificar a geração repetível das páginas. |
 | Interface Corujão local | `verify-corujao-advance-ui.mjs` passou a 390, 768 e 1440 px, sem rolagem horizontal ou erro de página. O teste `verify-public-showcase.mjs` foi atualizado e passou nas três larguras com catálogo vazio, campeonato publicado, dados da temporada, busca e falha da API. |
 | PWA local | Manifesto e ícones válidos, service worker controlador, cache `v67`, cache anterior removido, rotas públicas demonstrativas disponíveis offline e rotas privadas/oficiais retornando 503 offline. Zero erros JavaScript após corrigir a duplicação de `const mobile` no build. Aparelho físico pendente. |
-| Prévia Vercel | **Criada e validada.** Deploy corrigido `dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo`, URL `https://copatr-am8xuhlt9-ogaitjunior-sudos-projects.vercel.app`, estado READY, target de prévia. Enviada de um arquivo limpo do commit `a5d593e`; dez arquivos críticos conferiram com o manifesto (HTML sem o script de feedback injetado pela Vercel; service worker e manifest com finais de linha normalizados). Rotas principais retornaram 200, a configuração apontou para o Supabase esperado, e nenhuma promoção de produção ocorreu. |
+| Prévia Vercel | **Criada e validada.** Deploy corrigido `dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo`, URL `https://copatr-am8xuhlt9-ogaitjunior-sudos-projects.vercel.app`, estado READY. Enviada de um arquivo limpo do commit `a5d593e`; dez arquivos críticos conferiram com o manifesto (HTML sem o script de feedback injetado pela Vercel; service worker e manifest com finais de linha normalizados). Rotas principais retornaram 200 e a configuração apontou para o Supabase esperado. |
+| Produção Vercel | **Publicada e verificada.** `vercel promote dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo` criou o deployment de produção `dpl_HDdidHjhDi6uvGweNY3ad9PHYsKo`, estado READY, confirmado em `copatr.vercel.app`. Dez arquivos críticos conferiram com o manifesto e as rotas principais responderam HTTP 200. A vitrine pública passou em 390, 768 e 1440 px, com os placares e classificação esperados; o Corujão público respondeu HTTP 200 em 390 px sem rolagem horizontal. O PWA passou no domínio oficial, e a leitura anônima de um campeonato privado retornou zero linhas para competição, temporada, inscrições e partidas. |
 
 ## Desempenho móvel local
 
@@ -40,10 +41,10 @@ Na **prévia corrigida** (`dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo`), as cinco mediçõ
 
 `docs/corujao-8-rc2-manifest.json` registra hashes SHA-256 por arquivo, 383 arquivos de saída e hash da árvore de deploy. O manifesto RC1 permanece separado e inalterado. `.vercelignore` exclui evidências, documentos, ambiente local, dependências e arquivos temporários da entrada da Vercel. `prepare-vercel-output.mjs` remove configuração local e mapas JavaScript da saída.
 
-Novo deploy de prévia: `dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo`. Prévia RC2 anterior: `dpl_Dmi1o7bQ1T9sXkKviZxDwJ4jrLds`; prévia RC1: `dpl_CUZsU4XpXNVNEWzhr1bQbS4gqjRR`. Deploy de produção confirmado na Vercel: `dpl_DW8z1XUyEbscWEM1mDBqvG7EXYtx`. O procedimento de rollback, após eventual promoção autorizada, é usar **Instant Rollback** para esse deploy de produção e repetir a checagem do domínio oficial. Até a autorização, a produção permanece nesse deploy.
+Deploy de produção RC2: `dpl_HDdidHjhDi6uvGweNY3ad9PHYsKo`. Prévia promovida: `dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo`; prévia RC2 anterior: `dpl_Dmi1o7bQ1T9sXkKviZxDwJ4jrLds`; prévia RC1: `dpl_CUZsU4XpXNVNEWzhr1bQbS4gqjRR`. Deploy anterior de produção: `dpl_DW8z1XUyEbscWEM1mDBqvG7EXYtx`. Em caso de falha após a publicação, usar **Instant Rollback** para esse deploy anterior e repetir a checagem do domínio oficial.
 
 ## Ressalvas e próxima decisão
 
 1. Teste em aparelho físico não executado; os testes de responsividade e PWA foram feitos no Chromium em 390, 768 e 1440 px.
 2. O Supabase não possui a tabela `supabase_migrations.schema_migrations`; as funções e gatilhos foram conferidos no banco real, e as migrations correspondentes estão versionadas no Git.
-3. A publicação em produção exige autorização expressa do proprietário. Ao autorizar, promover somente o pacote da prévia `dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo` e repetir a checagem no domínio oficial. Caso seja necessário voltar, usar Instant Rollback para `dpl_DW8z1XUyEbscWEM1mDBqvG7EXYtx`.
+3. Acompanhar os primeiros organizadores e usar Instant Rollback para `dpl_DW8z1XUyEbscWEM1mDBqvG7EXYtx` se surgir uma falha crítica da versão publicada.
