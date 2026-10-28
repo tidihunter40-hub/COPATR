@@ -61,6 +61,7 @@
 .showcase-empty p{font:500 11px/1.5 Inter,Arial,sans-serif;color:#69829a;margin:0 0 10px}
 .showcase-competition{display:flex;align-items:center;gap:20px;border:1px solid #dfe7f0;border-radius:11px;background:#fff;padding:24px;min-height:205px}
 .competition-emblem{width:76px;height:76px;display:grid;place-items:center;border:1px solid #c3d9ef;border-radius:17px;background:linear-gradient(145deg,#0b2a50,#0867c8);color:#dfefff;flex:none}
+.competition-emblem img{width:100%;height:100%;padding:7px;object-fit:contain}
 .competition-copy{min-width:0;flex:1}
 .competition-copy h3{font:800 21px Sora,Inter,sans-serif;margin:9px 0 5px;color:#193857}
 .competition-copy p{font:600 12px Inter,Arial,sans-serif;color:#607d97;margin:0 0 7px}
@@ -68,8 +69,10 @@
 .showcase-competition .button{min-height:39px;padding:10px 14px;font-size:11px;white-space:nowrap;color:#0a6ed3;border-color:#91b9df}
 .competition-layout{display:grid;gap:13px}
 .showcase-roster{border:1px solid #dfe7f0;border-radius:10px;background:#fff;padding:17px}
-.roster-items{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.roster-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px;justify-content:center}
 .roster-items>span{display:flex;align-items:center;gap:8px;min-width:0;border:1px solid #e5edf5;border-radius:7px;background:#f7fafd;padding:7px 8px;color:#24405c;font:700 10px Inter,Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster-items .demo-crest{width:34px;height:34px;object-fit:contain}
+.roster-items>span{min-height:82px;justify-content:center;text-align:center;white-space:normal;overflow-wrap:anywhere}.roster-items .showcase-club-link,.roster-items .showcase-club-static{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-width:0}.roster-items .demo-crest img{width:100%;height:100%;object-fit:contain}
 .roster-items p{color:#718aa3;font:600 11px Inter,Arial,sans-serif}
 .statistics-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
 .statistics-focus,.statistics-upcoming{border:1px solid #dfe7f0;border-radius:11px;background:#fff;padding:25px;min-height:250px}

@@ -1,13 +1,24 @@
 import { createCatalogItems, filterCatalog } from './championships-catalog-data.mjs';
+import { publicCrestUrl } from './public-home.mjs';
 
 const page = document.documentElement.dataset.page;
 const mount = document.querySelector('#campeonatos');
 if (page === 'campeonatos' && mount) {
   document.body.classList.add('championships-catalog-page');
-  mount.innerHTML = `<div class="championships-hero"><div class="championships-hero-copy"><span class="championships-kicker">TR CAMPEONATOS</span><h1>A glória merece<br><em>um lugar</em><br>na história.</h1><p>Crie, organize e acompanhe seus campeonatos com uma plataforma completa, moderna e poderosa.</p><div class="championships-hero-actions"><a href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">Criar campeonato <span aria-hidden="true">→</span></a><a href="/demonstracao">Ver demonstração <span aria-hidden="true">↗</span></a></div><ul class="championships-hero-benefits"><li>Fácil de usar</li><li>Seguro e estável</li><li>Histórico completo</li></ul></div><p class="championships-hero-signature" aria-hidden="true">Sua competição.<br>Nossa tecnologia.</p></div><section class="championships-directory" aria-labelledby="championships-directory-title"><div class="championships-directory-heading"><div><span>VITRINE PÚBLICA</span><h2 id="championships-directory-title">Campeonatos em destaque</h2></div><p id="catalog-count" aria-live="polite">Carregando campeonatos publicados…</p></div><form class="championships-filters" id="championships-filters"><label class="catalog-search"><span class="sr-only">Buscar campeonato</span><input name="search" type="search" placeholder="Buscar campeonato" autocomplete="off"></label><label><span>Status</span><select name="status"><option value="all">Todos os status</option></select></label><label><span>Modalidade</span><select name="sport"><option value="all">Todas</option></select></label><label><span>Ordenar</span><select name="sort"><option value="recent">Mais recentes</option><option value="start">Início mais próximo</option><option value="active">Em andamento</option><option value="final">Finalizados</option></select></label></form><div class="championships-grid" id="championships-grid" aria-live="polite"></div></section>`;
+  if (!mount.querySelector('.championships-directory')) mount.innerHTML = `<div class="championships-hero"><div class="championships-hero-copy"><span class="championships-kicker">TR CAMPEONATOS</span><h1>A glória merece<br><em>um lugar</em><br>na história.</h1><p>Crie, organize e acompanhe seus campeonatos com uma plataforma completa, moderna e poderosa.</p><div class="championships-hero-actions"><a href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">Criar campeonato <span aria-hidden="true">→</span></a><a href="/demonstracao">Ver demonstração <span aria-hidden="true">↗</span></a></div><ul class="championships-hero-benefits"><li>Fácil de usar</li><li>Seguro e estável</li><li>Histórico completo</li></ul></div></div><section class="championships-directory" aria-labelledby="championships-directory-title"><div class="championships-directory-heading"><div><span>VITRINE PÚBLICA</span><h2 id="championships-directory-title">Campeonatos em destaque</h2></div><p id="catalog-count" aria-live="polite">Carregando campeonatos publicados…</p></div><form class="championships-filters" id="championships-filters"><label class="catalog-search"><span class="sr-only">Buscar campeonato</span><input name="search" type="search" placeholder="Buscar campeonato" autocomplete="off"></label><label><span>Status</span><select name="status"><option value="all">Todos os status</option></select></label><label><span>Modalidade</span><select name="sport"><option value="all">Todas</option></select></label><label><span>Ordenar</span><select name="sort"><option value="recent">Mais recentes</option><option value="start">Início mais próximo</option><option value="active">Em andamento</option><option value="final">Finalizados</option></select></label></form><div class="championships-grid" id="championships-grid" aria-live="polite"></div></section>`;
   const grid = mount.querySelector('#championships-grid');
   const form = mount.querySelector('#championships-filters');
   const count = mount.querySelector('#catalog-count');
+  const hydrateCrest = async (image) => {
+    const url = await publicCrestUrl(image.dataset.crestPath);
+    if (url && image.isConnected) image.src = url;
+  };
+  const crestObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      crestObserver.unobserve(entry.target);
+      hydrateCrest(entry.target);
+    }
+  }, { rootMargin: '300px' }) : null;
 
   const date = (value) => value ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
   const render = (data) => {
@@ -18,6 +29,7 @@ if (page === 'campeonatos' && mount) {
     [...new Set(items.map((item) => item.sport).filter(Boolean))].sort().forEach((sport) => sportSelect.add(new Option(sport, sport)));
     const draw = () => {
       const visible = filterCatalog(items, Object.fromEntries(new FormData(form)));
+      crestObserver?.disconnect();
       grid.replaceChildren();
       count.textContent = `${visible.length} ${visible.length === 1 ? 'campeonato publicado' : 'campeonatos publicados'}`;
       if (!visible.length) { const empty = document.createElement('p'); empty.className = 'catalog-empty'; empty.textContent = 'Nenhum campeonato corresponde aos filtros selecionados.'; grid.append(empty); return; }
@@ -27,6 +39,15 @@ if (page === 'campeonatos' && mount) {
         const sport = document.createElement('span'); sport.className = 'championship-sport'; sport.textContent = item.sport;
         const badge = document.createElement('span'); badge.className = `championship-status status-${item.status.id}`; badge.textContent = item.status.label;
         top.append(sport, badge);
+        const crest = document.createElement('img');
+        crest.className = 'championship-card-crest';
+        crest.src = item.crestUrl || '/assets/official/06_escudo_padrao_tr_campeonatos-256.webp';
+        crest.alt = `Escudo de ${item.name}`;
+        crest.loading = 'lazy';
+        crest.decoding = 'async';
+        crest.width = 512;
+        crest.height = 512;
+        crest.onerror = () => { crest.onerror = null; crest.src = '/assets/official/06_escudo_padrao_tr_campeonatos-256.webp'; };
         const title = document.createElement('h3'); title.textContent = item.name;
         const facts = document.createElement('div'); facts.className = 'championship-facts';
         if (item.season?.label) { const value = document.createElement('span'); value.textContent = item.season.label; facts.append(value); }
@@ -37,7 +58,11 @@ if (page === 'campeonatos' && mount) {
         else { const text = document.createElement('span'); text.textContent = 'Agenda e resultados aparecem quando forem cadastrados.'; detail.append(text); }
         if (item.champion) { const champion = document.createElement('p'); champion.className = 'championship-champion'; champion.textContent = `Campeão confirmado: ${item.champion}`; detail.append(champion); }
         const link = document.createElement('a'); link.className = 'championship-open'; link.href = `/c/${encodeURIComponent(item.id)}`; link.textContent = 'Ver campeonato';
-        card.append(top, title, facts, detail, link); grid.append(card);
+        card.append(top, crest, title, facts, detail, link); grid.append(card);
+        if (item.crest_path) {
+          crest.dataset.crestPath = item.crest_path;
+          if (crestObserver) crestObserver.observe(crest); else hydrateCrest(crest);
+        }
       });
     };
     form.addEventListener('input', draw); form.addEventListener('change', draw); draw();

@@ -14,8 +14,9 @@ const slug = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/
 const fail = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 const missingSchemaFeature = (error: { code?: string; message?: string } | null) => Boolean(error && (['42703', 'PGRST202', 'PGRST204'].includes(error.code || '') || /column .* does not exist|could not find .* column|could not find the function/i.test(error.message || '')));
 const editor = (role: string) => ['owner', 'admin', 'editor'].includes(role);
-export const DEFAULT_TEAM_SHIELD = '/assets/official/06_escudo_padrao_tr_campeonatos.png';
+export const DEFAULT_TEAM_SHIELD = '/assets/official/06_escudo_padrao_tr_campeonatos.webp';
 export const DEFAULT_COMPETITION_SHIELD = DEFAULT_TEAM_SHIELD;
+const PUBLIC_BRAND = '<picture><source srcset="/assets/official/01_logo_principal_transparente-320.avif" type="image/avif"><img src="/assets/official/01_logo_principal_transparente-320.webp" alt="TR Campeonatos" width="320" height="190" decoding="async"></picture>';
 const approvedOrganizer = (profile: ProfileAuthorization | null) => Boolean(profile && profile.organizer_status === 'approved' && ['organizer', 'platform_admin'].includes(profile.account_role));
 export const normalizeTeamSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
 export const filterTeamDirectory = <T extends { official_name: string; status?: string }>(teams: T[], query: string) => {
@@ -30,11 +31,11 @@ async function storeSmartShield(client: SupabaseClient, clubId: string, file: Fi
   const jobId = crypto.randomUUID();
   const extension = prepared.source.mime === 'image/jpeg' ? 'jpg' : prepared.source.mime.split('/')[1];
   const originalPath = `${clubId}/original/${jobId}.${extension}`;
-  const processedPath = prepared.processed ? `${clubId}/processed/${jobId}.png` : null;
+  const processedPath = prepared.processed ? `${clubId}/processed/${jobId}.${prepared.processed.type === 'image/webp' ? 'webp' : 'png'}` : null;
   const originalUpload = await client.storage.from('club-crests').upload(originalPath, file, { upsert: false, contentType: prepared.source.mime });
   if (originalUpload.error) throw new Error(`Não foi possível guardar o original: ${originalUpload.error.message}`);
   if (prepared.processed && processedPath) {
-    const outputUpload = await client.storage.from('club-crests').upload(processedPath, prepared.processed, { upsert: false, contentType: 'image/png' });
+    const outputUpload = await client.storage.from('club-crests').upload(processedPath, prepared.processed, { upsert: false, contentType: prepared.processed.type });
     if (outputUpload.error) throw new Error(`Original guardado, mas o escudo padronizado não foi salvo: ${outputUpload.error.message}`);
   }
   const path = processedPath || originalPath;
@@ -56,23 +57,23 @@ async function storeSmartShield(client: SupabaseClient, clubId: string, file: Fi
   return {
     path,
     status: prepared.status,
-    notice: prepared.status === 'processed' ? 'Escudo padronizado em 512 px com transparência segura.' : prepared.meta.mode === 'original_selected' ? 'Imagem original escolhida e preservada.' : 'Original preservado: o fundo não tinha confiança suficiente para remoção automática.',
+    notice: prepared.status === 'processed' ? 'Escudo otimizado em 512 px. Fundo preservado quando a remoção não era segura.' : prepared.meta.mode === 'original_selected' ? 'Imagem original escolhida e preservada.' : 'Imagem original preservada.',
   };
 }
 
 async function storeCompetitionShield(ctx: Context, competitionId: string, file: File, prepared: SmartShieldResult) {
   if (!safeId(competitionId)) throw new Error('Campeonato inválido.');
   const token = crypto.randomUUID();
-  const extension = prepared.source.mime === 'image/jpeg' ? 'jpg' : 'png';
+  const extension = prepared.source.mime === 'image/jpeg' ? 'jpg' : prepared.source.mime === 'image/webp' ? 'webp' : 'png';
   const prefix = `${ctx.organization.id}/${competitionId}`;
   const originalPath = `${prefix}/original/${token}.${extension}`;
-  const processedPath = prepared.processed ? `${prefix}/processed/${token}.png` : null;
+  const processedPath = prepared.processed ? `${prefix}/processed/${token}.${prepared.processed.type === 'image/webp' ? 'webp' : 'png'}` : null;
   const bucket = ctx.client.storage.from('competition-crests');
   const original = await bucket.upload(originalPath, file, { upsert: false, contentType: prepared.source.mime });
   if (original.error) throw new Error(`Não foi possível guardar o original: ${original.error.message}`);
   if (prepared.processed && processedPath) {
-    const output = await bucket.upload(processedPath, prepared.processed, { upsert: false, contentType: 'image/png' });
-    if (output.error) throw new Error(`Original guardado, mas o PNG não foi salvo: ${output.error.message}`);
+    const output = await bucket.upload(processedPath, prepared.processed, { upsert: false, contentType: prepared.processed.type });
+    if (output.error) throw new Error(`Original guardado, mas a versão otimizada não foi salva: ${output.error.message}`);
   }
   const updated = await ctx.client.from('competitions').update({
     crest_path: processedPath || originalPath, crest_original_path: originalPath,
@@ -253,7 +254,7 @@ async function panelPage(client: SupabaseClient) {
   const selected = available.find((item) => item.id === sessionStorage.getItem('tr-selected-organization')) || available[0];
   const ctx: Context = { client, user: { id: user.id, email: user.email }, organization: { id: selected.id, name: selected.name }, role: selected.role };
   target.removeAttribute('role');
-  target.innerHTML = `<div class="panel-layout"><aside class="panel-side"><a href="/" class="panel-logo"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><div class="panel-org">${escapeHtml(selected.name)}<small>${escapeHtml(selected.role)}</small></div><nav aria-label="Painel do organizador"><a href="/painel" ${location.pathname === '/painel' ? 'aria-current="page"' : ''}>Visão geral</a><a href="/painel/campeonatos" ${location.pathname.startsWith('/painel/campeonatos') ? 'aria-current="page"' : ''}>Campeonatos</a><a href="/painel/equipes" ${location.pathname.startsWith('/painel/equipes') ? 'aria-current="page"' : ''}>Equipes</a><a href="/minha-conta">Minha conta</a><a href="/campeonatos" target="_blank" rel="noopener noreferrer">Vitrine pública</a><a href="/demonstracao/copa-tr-esports" target="_blank" rel="noopener noreferrer">Demonstração esportiva</a></nav><button id="sign-out" type="button">Sair</button></aside><div class="panel-content"><header class="panel-header"><span>Painel do Organizador</span><div><span>${escapeHtml(preferredAccountName(profile, user))}</span>${available.length > 1 ? `<label>Organização<select id="organization-select">${available.map((item) => `<option value="${item.id}" ${item.id === selected.id ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('')}</select></label>` : ''}</div></header><main id="panel-main" aria-live="polite">Carregando dados oficiais…</main></div></div>`;
+  target.innerHTML = `<div class="panel-layout"><aside class="panel-side"><a href="/" class="panel-logo"><img src="/assets/official/01_logo_principal_transparente.webp" alt="TR Campeonatos"></a><div class="panel-org">${escapeHtml(selected.name)}<small>${escapeHtml(selected.role)}</small></div><nav aria-label="Painel do organizador"><a href="/painel" ${location.pathname === '/painel' ? 'aria-current="page"' : ''}>Visão geral</a><a href="/painel/campeonatos" ${location.pathname.startsWith('/painel/campeonatos') ? 'aria-current="page"' : ''}>Campeonatos</a><a href="/painel/equipes" ${location.pathname.startsWith('/painel/equipes') ? 'aria-current="page"' : ''}>Equipes</a><a href="/minha-conta">Minha conta</a><a href="/campeonatos" target="_blank" rel="noopener noreferrer">Vitrine pública</a><a href="/demonstracao/copa-tr-esports" target="_blank" rel="noopener noreferrer">Demonstração esportiva</a></nav><button id="sign-out" type="button">Sair</button></aside><div class="panel-content"><header class="panel-header"><span>Painel do Organizador</span><div><span>${escapeHtml(preferredAccountName(profile, user))}</span>${available.length > 1 ? `<label>Organização<select id="organization-select">${available.map((item) => `<option value="${item.id}" ${item.id === selected.id ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('')}</select></label>` : ''}</div></header><main id="panel-main" aria-live="polite">Carregando dados oficiais…</main></div></div>`;
   target.querySelector('#sign-out')?.addEventListener('click', async () => {
     const { error } = await client.auth.signOut();
     if (error) { window.alert('Não foi possível encerrar a sessão. Tente novamente.'); return; }
@@ -287,7 +288,7 @@ function restrictedPanel(client: SupabaseClient, profile: ProfileAuthorization |
       ? 'O acesso desta conta como organizador está suspenso. Entre em contato com a plataforma.'
       : 'Esta conta não possui autorização para administrar campeonatos.';
   target.removeAttribute('role');
-  target.innerHTML = `<div class="setup-shell"><a href="/"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><div class="panel-card"><span class="eyebrow">ACESSO RESTRITO</span><h1>Acesso de organizador necessário</h1><p>${message}</p><div class="restricted-actions"><a class="secondary-action" href="/demonstracao">Abrir demonstração</a><button id="restricted-sign-out" class="primary-action" type="button">Sair da conta</button></div></div></div>`;
+  target.innerHTML = `<div class="setup-shell"><a href="/"><img src="/assets/official/01_logo_principal_transparente.webp" alt="TR Campeonatos"></a><div class="panel-card"><span class="eyebrow">ACESSO RESTRITO</span><h1>Acesso de organizador necessário</h1><p>${message}</p><div class="restricted-actions"><a class="secondary-action" href="/demonstracao">Abrir demonstração</a><button id="restricted-sign-out" class="primary-action" type="button">Sair da conta</button></div></div></div>`;
   target.querySelector('#restricted-sign-out')?.addEventListener('click', async () => {
     const { error } = await client.auth.signOut();
     if (!error) { sessionStorage.removeItem('tr-selected-organization'); location.assign('/'); }
@@ -300,7 +301,7 @@ const empty = (title: string, copy: string) => `<div class="panel-card empty-sta
 
 function organizationSetup(client: SupabaseClient, userId: string) {
   const target = mount()!;
-  target.innerHTML = `<div class="setup-shell"><a href="/"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><div class="panel-card"><span class="eyebrow">PRIMEIRO ACESSO</span><h1>Crie sua organização</h1><p>Campeonatos oficiais ficam vinculados à sua organização. Você será o proprietário.</p><form id="organization-form"><label>Nome da organização<input name="name" minlength="2" maxlength="100" required></label><button class="primary-action">Criar organização</button></form><p id="setup-message" role="status"></p></div></div>`;
+  target.innerHTML = `<div class="setup-shell"><a href="/"><img src="/assets/official/01_logo_principal_transparente.webp" alt="TR Campeonatos"></a><div class="panel-card"><span class="eyebrow">PRIMEIRO ACESSO</span><h1>Crie sua organização</h1><p>Campeonatos oficiais ficam vinculados à sua organização. Você será o proprietário.</p><form id="organization-form"><label>Nome da organização<input name="name" minlength="2" maxlength="100" required></label><button class="primary-action">Criar organização</button></form><p id="setup-message" role="status"></p></div></div>`;
   target.querySelector<HTMLFormElement>('#organization-form')!.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = String(new FormData(event.currentTarget as HTMLFormElement).get('name') || '').trim();
@@ -355,7 +356,8 @@ function teamBackgroundChoiceMarkup(selected: unknown = null) {
 
 function crestChoiceMarkup(currentUrl: string | null = null, editing = false, kind: 'equipe' | 'campeonato' = 'equipe') {
   const selected = currentUrl && editing ? 'current' : 'default';
-  return `<fieldset class="crest-choice"><legend>Escudo do ${kind}</legend><div class="crest-choice-options"><label class="crest-choice-card"><input type="radio" name="crestMode" value="default" ${selected === 'default' ? 'checked' : ''}><img src="${DEFAULT_TEAM_SHIELD}" alt="" width="1254" height="1254"><span><strong>Escudo padrão TR Campeonatos</strong><small>Usado quando nenhum escudo próprio for enviado.</small></span></label><label class="crest-choice-card"><input type="radio" name="crestMode" value="upload"><span class="crest-upload-icon" aria-hidden="true">↑</span><span><strong>Enviar meu escudo</strong><small>PNG ou JPG/JPEG, até 3 MB.</small></span></label>${editing && currentUrl ? `<label class="crest-choice-card"><input type="radio" name="crestMode" value="current" checked><img src="${escapeHtml(currentUrl)}" alt="" width="1254" height="1254"><span><strong>Manter escudo atual</strong><small>Nenhuma alteração na imagem.</small></span></label>` : ''}</div><label class="crest-file-label" hidden>Selecione PNG ou JPEG<input name="crest" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg"></label><div class="crest-preview"><span>PRÉVIA DO ${kind.toUpperCase()}</span>${teamShieldMarkup(currentUrl && editing ? currentUrl : null, kind, 'medium', 'eager')}<strong data-crest-preview-name>Nome ${kind === 'equipe' ? 'da equipe' : 'do campeonato'}</strong></div><div class="crest-review" hidden><p>Confira o recorte antes de salvar.</p><label><input type="radio" name="crestVersion" value="processed" checked> Usar PNG sem fundo</label><label><input type="radio" name="crestVersion" value="original"> Manter imagem original</label><p class="data-note" data-crest-status role="status"></p></div></fieldset>`;
+  const article = kind === 'equipe' ? 'da' : 'do';
+  return `<fieldset class="crest-choice"><legend>Escudo ${article} ${kind}</legend><div class="crest-choice-options"><label class="crest-choice-card"><input type="radio" name="crestMode" value="default" ${selected === 'default' ? 'checked' : ''}><img src="${DEFAULT_TEAM_SHIELD}" alt="" width="1254" height="1254"><span><strong>Escudo padrão TR Campeonatos</strong><small>Usado quando nenhum escudo próprio for enviado.</small></span></label><label class="crest-choice-card"><input type="radio" name="crestMode" value="upload"><span class="crest-upload-icon" aria-hidden="true">↑</span><span><strong>Enviar meu escudo</strong><small>PNG ou JPG/JPEG, até 3 MB.</small></span></label>${editing && currentUrl ? `<label class="crest-choice-card"><input type="radio" name="crestMode" value="current" checked><img src="${escapeHtml(currentUrl)}" alt="" width="1254" height="1254"><span><strong>Manter escudo atual</strong><small>Nenhuma alteração na imagem.</small></span></label>` : ''}</div><label class="crest-file-label" hidden>Selecione PNG ou JPEG<input name="crest" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg"></label><div class="crest-preview"><span>PRÉVIA ${article.toUpperCase()} ${kind.toUpperCase()}</span>${teamShieldMarkup(currentUrl && editing ? currentUrl : null, kind, 'medium', 'eager')}<strong data-crest-preview-name>Nome ${kind === 'equipe' ? 'da equipe' : 'do campeonato'}</strong></div><div class="crest-review" hidden><p>Confira o recorte antes de salvar.</p><label><input type="radio" name="crestVersion" value="processed" checked> Usar imagem otimizada</label><label><input type="radio" name="crestVersion" value="original"> Manter imagem original</label><p class="data-note" data-crest-status role="status"></p></div></fieldset>`;
 }
 
 const crestPreparations = new WeakMap<HTMLFormElement, Promise<SmartShieldResult>>();
@@ -639,14 +641,23 @@ async function competitionList(ctx: Context) {
 
 function newCompetition(ctx: Context) {
   if (!editor(ctx.role)) { panelMain().innerHTML = empty('Acesso restrito', 'Sua função nesta organização permite apenas visualizar competições.'); return; }
-  panelMain().innerHTML = `${panelHeading('NOVA COMPETIÇÃO', 'Criar campeonato', 'Defina a estrutura inicial. Equipes e confrontos serão adicionados depois.')}<div class="panel-card empty-state"><h2>Uma competição começa em dois passos</h2><p>Escolha o tipo e informe o nome e as fases.</p><button id="start-competition" class="primary-action" type="button">+ Criar campeonato</button></div><dialog id="competition-type-dialog" class="competition-dialog" aria-labelledby="competition-type-title"><div class="dialog-heading"><span>ETAPA 1 DE 2</span><button type="button" data-close-dialog aria-label="Fechar">×</button></div><h2 id="competition-type-title">Tipo de campeonato</h2><p>Escolha como o campeonato será organizado.</p><div class="competition-kind-grid"><button type="button" data-kind="single"><strong>Campeonato único</strong><span>Uma modalidade e uma categoria.</span><small>Corujão, futebol, futsal ou torneio eliminatório.</small></button><button type="button" data-kind="categories"><strong>Campeonato com categorias</strong><span>Mais de uma categoria no mesmo campeonato.</span><small>Sub-15 e Sub-17, masculino e feminino, divisões distintas.</small></button></div><button type="button" class="secondary-action" data-close-dialog>Cancelar</button></dialog><dialog id="competition-details-dialog" class="competition-dialog" aria-labelledby="competition-details-title"><div class="dialog-heading"><span>ETAPA 2 DE 2</span><button type="button" data-close-dialog aria-label="Fechar">×</button></div><h2 id="competition-details-title">Novo campeonato</h2><form id="new-competition"><input type="hidden" name="kind" value="single"><label>Nome do campeonato<input name="name" minlength="3" maxlength="120" autofocus required></label>${crestChoiceMarkup(null, false, 'campeonato')}<fieldset class="phase-choice"><legend>Fases do campeonato</legend><label><input type="radio" name="format" value="round_robin" checked><span><strong>Pontos corridos</strong><small>Classificação por pontos.</small></span></label><label><input type="radio" name="format" value="groups_knockout"><span><strong>Pontos corridos + Eliminatórias</strong><small>Fase classificatória seguida por mata-mata.</small></span></label><label><input type="radio" name="format" value="knockout"><span><strong>Eliminatórias</strong><small>Confrontos diretos.</small></span></label></fieldset><details><summary>Modalidade e edição</summary><label>Modalidade<select name="sport"><option>Futebol</option><option>Futsal</option><option>Vôlei</option><option>Basquete</option><option>E-sports</option></select></label><label>Edição<input name="season" minlength="2" maxlength="40" value="${new Date().getFullYear()}" required></label></details><p class="data-note" id="format-capability">O campeonato começará em preparação e privado. Nenhum confronto será gerado automaticamente.</p><div class="dialog-actions"><button class="secondary-action" type="button" data-close-dialog>Cancelar</button><button class="primary-action" type="submit">Criar campeonato</button></div><p id="form-message" role="status" aria-live="polite"></p></form></dialog>`;
+  panelMain().innerHTML = `${panelHeading('NOVA COMPETIÇÃO', 'Criar campeonato', 'Escolha o tipo, informe o nome e adicione o escudo se quiser.')}<div class="panel-card empty-state"><h2>Comece em dois passos</h2><p>Escolha o tipo e informe o nome. Depois, adicione as equipes e monte as partidas.</p><button id="start-competition" class="primary-action" type="button">+ Criar campeonato</button></div><dialog id="competition-type-dialog" class="competition-dialog" aria-labelledby="competition-type-title"><div class="dialog-heading"><span>ETAPA 1 DE 2</span><button type="button" data-close-dialog aria-label="Fechar">×</button></div><h2 id="competition-type-title">Tipo de campeonato</h2><p>Escolha como o campeonato será organizado.</p><div class="competition-kind-grid"><button type="button" data-kind="single"><strong>Campeonato único</strong><span>Uma modalidade e uma categoria.</span><small>Futebol, futsal ou torneio eliminatório.</small></button><button type="button" data-kind="corujao"><strong>Modo Corujão</strong><span>E-sports com fase de grupos e eliminatórias.</span><small>As rodadas serão montadas conforme a quantidade de equipes.</small></button><button type="button" data-kind="categories"><strong>Campeonato com categorias</strong><span>Mais de uma categoria no mesmo campeonato.</span><small>Sub-15 e Sub-17, masculino e feminino, divisões distintas.</small></button></div><button type="button" class="secondary-action" data-close-dialog>Cancelar</button></dialog><dialog id="competition-details-dialog" class="competition-dialog" aria-labelledby="competition-details-title"><div class="dialog-heading"><span>ETAPA 2 DE 2</span><button type="button" data-close-dialog aria-label="Fechar">×</button></div><h2 id="competition-details-title">Novo campeonato</h2><form id="new-competition"><input type="hidden" name="kind" value="single"><label>Nome do campeonato<input name="name" minlength="3" maxlength="120" autofocus required></label>${crestChoiceMarkup(null, false, 'campeonato')}<fieldset class="phase-choice"><legend>Fases do campeonato</legend><label><input type="radio" name="format" value="round_robin" checked><span><strong>Pontos corridos</strong><small>Classificação por pontos.</small></span></label><label><input type="radio" name="format" value="groups_knockout"><span><strong>Pontos corridos + Eliminatórias</strong><small>Fase classificatória seguida por mata-mata.</small></span></label><label><input type="radio" name="format" value="knockout"><span><strong>Eliminatórias</strong><small>Confrontos diretos.</small></span></label></fieldset><details><summary>Modalidade e edição</summary><label>Modalidade<select name="sport"><option>Futebol</option><option>Futsal</option><option>Vôlei</option><option>Basquete</option><option>E-sports</option></select></label><label>Edição<input name="season" minlength="2" maxlength="40" value="${new Date().getFullYear()}" required></label></details><p class="data-note" id="format-capability">O campeonato começará em preparação e privado. Nenhum confronto será gerado automaticamente.</p><div class="dialog-actions"><button class="secondary-action" type="button" data-close-dialog>Cancelar</button><button class="primary-action" type="submit">Criar campeonato</button></div><p id="form-message" role="status" aria-live="polite"></p></form></dialog>`;
   installCrestChoice(panelMain().querySelector<HTMLFormElement>('#new-competition')!);
   const typeDialog = panelMain().querySelector<HTMLDialogElement>('#competition-type-dialog')!;
   const detailsDialog = panelMain().querySelector<HTMLDialogElement>('#competition-details-dialog')!;
   panelMain().querySelector('#start-competition')?.addEventListener('click', () => typeDialog.showModal());
   panelMain().querySelectorAll<HTMLButtonElement>('[data-close-dialog]').forEach((button) => button.addEventListener('click', () => { button.closest('dialog')?.close(); }));
   panelMain().querySelectorAll<HTMLButtonElement>('[data-kind]').forEach((button) => button.addEventListener('click', () => {
-    panelMain().querySelector<HTMLInputElement>('#new-competition [name="kind"]')!.value = button.dataset.kind || 'single';
+    const corujao = button.dataset.kind === 'corujao';
+    panelMain().querySelector<HTMLFormElement>('#new-competition')!.dataset.preset = corujao ? 'corujao' : '';
+    panelMain().querySelector<HTMLInputElement>('#new-competition [name="kind"]')!.value = button.dataset.kind === 'categories' ? 'categories' : 'single';
+    panelMain().querySelector<HTMLSelectElement>('#new-competition [name="sport"]')!.value = corujao ? 'E-sports' : 'Futebol';
+    panelMain().querySelector<HTMLInputElement>(`#new-competition [name="format"][value="${corujao ? 'groups_knockout' : 'round_robin'}"]`)!.checked = true;
+    panelMain().querySelector<HTMLElement>('.phase-choice')!.hidden = corujao;
+    panelMain().querySelector<HTMLElement>('#new-competition details')!.hidden = corujao;
+    panelMain().querySelector<HTMLElement>('#format-capability')!.textContent = corujao
+      ? 'Modo Corujão: o planejador monta grupos e confrontos. A progressão oficial até o campeão está validada para 8 equipes em dois grupos de quatro. Outros tamanhos aguardam regulamento de classificação.'
+      : 'O campeonato começará em preparação e privado. Nenhum confronto será gerado automaticamente.';
     typeDialog.close(); detailsDialog.showModal();
   }));
   panelMain().querySelectorAll<HTMLInputElement>('#new-competition input[name="format"]').forEach((radio) => radio.addEventListener('change', () => {
@@ -658,8 +669,8 @@ function newCompetition(ctx: Context) {
     const fields = new FormData(form);
     const name = String(fields.get('name') || '').trim();
     const label = String(fields.get('season') || '').trim();
-    const sport = String(fields.get('sport') || '');
-    const format = String(fields.get('format') || '');
+    const sport = form.dataset.preset === 'corujao' ? 'E-sports' : String(fields.get('sport') || '');
+    const format = form.dataset.preset === 'corujao' ? 'groups_knockout' : String(fields.get('format') || '');
     const kind = String(fields.get('kind') || 'single');
     const crest = fields.get('crest');
     const crestMode = String(fields.get('crestMode') || 'default');
@@ -673,7 +684,14 @@ function newCompetition(ctx: Context) {
     }
     const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     submit.disabled = true; message.textContent = 'Criando campeonato…';
-    let created = await ctx.client.rpc('create_competition_setup', { target_organization: ctx.organization.id, target_name: name, target_sport: sport, target_season_label: label, target_format: format, target_kind: kind });
+    const corujao = form.dataset.preset === 'corujao';
+    let created = corujao
+      ? await ctx.client.rpc('create_competition_mode', { target_organization: ctx.organization.id, target_name: name, target_sport: sport, target_season_label: label, target_format: format, target_kind: kind, target_mode: 'corujao' })
+      : await ctx.client.rpc('create_competition_setup', { target_organization: ctx.organization.id, target_name: name, target_sport: sport, target_season_label: label, target_format: format, target_kind: kind });
+    if (created.error && missingSchemaFeature(created.error) && corujao) {
+      message.textContent = 'O Modo Corujão requer a migração 202610270002 no Supabase. Nenhum campeonato foi criado.';
+      submit.disabled = false; return;
+    }
     if (created.error && missingSchemaFeature(created.error) && kind === 'single') {
       created = await ctx.client.rpc('create_competition_with_season', { target_organization: ctx.organization.id, target_name: name, target_sport: sport, target_season_label: label, target_format: format });
     }
@@ -686,25 +704,30 @@ function newCompetition(ctx: Context) {
       try { message.textContent = 'Salvando escudo…'; await storeCompetitionShield(ctx, created.data.id, crest, prepared); }
       catch (error) { message.textContent = `Campeonato criado, mas o escudo não foi salvo: ${error instanceof Error ? error.message : 'erro desconhecido'}. Edite as informações para tentar novamente.`; submit.disabled = false; return; }
     }
-    location.assign(`/painel/campeonatos/${created.data.id}`);
+    location.assign(corujao ? `/painel/campeonatos/${created.data.id}/resultados` : `/painel/campeonatos/${created.data.id}`);
   });
 }
 
 async function getCompetition(ctx: Context, id: string) {
-  const result = await ctx.client.from('competitions').select('id,name,sport,status,visibility,organization_id,competition_kind,default_format,subtitle,description,accent_color,regulation,prizes,location_mode,venue,starts_on,ends_on').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
+  const result = await ctx.client.from('competitions').select('id,name,sport,status,visibility,organization_id,competition_kind,default_format,setup_mode,subtitle,description,accent_color,regulation,prizes,location_mode,venue,starts_on,ends_on').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
+  let data = result.data;
   if (missingSchemaFeature(result.error)) {
-    const legacy = await ctx.client.from('competitions').select('id,name,sport,status,visibility,organization_id').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
-    fail(legacy.error);
-    return legacy.data ? {
-      ...legacy.data, __extendedSchema: false, competition_kind: 'single', default_format: 'round_robin',
-      subtitle: null, description: null, accent_color: '#0878E8', regulation: null, prizes: null,
-      location_mode: 'online', venue: null, starts_on: null, ends_on: null, crest_path: null,
-    } : null;
-  }
-  fail(result.error);
-  if (!result.data) return null;
+    const previous = await ctx.client.from('competitions').select('id,name,sport,status,visibility,organization_id,competition_kind,default_format,subtitle,description,accent_color,regulation,prizes,location_mode,venue,starts_on,ends_on').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
+    if (!previous.error) data = previous.data ? { ...previous.data, setup_mode: 'standard' } : null;
+    else {
+      if (!missingSchemaFeature(previous.error)) fail(previous.error);
+      const legacy = await ctx.client.from('competitions').select('id,name,sport,status,visibility,organization_id').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
+      fail(legacy.error);
+      return legacy.data ? {
+        ...legacy.data, __extendedSchema: false, competition_kind: 'single', default_format: 'round_robin', setup_mode: 'standard',
+        subtitle: null, description: null, accent_color: '#0878E8', regulation: null, prizes: null,
+        location_mode: 'online', venue: null, starts_on: null, ends_on: null, crest_path: null,
+      } : null;
+    }
+  } else fail(result.error);
+  if (!data) return null;
   const crest = await ctx.client.from('competitions').select('crest_path').eq('id', id).eq('organization_id', ctx.organization.id).maybeSingle();
-  return { ...result.data, crest_path: crest.error ? null : crest.data?.crest_path, __extendedSchema: true };
+  return { ...data, crest_path: crest.error ? null : crest.data?.crest_path, __extendedSchema: true };
 }
 
 async function competitionDetail(ctx: Context, id: string) {
@@ -817,6 +840,55 @@ async function resultEditor(ctx: Context, id: string) {
   const names = new Map(entries.map((entry) => [entry.id, entry.club_name_snapshot]));
   panelMain().innerHTML = `${panelHeading('CENTRAL DE PARTIDAS', competition.name, `${selected.category || selected.label} · resultados oficiais`)}<div class="panel-card"><div class="filter-row"><label>Temporada<select id="season-select">${seasons.map((season) => `<option value="${season.id}" ${season.id === selected.id ? 'selected' : ''}>${escapeHtml(season.category || season.label)}</option>`).join('')}</select></label><label>Situação<select id="status-filter"><option value="">Todas</option><option value="scheduled">Agendadas</option><option value="in_progress">Em andamento</option><option value="completed">Finalizadas</option><option value="confirmed">Confirmadas</option></select></label><label>Rodada<input id="round-filter" type="number" min="1" placeholder="Todas"></label><label>Equipe<select id="team-filter"><option value="">Todas</option>${activeEntries.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.club_name_snapshot)}</option>`).join('')}</select></label><label>Fase<select id="phase-filter"><option value="">Todas</option><option value="league">Liga</option><option value="groups">Grupos</option><option value="round_of_16">Oitavas</option><option value="quarterfinal">Quartas</option><option value="semifinal">Semifinal</option><option value="final">Final</option></select></label><label>Data<input id="date-filter" type="date"></label></div></div><div id="match-list">${matches.length ? matches.map((match) => `<article class="panel-card match-row" data-status="${match.status}" data-round="${match.round_number ?? ''}" data-phase="${match.phase}" data-date="${match.scheduled_at?.slice(0, 10) || ''}" data-home="${match.home_entry_id}" data-away="${match.away_entry_id}"><div class="match-meta"><span>${escapeHtml(match.phase)} · Rodada ${match.round_number ?? '—'}</span><span>${escapeHtml(readableDate(match.scheduled_at))}</span><span class="pill">${escapeHtml(match.status)}</span></div><form data-match-id="${match.id}"><strong>${escapeHtml(names.get(match.home_entry_id) || 'Equipe indisponível')}</strong><input aria-label="Gols do mandante" name="home" type="number" min="0" max="32767" value="${match.home_score ?? ''}" required ${canEdit ? '' : 'disabled'}><b>×</b><input aria-label="Gols do visitante" name="away" type="number" min="0" max="32767" value="${match.away_score ?? ''}" required ${canEdit ? '' : 'disabled'}><strong>${escapeHtml(names.get(match.away_entry_id) || 'Equipe indisponível')}</strong><select name="status" aria-label="Situação do resultado" ${canEdit ? '' : 'disabled'}><option value="completed" ${match.status === 'completed' ? 'selected' : ''}>Finalizado</option><option value="confirmed" ${match.status === 'confirmed' ? 'selected' : ''}>Confirmado</option></select>${canEdit ? '<button class="primary-action" type="submit">Salvar</button>' : ''}</form><p role="status"></p></article>`).join('') : empty('Nenhuma partida cadastrada', 'Cadastre equipes e partidas para lançar resultados.')}</div>${canEdit ? `<div class="panel-card"><h2>Adicionar equipe existente</h2><form id="entry-form"><label>Clube<select name="club" id="club-select" required><option value="">Carregando clubes…</option></select></label><button class="secondary-action">Adicionar à temporada</button><p role="status"></p></form></div><div class="panel-card"><h2>Agendar partida</h2><form id="match-form" class="fixture-form"><label>Mandante<select name="home" required>${activeEntries.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.club_name_snapshot)}</option>`).join('')}</select></label><label>Visitante<select name="away" required>${activeEntries.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.club_name_snapshot)}</option>`).join('')}</select></label><label>Rodada<input name="round" type="number" min="1" required></label><label>Data e horário<input name="date" type="datetime-local"></label><button class="primary-action" ${activeEntries.length < 2 ? 'disabled' : ''}>Agendar</button><p role="status"></p></form></div>` : ''}`;
   panelMain().querySelector('#match-list')?.insertAdjacentHTML('beforebegin', `<div class="panel-card"><h2>${selected.draw_confirmed_at ? 'Sorteio oficial confirmado' : 'Montar estrutura'}</h2><p>${selected.draw_confirmed_at ? 'Grupos e confrontos foram gravados nesta temporada.' : `Use as ${activeEntries.length} equipes confirmadas desta ${selected.category ? 'categoria' : 'edição'} para sortear grupos, revisar confrontos e confirmar a gravação oficial.`}</p>${selected.draw_confirmed_at ? '' : `<a class="secondary-action" href="/planejador?temporada=${encodeURIComponent(selected.id)}">Abrir planejador com estas equipes →</a>`}</div>`);
+  if (selected.draw_kind === 'corujao' && selected.draw_confirmed_at) {
+    const progression = await ctx.client.rpc('corujao_advance_state', { target_season: selected.id });
+    const state = progression.data as any;
+    const fixturePreview = (state?.fixtures || []).map((fixture: any, index: number) =>
+      `<li>Jogo ${index + 1}: <strong>${escapeHtml(names.get(fixture.homeId) || 'Equipe indisponível')}</strong> × <strong>${escapeHtml(names.get(fixture.awayId) || 'Equipe indisponível')}</strong></li>`).join('');
+    const tiePreview = (state?.ties || []).map((tie: any, index: number) =>
+      `<li><strong>${escapeHtml(tie.group)}</strong>: ${(tie.candidates || []).map((entryId: string) => escapeHtml(names.get(entryId) || 'Equipe indisponível')).join(', ')} ${canEdit ? `<button class="secondary-action" type="button" data-tie-index="${index}">Sortear desempate</button>` : ''}</li>`).join('');
+    const championName = names.get(state?.championId) || 'Equipe indisponível';
+    const progressionBody = progression.error
+      ? `<p>Não foi possível consultar a progressão: ${escapeHtml(progression.error.code === 'PGRST202' ? 'a migration 202610270004 ainda não foi aplicada.' : progression.error.message)}</p>`
+      : state?.status === 'awaiting_results'
+        ? `<p>Confirme todas as partidas da ${state.phase === 'groups' ? 'fase de grupos' : state.phase === 'semifinal' ? 'semifinal' : 'final'} para avançar. ${state.confirmed || 0} de ${state.total || 0} resultados confirmados.</p>`
+        : state?.status === 'tiebreak_required'
+          ? `<p>Empate absoluto nos critérios do regulamento: pontos, vitórias, saldo e gols marcados. O sorteio oficial da posição deve ser registrado antes do avanço.</p><ul>${tiePreview}</ul>`
+          : state?.status === 'ready'
+            ? `<p>${state.phase === 'semifinal' ? 'Fase de grupos concluída. Revise os classificados e as semifinais.' : 'Semifinais concluídas. Revise o confronto da final.'}</p><ul>${fixturePreview}</ul>${canEdit ? '<button id="confirm-corujao-advance" class="primary-action" type="button">Gerar próxima fase</button>' : ''}`
+            : state?.status === 'champion_ready'
+              ? `<p>Final concluída. Campeão: <strong>${escapeHtml(championName)}</strong>.</p>${canEdit ? '<button id="confirm-corujao-advance" class="primary-action" type="button">Confirmar campeão</button>' : ''}`
+              : state?.status === 'completed'
+                ? `<p>Campeonato concluído. Campeão: <strong>${escapeHtml(championName)}</strong>.</p>`
+                : `<p>${escapeHtml(state?.message || 'A progressão desta temporada ainda não está disponível.')}</p>`;
+    panelMain().querySelector('#match-list')?.insertAdjacentHTML('beforebegin',
+      `<section class="panel-card" id="corujao-progression" aria-labelledby="corujao-progression-title"><h2 id="corujao-progression-title">Caminho até o campeão</h2>${progressionBody}<p role="status" aria-live="polite"></p></section>`);
+    const progressionPanel = panelMain().querySelector<HTMLElement>('#corujao-progression')!;
+    progressionPanel.querySelectorAll<HTMLButtonElement>('[data-tie-index]').forEach((button) => button.addEventListener('click', async () => {
+      if (!canEdit || !state || !window.confirm('Realizar e registrar o sorteio oficial deste desempate?')) return;
+      const tie = state.ties[Number(button.dataset.tieIndex)];
+      const message = progressionPanel.querySelector<HTMLElement>('[role="status"]')!;
+      button.disabled = true; message.textContent = 'Registrando sorteio…';
+      const result = await ctx.client.rpc('draw_corujao_tiebreak', {
+        target_season: selected.id, target_group: tie.group, target_tie_key: tie.tieKey,
+      });
+      if (result.error) { message.textContent = result.error.message; button.disabled = false; }
+      else { message.textContent = 'Sorteio registrado no histórico. Atualizando confrontos…'; location.reload(); }
+    }));
+    progressionPanel.querySelector<HTMLButtonElement>('#confirm-corujao-advance')?.addEventListener('click', async (event) => {
+      if (!canEdit || !state?.revision || !window.confirm(state.status === 'champion_ready'
+        ? 'Confirmar o campeão, o vice e concluir a temporada oficialmente?'
+        : 'Confirmar e registrar estas partidas da próxima fase?')) return;
+      const button = event.currentTarget as HTMLButtonElement;
+      const message = progressionPanel.querySelector<HTMLElement>('[role="status"]')!;
+      button.disabled = true; message.textContent = 'Registrando progressão oficial…';
+      const result = await ctx.client.rpc('confirm_corujao_advance', {
+        target_season: selected.id, expected_revision: state.revision,
+      });
+      if (result.error) { message.textContent = result.error.message; button.disabled = false; }
+      else { message.textContent = 'Progressão registrada. Atualizando partidas…'; location.reload(); }
+    });
+  }
   if (selected.draw_confirmed_at) {
     panelMain().querySelector('#entry-form')?.closest('.panel-card')?.remove();
     panelMain().querySelector('#match-form')?.closest('.panel-card')?.remove();
@@ -1016,21 +1088,28 @@ export function publicMatchDetailData(match: any, shootout: any, events: any[], 
 export async function publicPage(client: SupabaseClient, id: string, demo = false) {
   const target = mount()!;
   if (!safeId(id)) { target.textContent = 'Endereço de campeonato inválido.'; return; }
-  let query = await client.from('competitions').select('id,name,sport,status,visibility,subtitle,description,accent_color,regulation,prizes,location_mode,venue,starts_on,ends_on').eq('id', id).eq('visibility', 'public').maybeSingle();
+  const seasonsPromise = Promise.resolve(client.from('competition_seasons').select('*').eq('competition_id', id).order('created_at', { ascending: false }));
+  let query = await client.from('competitions').select('id,name,sport,status,visibility,crest_path,subtitle,description,accent_color,regulation,prizes,location_mode,venue,starts_on,ends_on').eq('id', id).eq('visibility', 'public').maybeSingle();
+  if (missingSchemaFeature(query.error)) query = await client.from('competitions').select('id,name,sport,status,visibility,subtitle,description,accent_color,regulation,prizes,location_mode,venue,starts_on,ends_on').eq('id', id).eq('visibility', 'public').maybeSingle();
   if (missingSchemaFeature(query.error)) query = await client.from('competitions').select('id,name,sport,status,visibility').eq('id', id).eq('visibility', 'public').maybeSingle();
   fail(query.error);
   const competition = query.data;
   if (!competition) { target.innerHTML = '<div class="public-shell"><a href="/campeonatos">← Campeonatos</a><h1>Campeonato não encontrado</h1><p>Ele pode não estar publicado.</p></div>'; return; }
-  const crestQuery = await client.from('competitions').select('crest_path').eq('id', id).eq('visibility', 'public').maybeSingle();
-  const competitionCrestUrl = await signedCompetitionShield(client, crestQuery.error ? null : crestQuery.data?.crest_path);
   if (/^#[0-9A-Fa-f]{6}$/.test(competition.accent_color || '')) target.style.setProperty('--competition-accent', competition.accent_color);
   document.title = `${competition.name} | TR Campeonatos`;
-  const seasonsQuery = await client.from('competition_seasons').select('*').eq('competition_id', id).order('created_at', { ascending: false });
+  if (!new URLSearchParams(location.search).has('jogo')) {
+    target.removeAttribute('role');
+    target.innerHTML = `<header class="public-header"><a class="public-brand" href="/" aria-label="TR Campeonatos, início">${PUBLIC_BRAND}</a><nav aria-label="Navegação geral"><a href="/campeonatos">Campeonatos</a><a href="/demonstracao">Demonstração</a></nav></header><main class="public-shell"><div id="inicio" class="public-hero"><span class="public-hero-shield-placeholder" aria-hidden="true"></span><span>VITRINE PÚBLICA</span><h1>${escapeHtml(competition.name)}</h1><p>${escapeHtml(competition.sport)} · Carregando equipes</p><div class="public-share-actions" aria-hidden="true"><span class="secondary-action">Compartilhar campeonato</span><span class="secondary-action">Enviar no WhatsApp</span></div><p id="share-status" aria-hidden="true"></p></div><nav class="public-section-nav" aria-label="Seções da competição"><a href="#inicio">Início</a><a href="#classificacao">Classificação</a><a href="#jogos">Jogos</a><a href="#equipes">Equipes</a><a href="#estatisticas">Estatísticas</a></nav><div class="public-overview"><section class="panel-card public-featured" aria-label="Jogo em destaque"><div class="public-section-heading"><div><span>EM DESTAQUE</span><h2>Carregando partidas</h2></div></div><article class="public-fixture match-arena" aria-label="Carregando jogo"></article></section></div></main>`;
+  }
+  const [competitionCrestUrl, seasonsQuery] = await Promise.all([
+    signedCompetitionShield(client, competition.crest_path),
+    seasonsPromise,
+  ]);
   fail(seasonsQuery.error);
   const seasons = seasonsQuery.data || [];
   const requested = new URLSearchParams(location.search).get('temporada');
   const season = seasons.find((item) => item.id === requested) || seasons[0];
-  let entries: any[] = [], matches: any[] = [], titles: any[] = [], shootouts: any[] = [];
+  let entries: any[] = [], matches: any[] = [], titles: any[] = [], shootouts: any[] = [], tiebreakDraws: any[] = [];
   if (season) {
     const results = await Promise.all([
       client.from('competition_entries').select('*').eq('season_id', season.id),
@@ -1039,9 +1118,18 @@ export async function publicPage(client: SupabaseClient, id: string, demo = fals
     ]);
     results.forEach((result) => fail(result.error));
     entries = results[0].data || []; matches = results[1].data || []; titles = results[2].data || [];
+    if (season.draw_kind === 'corujao' && matches.some((match) => match.phase === 'semifinal')) {
+      const draws = await client.from('corujao_tiebreak_draws')
+        .select('group_label,tie_key,ordered_ids,seed,drawn_at')
+        .eq('season_id', season.id).order('drawn_at', { ascending: false });
+      if (!draws.error) tiebreakDraws = draws.data || [];
+    }
+    const penaltiesPromise = matches.length
+      ? Promise.resolve(client.from('penalty_shootouts').select('match_id,home_score,away_score,winning_entry_id').in('match_id', matches.map((match) => match.id)))
+      : null;
     if (!demo) await refreshEntryCrests(client, entries);
     if (matches.length) {
-      const penalties = await client.from('penalty_shootouts').select('match_id,home_score,away_score,winning_entry_id').in('match_id', matches.map((match) => match.id));
+      const penalties = await penaltiesPromise!;
       fail(penalties.error); shootouts = penalties.data || [];
     }
   }
@@ -1064,15 +1152,23 @@ export async function publicPage(client: SupabaseClient, id: string, demo = fals
     else { home.draws++; away.draws++; home.points++; away.points++; home.recent.push('E'); away.recent.push('E'); }
   }
   const standingsSupported = demo || ['Futebol', 'Futsal'].includes(competition.sport);
-  standings.sort((a, b) => b.points - a.points || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst) || b.goalsFor - a.goalsFor || a.name.localeCompare(b.name));
+  const lotteryOrder = new Map<string, number>();
+  for (const draw of tiebreakDraws) for (const [position, entryId] of (draw.ordered_ids || []).entries()) {
+    if (!lotteryOrder.has(entryId)) lotteryOrder.set(entryId, position);
+  }
+  standings.sort((a, b) => b.points - a.points || b.wins - a.wins || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst) || b.goalsFor - a.goalsFor ||
+    (entryById.get(a.id)?.group_label === entryById.get(b.id)?.group_label && lotteryOrder.has(a.id) && lotteryOrder.has(b.id)
+      ? lotteryOrder.get(a.id)! - lotteryOrder.get(b.id)! : 0) || a.name.localeCompare(b.name));
   const titleNames = new Map(entries.map((entry) => [entry.club_id, entry.club_name_snapshot]));
   target.removeAttribute('role');
   const publicStatus = (value: string) => ({ active: 'Em andamento', draft: 'Rascunho', finished: 'Encerrado', completed: 'Concluído', published: 'Publicado', cancelled: 'Cancelado' } as Record<string, string>)[value] || value;
   const publicFormat = (value: string) => ({ round_robin: 'Pontos corridos', knockout: 'Mata-mata', groups_knockout: 'Grupos e mata-mata' } as Record<string, string>)[value] || value;
+  const publicSeasonStatus = (item: any) => item.draw_confirmed_at && item.status === 'draft' ? 'Sorteio confirmado' : publicStatus(item.status);
+  const publicGroupTitle = (label: string) => /^grupo\s+/i.test(label) ? label : `Grupo ${label}`;
   const routeBase = demo ? location.pathname : `/c/${id}`;
   const publicBase = `${routeBase}${season ? `?temporada=${encodeURIComponent(season.id)}` : ''}`;
   const detailHref = (matchId: string) => `${routeBase}?temporada=${encodeURIComponent(season.id)}&jogo=${encodeURIComponent(matchId)}`;
-  const header = `<header class="public-header"><a class="public-brand" href="/" aria-label="TR Campeonatos, início"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><nav aria-label="Navegação geral"><a href="/campeonatos">Campeonatos</a><a href="/demonstracao">Demonstração</a></nav></header>`;
+  const header = `<header class="public-header"><a class="public-brand" href="/" aria-label="TR Campeonatos, início">${PUBLIC_BRAND}</a><nav aria-label="Navegação geral"><a href="/campeonatos">Campeonatos</a><a href="/demonstracao">Demonstração</a></nav></header>`;
   const navBase = new URLSearchParams(location.search).has("jogo") ? publicBase : "";
   const mobileNav = `<nav class="public-mobile-nav" aria-label="Seções da competição"><a href="${navBase}#inicio"><span aria-hidden="true">⌂</span>Início</a><a href="${navBase}#classificacao"><span aria-hidden="true">♜</span>Classificação</a><a href="${navBase}#jogos"><span aria-hidden="true">▣</span>Jogos</a><a href="${navBase}#equipes"><span aria-hidden="true">♟</span>Equipes</a><a href="${navBase}#estatisticas"><span aria-hidden="true">▥</span>Estatísticas</a></nav>`;
   const requestedMatch = new URLSearchParams(location.search).get('jogo');
@@ -1106,7 +1202,60 @@ export async function publicPage(client: SupabaseClient, id: string, demo = fals
       return !demo && entry.club_id && safeId(entry.club_id) ? `<a class="public-team-card"${backgroundStyle} href="/clubes/${entry.club_id}">${content}<span class="public-team-card-profile">Ver perfil →</span></a>` : `<div class="public-team-card"${backgroundStyle}>${content}</div>`;
     }).join('');
     const standingsTable = standingsSupported && (season?.format === "round_robin" || season?.format === "groups_knockout") && standings.length ? publicStandingsView(standings, entryById, crestUrls, matches, detailHref, demo) : "<p>A classificação por pontos ainda não está disponível para esta modalidade ou formato, ou não há equipes confirmadas.</p>";
-    target.innerHTML = `${header}<main class="public-shell"><div id="inicio" class="public-hero"><span>${demo ? 'DEMONSTRAÇÃO · DADOS FICTÍCIOS' : 'VITRINE PÚBLICA'} · ${escapeHtml(season?.category || season?.label || competition.sport)}</span><h1>${escapeHtml(competition.name)}</h1><p>${escapeHtml(competition.sport)} · ${escapeHtml(publicStatus(competition.status))} · ${entries.length} equipes</p><div class="public-share-actions"><button id="share-competition" class="secondary-action" type="button">Compartilhar campeonato</button><a class="secondary-action" target="_blank" rel="noopener noreferrer" href="https://wa.me/?text=${encodeURIComponent(competition.name + ' — ' + location.origin + routeBase)}">Enviar no WhatsApp</a></div><p id="share-status" role="status"></p></div><nav class="public-section-nav" aria-label="Seções da competição"><a href="#inicio">Início</a><a href="#classificacao">Classificação</a><a href="#jogos">Jogos</a><a href="#equipes">Equipes</a><a href="#estatisticas">Estatísticas</a></nav>${season ? `<div class="season-bar"><label>${seasons.some((item) => item.category) ? 'Categoria' : 'Temporada'}<select id="public-season">${seasons.map((item) => `<option value="${item.id}" ${item.id === season.id ? 'selected' : ''}>${escapeHtml(item.category || item.label)}</option>`).join('')}</select></label><span>${escapeHtml(publicFormat(season.format))} · ${escapeHtml(publicStatus(season.status))}</span></div><div class="public-overview"><section class="panel-card public-featured" aria-label="Jogo em destaque"><div class="public-section-heading"><div><span>EM DESTAQUE</span><h2>${featured?.status === 'confirmed' ? 'Último resultado' : 'Próximo confronto'}</h2></div><a href="#jogos">Todos os jogos →</a></div>${featured ? publicFixture(featured, entryById, crestUrls, shootoutByMatch.get(featured.id), detailHref(featured.id)) : '<p>Nenhuma partida cadastrada nesta temporada.</p>'}</section><section class="panel-card public-upcoming"><div class="public-section-heading"><div><span>AGENDA</span><h2>Próximos jogos</h2></div></div>${upcoming.length ? upcoming.slice(0, 1).map((match) => publicFixture(match, entryById, crestUrls, shootoutByMatch.get(match.id), detailHref(match.id))).join('') + `<a class="upcoming-all" href="#jogos">Ver todos os confrontos →</a>` : '<p>Nenhum próximo jogo cadastrado.</p>'}</section></div><section class="panel-card public-section" id="jogos"><div class="public-section-heading"><div><span>CENTRAL DE PARTIDAS</span><h2>Jogos e resultados</h2></div><span>${matches.length} confrontos</span></div><div class="fixture-controls"><div role="group" aria-label="Filtrar partidas"><button type="button" class="fixture-filter active" data-filter="all" aria-pressed="true">Todas</button><button type="button" class="fixture-filter" data-filter="results" aria-pressed="false">Resultados</button><button type="button" class="fixture-filter" data-filter="upcoming" aria-pressed="false">Próximas</button></div><label>Rodada<select id="round-filter"><option value="all">Todas</option>${rounds.map((round) => `<option value="${round}">Rodada ${round}</option>`).join('')}</select></label></div><div class="public-fixtures">${matches.length ? matches.map((match) => publicFixture(match, entryById, crestUrls, shootoutByMatch.get(match.id), detailHref(match.id))).join('') : '<p>Nenhuma partida publicada nesta temporada.</p>'}</div><p id="fixture-empty" class="data-note" hidden>Nenhuma partida corresponde aos filtros.</p></section><section class="panel-card public-section" id="classificacao"><div class="public-section-heading"><div><span>TABELA DO CAMPEONATO</span><h2>Classificação</h2></div><span>${standings.length} equipes</span></div>${standingsTable}</section><section class="panel-card public-section premium-teams" id="equipes"><div class="premium-section-heading"><div class="premium-heading-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="8" r="5"/><path d="M6 27v-3a10 10 0 0 1 20 0v3zM2 24a7 7 0 0 1 5-7M30 24a7 7 0 0 0-5-7"/></svg></div><div><span>PARTICIPANTES</span><h2>EQUIPES</h2></div><span class="premium-heading-count"><strong>${entries.filter((entry) => entry.status === 'confirmed').length}</strong><span class="premium-count-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M5 20v-2a7 7 0 0 1 14 0v2M3 13a4 4 0 0 1 3-4m15 4a4 4 0 0 0-3-4"/></svg></span><small>EQUIPES INSCRITAS</small></span></div><div class="public-team-grid">${teamCards || '<p>Nenhuma equipe confirmada nesta temporada.</p>'}</div></section><section class="panel-card public-section premium-stats" id="estatisticas"><div class="premium-section-heading"><div class="premium-heading-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M4 27h24M7 24V9h5v15m4 0V5h5v19m4 0v-9h4v9"/></svg></div><div><span>DADOS DA TEMPORADA</span><h2>ESTATÍSTICAS</h2></div><div class="premium-season-slot"></div></div><div class="public-stats-grid"><div><span class="premium-stat-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 7h14v5a7 7 0 0 1-14 0V7zM9 9H4v3a6 6 0 0 0 6 6m13-9h5v3a6 6 0 0 1-6 6M16 19v6m-6 3h12m-9-3h6v3h-6z"/></svg></span><strong>${resultCount}</strong><span>Resultados confirmados</span><small>Partidas com placar final registrado</small></div><div><span class="premium-stat-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"/><path d="m16 9 4 3-1.5 5h-5L12 12l4-3zm-4-1-4 1-3 5 3 3 4-1m8-5 4 2 1 5-4 1-3-3m-9 0-2 5 4 4 4-2v-5m5-3 4 2 2 5-4 3-4-2"/></svg></span><strong>${upcoming.length}</strong><span>Jogos por disputar</span><small>Partidas ainda não realizadas</small></div><div><span class="premium-stat-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M4 26V8h24v18M8 23V12h16v11M8 12l16 11m0-11L8 23M2 28h28"/></svg></span><strong>${goals}</strong><span>Gols confirmados</span><small>Total de gols na competição</small></div></div><p class="data-note"><span aria-hidden="true">ⓘ</span>${demo ? 'Os números são calculados dos placares desta demonstração. Estatísticas de atletas aparecem somente quando são cadastradas.' : 'Os números são calculados dos registros oficiais. Estatísticas de atletas aparecem somente após cadastro da súmula.'}</p></section><section class="panel-card public-section premium-champions"><div class="premium-section-heading"><div class="premium-heading-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M10 4h12v5a7 7 0 0 1-14 0V4zm0 2H4v3a7 7 0 0 0 7 7m11-10h6v3a7 7 0 0 1-7 7M16 16v7m-6 5h12m-9-5h6v5h-6"/></svg></div><div><span>HISTÓRIA DA COMPETIÇÃO</span><h2>CONQUISTAS CONFIRMADAS</h2></div></div>${titles.length ? `<div class="premium-champion-list">${titles.slice().sort((a, b) => a.place - b.place).map((title) => `<article class="premium-champion"><span class="premium-trophy" aria-hidden="true">🏆</span><div><strong>${title.place === 1 ? 'CAMPEÃO' : `${title.place}º LUGAR`}</strong><h3>${escapeHtml(titleNames.get(title.club_id) || 'Clube registrado')}</h3></div></article>`).join('')}</div>` : `<div class="premium-champion-empty"><span class="premium-trophy" aria-hidden="true">🏆</span><div><p>${demo ? 'Nenhum título registrado nesta demonstração.' : 'Nenhum título oficial confirmado para esta temporada.'}</p><small>Conquistas aparecerão aqui quando forem registradas.</small></div></div>`}</section>` : '<section class="panel-card"><h2>Nenhuma temporada publicada</h2><p>O organizador ainda não cadastrou uma temporada.</p></section>'}${demo ? '<a class="back-link" href="/demonstracao">← Voltar à demonstração interativa</a>' : '<a class="back-link" href="/campeonatos">← Ver outros campeonatos</a>'}</main>${season ? mobileNav : ''}`;
+    const completedMarkup = `${header}<main class="public-shell"><div id="inicio" class="public-hero"><span>${demo ? 'DEMONSTRAÇÃO · DADOS FICTÍCIOS' : 'VITRINE PÚBLICA'} · ${escapeHtml(season?.category || season?.label || competition.sport)}</span><h1>${escapeHtml(competition.name)}</h1><p>${escapeHtml(competition.sport)} · ${escapeHtml(publicStatus(competition.status))} · ${entries.length} equipes</p><div class="public-share-actions"><button id="share-competition" class="secondary-action" type="button">Compartilhar campeonato</button><a class="secondary-action" target="_blank" rel="noopener noreferrer" href="https://wa.me/?text=${encodeURIComponent(competition.name + ' — ' + location.origin + routeBase)}">Enviar no WhatsApp</a></div><p id="share-status" role="status"></p></div><nav class="public-section-nav" aria-label="Seções da competição"><a href="#inicio">Início</a><a href="#classificacao">Classificação</a><a href="#jogos">Jogos</a><a href="#equipes">Equipes</a><a href="#estatisticas">Estatísticas</a></nav>${season ? `<div class="season-bar"><label>${seasons.some((item) => item.category) ? 'Categoria' : 'Temporada'}<select id="public-season">${seasons.map((item) => `<option value="${item.id}" ${item.id === season.id ? 'selected' : ''}>${escapeHtml(item.category || item.label)}</option>`).join('')}</select></label><span>${escapeHtml(publicFormat(season.format))} · ${escapeHtml(publicSeasonStatus(season))}</span></div><div class="public-overview"><section class="panel-card public-featured" aria-label="Jogo em destaque"><div class="public-section-heading"><div><span>EM DESTAQUE</span><h2>${featured?.status === 'confirmed' ? 'Último resultado' : 'Próximo confronto'}</h2></div><a href="#jogos">Todos os jogos →</a></div>${featured ? publicFixture(featured, entryById, crestUrls, shootoutByMatch.get(featured.id), detailHref(featured.id)) : '<p>Nenhuma partida cadastrada nesta temporada.</p>'}</section><section class="panel-card public-upcoming"><div class="public-section-heading"><div><span>AGENDA</span><h2>Próximos jogos</h2></div></div>${upcoming.length ? upcoming.slice(0, 1).map((match) => publicFixture(match, entryById, crestUrls, shootoutByMatch.get(match.id), detailHref(match.id))).join('') + `<a class="upcoming-all" href="#jogos">Ver todos os confrontos →</a>` : '<p>Nenhum próximo jogo cadastrado.</p>'}</section></div><section class="panel-card public-section" id="jogos"><div class="public-section-heading"><div><span>CENTRAL DE PARTIDAS</span><h2>Jogos e resultados</h2></div><span>${matches.length} confrontos</span></div><div class="fixture-controls"><div role="group" aria-label="Filtrar partidas"><button type="button" class="fixture-filter active" data-filter="all" aria-pressed="true">Todas</button><button type="button" class="fixture-filter" data-filter="results" aria-pressed="false">Resultados</button><button type="button" class="fixture-filter" data-filter="upcoming" aria-pressed="false">Próximas</button></div><label>Rodada<select id="round-filter"><option value="all">Todas</option>${rounds.map((round) => `<option value="${round}">Rodada ${round}</option>`).join('')}</select></label></div><div class="public-fixtures">${matches.length ? matches.map((match) => publicFixture(match, entryById, crestUrls, shootoutByMatch.get(match.id), detailHref(match.id))).join('') : '<p>Nenhuma partida publicada nesta temporada.</p>'}</div><p id="fixture-empty" class="data-note" hidden>Nenhuma partida corresponde aos filtros.</p></section><section class="panel-card public-section" id="classificacao"><div class="public-section-heading"><div><span>TABELA DO CAMPEONATO</span><h2>Classificação</h2></div><span>${standings.length} equipes</span></div>${standingsTable}</section><section class="panel-card public-section premium-teams" id="equipes"><div class="premium-section-heading"><div class="premium-heading-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="8" r="5"/><path d="M6 27v-3a10 10 0 0 1 20 0v3zM2 24a7 7 0 0 1 5-7M30 24a7 7 0 0 0-5-7"/></svg></div><div><span>PARTICIPANTES</span><h2>EQUIPES</h2></div><span class="premium-heading-count"><strong>${entries.filter((entry) => entry.status === 'confirmed').length}</strong><span class="premium-count-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M5 20v-2a7 7 0 0 1 14 0v2M3 13a4 4 0 0 1 3-4m15 4a4 4 0 0 0-3-4"/></svg></span><small>EQUIPES INSCRITAS</small></span></div><div class="public-team-grid">${teamCards || '<p>Nenhuma equipe confirmada nesta temporada.</p>'}</div></section><section class="panel-card public-section premium-stats" id="estatisticas"><div class="premium-section-heading"><div class="premium-heading-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M4 27h24M7 24V9h5v15m4 0V5h5v19m4 0v-9h4v9"/></svg></div><div><span>DADOS DA TEMPORADA</span><h2>ESTATÍSTICAS</h2></div><div class="premium-season-slot"></div></div><div class="public-stats-grid"><div><span class="premium-stat-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M9 7h14v5a7 7 0 0 1-14 0V7zM9 9H4v3a6 6 0 0 0 6 6m13-9h5v3a6 6 0 0 1-6 6M16 19v6m-6 3h12m-9-3h6v3h-6z"/></svg></span><strong>${resultCount}</strong><span>Resultados confirmados</span><small>Partidas com placar final registrado</small></div><div><span class="premium-stat-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"/><path d="m16 9 4 3-1.5 5h-5L12 12l4-3zm-4-1-4 1-3 5 3 3 4-1m8-5 4 2 1 5-4 1-3-3m-9 0-2 5 4 4 4-2v-5m5-3 4 2 2 5-4 3-4-2"/></svg></span><strong>${upcoming.length}</strong><span>Jogos por disputar</span><small>Partidas ainda não realizadas</small></div><div><span class="premium-stat-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M4 26V8h24v18M8 23V12h16v11M8 12l16 11m0-11L8 23M2 28h28"/></svg></span><strong>${goals}</strong><span>Gols confirmados</span><small>Total de gols na competição</small></div></div><p class="data-note"><span aria-hidden="true">ⓘ</span>${demo ? 'Os números são calculados dos placares desta demonstração. Estatísticas de atletas aparecem somente quando são cadastradas.' : 'Os números são calculados dos registros oficiais. Estatísticas de atletas aparecem somente após cadastro da súmula.'}</p></section><section class="panel-card public-section premium-champions"><div class="premium-section-heading"><div class="premium-heading-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M10 4h12v5a7 7 0 0 1-14 0V4zm0 2H4v3a7 7 0 0 0 7 7m11-10h6v3a7 7 0 0 1-7 7M16 16v7m-6 5h12m-9-5h6v5h-6"/></svg></div><div><span>HISTÓRIA DA COMPETIÇÃO</span><h2>CONQUISTAS CONFIRMADAS</h2></div></div>${titles.length ? `<div class="premium-champion-list">${titles.slice().sort((a, b) => a.place - b.place).map((title) => `<article class="premium-champion"><span class="premium-trophy" aria-hidden="true">🏆</span><div><strong>${title.place === 1 ? 'CAMPEÃO' : `${title.place}º LUGAR`}</strong><h3>${escapeHtml(titleNames.get(title.club_id) || 'Clube registrado')}</h3></div></article>`).join('')}</div>` : `<div class="premium-champion-empty"><span class="premium-trophy" aria-hidden="true">🏆</span><div><p>${demo ? 'Nenhum título registrado nesta demonstração.' : 'Nenhum título oficial confirmado para esta temporada.'}</p><small>Conquistas aparecerão aqui quando forem registradas.</small></div></div>`}</section>` : '<section class="panel-card"><h2>Nenhuma temporada publicada</h2><p>O organizador ainda não cadastrou uma temporada.</p></section>'}${demo ? '<a class="back-link" href="/demonstracao">← Voltar à demonstração interativa</a>' : '<a class="back-link" href="/campeonatos">← Ver outros campeonatos</a>'}</main>${season ? mobileNav : ''}`;
+    const completed = document.createElement('div');
+    completed.innerHTML = completedMarkup;
+    const currentMain = target.querySelector<HTMLElement>('main.public-shell');
+    const currentHero = currentMain?.querySelector<HTMLElement>('#inicio');
+    const finishedMain = completed.querySelector<HTMLElement>('main.public-shell');
+    const finishedHero = finishedMain?.querySelector<HTMLElement>('#inicio');
+    if (currentMain && currentHero && finishedMain && finishedHero) {
+      const currentTitle = currentHero.querySelector('h1');
+      const finishedTitle = finishedHero.querySelector('h1');
+      if (currentTitle && finishedTitle && currentTitle.textContent === finishedTitle.textContent) {
+        const currentKicker = currentHero.querySelector(':scope > span:not(.public-hero-shield-placeholder)');
+        const finishedKicker = finishedHero.querySelector('span');
+        if (currentKicker && finishedKicker) currentKicker.textContent = finishedKicker.textContent;
+        const currentSummary = currentHero.querySelector('p');
+        const finishedSummary = finishedHero.querySelector('p');
+        if (currentSummary && finishedSummary) currentSummary.textContent = finishedSummary.textContent;
+        currentHero.querySelector('.public-share-actions')?.replaceWith(
+          finishedHero.querySelector('.public-share-actions')!);
+        currentHero.querySelector('#share-status')?.replaceWith(
+          finishedHero.querySelector('#share-status')!);
+      } else currentHero.innerHTML = finishedHero.innerHTML;
+      finishedHero.remove();
+      const currentNav = currentMain.querySelector<HTMLElement>('.public-section-nav');
+      const finishedNav = finishedMain.querySelector<HTMLElement>('.public-section-nav');
+      if (currentNav && finishedNav) { currentNav.innerHTML = finishedNav.innerHTML; finishedNav.remove(); }
+      const currentOverview = currentMain.querySelector<HTMLElement>('.public-overview');
+      const finishedOverview = finishedMain.querySelector<HTMLElement>('.public-overview');
+      const finishedSeasonBar = finishedMain.querySelector<HTMLElement>('.season-bar');
+      if (finishedSeasonBar && currentOverview) currentOverview.before(finishedSeasonBar);
+      if (currentOverview && finishedOverview) {
+        const currentFeatured = currentOverview.querySelector<HTMLElement>('.public-featured');
+        const finishedFeatured = finishedOverview.querySelector<HTMLElement>('.public-featured');
+        const currentFixture = currentFeatured?.querySelector<HTMLElement>('.public-fixture');
+        const finishedFixture = finishedFeatured?.querySelector<HTMLElement>('.public-fixture');
+        if (currentFeatured && finishedFeatured && currentFixture && finishedFixture) {
+          currentFixture.className = finishedFixture.className;
+          currentFixture.removeAttribute('aria-label');
+          for (const attribute of Array.from(finishedFixture.attributes)) currentFixture.setAttribute(attribute.name, attribute.value);
+          currentFixture.replaceChildren(...Array.from(finishedFixture.childNodes));
+          currentFeatured.querySelector('.public-section-heading')?.remove();
+          const finishedHeading = finishedFeatured.querySelector('.public-section-heading');
+          if (finishedHeading) currentFeatured.prepend(finishedHeading);
+          finishedFeatured.remove();
+        } else if (currentFeatured && finishedFeatured) currentFeatured.replaceWith(finishedFeatured);
+        currentOverview.append(...Array.from(finishedOverview.childNodes));
+        finishedOverview.remove();
+      }
+      currentMain.append(...Array.from(finishedMain.childNodes));
+      const mobile = completed.querySelector<HTMLElement>('.public-mobile-nav');
+      if (mobile) target.append(mobile);
+    } else {
+      target.innerHTML = completedMarkup;
+    }
     const seasonBar = target.querySelector<HTMLElement>('.season-bar');
     const seasonSlot = target.querySelector<HTMLElement>('.premium-season-slot');
     if (seasonBar && seasonSlot) seasonSlot.append(seasonBar);
@@ -1127,7 +1276,7 @@ export async function publicPage(client: SupabaseClient, id: string, demo = fals
       groupedEntries.set(label, [...(groupedEntries.get(label) || []), entry]);
     }
     if (groupedEntries.size) {
-      const groupCards = [...groupedEntries].map(([label, groupEntries]) => `<article class="public-group-card"><span>GRUPO ${escapeHtml(label)}</span><strong>${groupEntries.length} equipes</strong><ul>${groupEntries.map((entry) => {
+      const groupCards = [...groupedEntries].map(([label, groupEntries]) => `<article class="public-group-card"><span>${escapeHtml(publicGroupTitle(label).toLocaleUpperCase('pt-BR'))}</span><strong>${groupEntries.length} equipes</strong><ul>${groupEntries.map((entry) => {
         const crest = entry.crest_path_snapshot && crestUrls.get(entry.crest_path_snapshot);
         return `<li>${teamShieldMarkup(crest, entry.club_name_snapshot, 'small')}<span>${escapeHtml(entry.club_name_snapshot)}</span></li>`;
       }).join('')}</ul></article>`).join('');
@@ -1135,7 +1284,7 @@ export async function publicPage(client: SupabaseClient, id: string, demo = fals
       const groupStandings = [...groupedEntries].map(([label, groupEntries]) => {
         const ids = new Set(groupEntries.map((entry) => entry.id));
         const rows = standings.filter((row) => ids.has(row.id));
-        return `<div class="public-group-standings"><h3>Grupo ${escapeHtml(label)}</h3>${publicStandingsView(rows, entryById, crestUrls, matches.filter((match) => match.phase === 'groups' && ids.has(match.home_entry_id) && ids.has(match.away_entry_id)), detailHref, demo)}</div>`;
+        return `<div class="public-group-standings"><h3>${escapeHtml(publicGroupTitle(label))}</h3>${publicStandingsView(rows, entryById, crestUrls, matches.filter((match) => match.phase === 'groups' && ids.has(match.home_entry_id) && ids.has(match.away_entry_id)), detailHref, demo)}</div>`;
       }).join('');
       const classification = target.querySelector('#classificacao');
       if (classification) classification.innerHTML = `<div class="public-section-heading"><div><span>TABELAS DA PRIMEIRA FASE</span><h2>Classificação dos grupos</h2></div></div><div class="public-group-tables">${groupStandings}</div>`;
@@ -1194,7 +1343,9 @@ export async function publicPage(client: SupabaseClient, id: string, demo = fals
     detail.hidden = !detail.hidden;
     target.querySelectorAll<HTMLButtonElement>(`.standing-expand[data-target="${button.dataset.target}"]`).forEach((control) => control.setAttribute('aria-expanded', String(!detail.hidden)));
   }));
-  target.querySelector('.public-hero')?.insertAdjacentHTML('afterbegin', competitionShieldMarkup(competitionCrestUrl, competition.name, 'public-hero-shield'));
+  const shieldPlaceholder = target.querySelector('.public-hero-shield-placeholder');
+  if (shieldPlaceholder) shieldPlaceholder.outerHTML = competitionShieldMarkup(competitionCrestUrl, competition.name, 'public-hero-shield');
+  else target.querySelector('.public-hero')?.insertAdjacentHTML('afterbegin', competitionShieldMarkup(competitionCrestUrl, competition.name, 'public-hero-shield'));
   const animatedMatch = sessionStorage.getItem('tr-public-updated-match');
   if (animatedMatch && safeId(animatedMatch)) target.querySelector(`[data-match-id="${animatedMatch}"]`)?.classList.add('fixture-updated');
   sessionStorage.removeItem('tr-public-updated-match');
@@ -1290,5 +1441,5 @@ async function publicClub(client: SupabaseClient, id: string) {
   }
   document.title = `${club.official_name} | TR Campeonatos`;
   target.removeAttribute('role');
-  target.innerHTML = `<header class="public-header"><a href="/"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><nav><a href="/campeonatos">Campeonatos</a><a href="/demonstracao">Demonstração</a></nav></header><main class="public-shell"><div class="public-hero club-hero"><span class="club-crest">${teamShieldMarkup(crestUrl, club.official_name, 'hero', 'eager')}</span><div><span>PERFIL OFICIAL DO CLUBE</span><h1>${escapeHtml(club.official_name)}</h1><p>${escapeHtml(club.sport)} · Identidade permanente</p></div></div>${historySummary}<div class="public-grid"><section class="panel-card"><h2>Participações públicas</h2>${entries.length ? entries.map((entry: any) => `<article class="history-row"><strong><a href="/c/${entry.season.competition.id}">${escapeHtml(entry.season.competition.name)}</a></strong><span>${escapeHtml(entry.season.category || entry.season.label)} · ${entry.final_position ? `${entry.final_position}º lugar` : entry.final_phase ? escapeHtml(entry.final_phase) : 'Participação registrada'}</span></article>`).join('') : '<p>Nenhuma participação pública registrada.</p>'}</section><section class="panel-card"><h2>Conquistas confirmadas</h2>${titles.length ? titles.map((title: any) => `<article class="history-row"><strong>${title.place === 1 ? 'Campeão' : title.place === 2 ? 'Vice-campeão' : 'Terceiro lugar'}</strong><span>${escapeHtml(title.season.competition.name)} · ${escapeHtml(title.season.category || title.season.label)}</span></article>`).join('') : '<p>Nenhum título oficial confirmado.</p>'}</section></div><section class="panel-card"><h2>Resultados recentes</h2>${recentMatches || '<p>Nenhuma partida confirmada em competições públicas.</p>'}</section><a class="back-link" href="/campeonatos">← Ver campeonatos</a></main>`;
+  target.innerHTML = `<header class="public-header"><a href="/" aria-label="TR Campeonatos, início">${PUBLIC_BRAND}</a><nav><a href="/campeonatos">Campeonatos</a><a href="/demonstracao">Demonstração</a></nav></header><main class="public-shell"><div class="public-hero club-hero"><span class="club-crest">${teamShieldMarkup(crestUrl, club.official_name, 'hero', 'eager')}</span><div><span>PERFIL OFICIAL DO CLUBE</span><h1>${escapeHtml(club.official_name)}</h1><p>${escapeHtml(club.sport)} · Identidade permanente</p></div></div>${historySummary}<div class="public-grid"><section class="panel-card"><h2>Participações públicas</h2>${entries.length ? entries.map((entry: any) => `<article class="history-row"><strong><a href="/c/${entry.season.competition.id}">${escapeHtml(entry.season.competition.name)}</a></strong><span>${escapeHtml(entry.season.category || entry.season.label)} · ${entry.final_position ? `${entry.final_position}º lugar` : entry.final_phase ? escapeHtml(entry.final_phase) : 'Participação registrada'}</span></article>`).join('') : '<p>Nenhuma participação pública registrada.</p>'}</section><section class="panel-card"><h2>Conquistas confirmadas</h2>${titles.length ? titles.map((title: any) => `<article class="history-row"><strong>${title.place === 1 ? 'Campeão' : title.place === 2 ? 'Vice-campeão' : 'Terceiro lugar'}</strong><span>${escapeHtml(title.season.competition.name)} · ${escapeHtml(title.season.category || title.season.label)}</span></article>`).join('') : '<p>Nenhum título oficial confirmado.</p>'}</section></div><section class="panel-card"><h2>Resultados recentes</h2>${recentMatches || '<p>Nenhuma partida confirmada em competições públicas.</p>'}</section><a class="back-link" href="/campeonatos">← Ver campeonatos</a></main>`;
 }

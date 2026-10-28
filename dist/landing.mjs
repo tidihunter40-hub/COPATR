@@ -1,5 +1,16 @@
-import { getPublicHomepageData } from './public-home.mjs';
+import { getPublicHomepageData, publicCrestUrl } from './public-home.mjs';
 import { renderChampionGallery } from './gallery-stage05.mjs';
+
+const hydratePublicCrest = async (image) => {
+  const url = await publicCrestUrl(image.dataset.crestPath);
+  if (url && image.isConnected) image.src = url;
+};
+const publicCrestObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  for (const entry of entries) if (entry.isIntersecting) {
+    publicCrestObserver.unobserve(entry.target);
+    hydratePublicCrest(entry.target);
+  }
+}, { rootMargin: '300px' }) : null;
 
 const iconPaths = {
   ball: '<circle cx="16" cy="16" r="12"/><path d="m12 10 4-3 4 3-1.5 5h-5L12 10Z M13.5 15 9 19l2 5 M18.5 15l4.5 4-2 5 M11 24l5 3 5-3 M7 10h5 M20 10h5"/>',
@@ -31,11 +42,12 @@ function textElement(tag, className, value) {
   return element;
 }
 
-getPublicHomepageData().then(({ competitions, champions, competitionsStatus, championsStatus }) => {
+getPublicHomepageData(document.documentElement.dataset.page === 'campeonatos' ? 'full' : document.documentElement.dataset.page === 'inicio' ? 'summary' : 'none').then(({ competitions, champions, competitionsStatus, championsStatus }) => {
   globalThis.TRPublicHomeData = { competitions, champions, competitionsStatus, championsStatus };
   window.dispatchEvent(new CustomEvent('tr:public-home-data', { detail: globalThis.TRPublicHomeData }));
   const mount = document.querySelector('#public-competitions');
   if (mount) {
+    publicCrestObserver?.disconnect();
     mount.replaceChildren();
   }
   if (mount && competitionsStatus === 'ready' && competitions.length) {
@@ -50,6 +62,17 @@ getPublicHomepageData().then(({ competitions, champions, competitionsStatus, cha
       image.alt = '';
       image.loading = 'lazy';
       cover.append(image);
+      const crest = document.createElement('img');
+      crest.className = 'public-competition-crest';
+      crest.src = competition.crestUrl || '/assets/official/06_escudo_padrao_tr_campeonatos-256.webp';
+      crest.alt = `Escudo de ${competition.name}`;
+      crest.loading = 'lazy';
+      crest.decoding = 'async';
+      crest.width = 256;
+      crest.height = 256;
+      crest.onerror = () => { crest.onerror = null; crest.src = '/assets/official/06_escudo_padrao_tr_campeonatos-256.webp'; };
+      if (competition.crest_path) crest.dataset.crestPath = competition.crest_path;
+      cover.append(crest);
       const body = textElement('span', 'public-competition-body', '');
       body.append(textElement('span', 'public-competition-eyebrow', `${competition.sport} · ${competition.status === 'active' ? 'Em andamento' : competition.status === 'archived' ? 'Arquivo' : 'Publicado'}`));
       body.append(textElement('strong', 'public-competition-name', competition.name));
@@ -58,6 +81,10 @@ getPublicHomepageData().then(({ competitions, champions, competitionsStatus, cha
       grid.append(card);
     }
     mount.append(grid);
+    grid.querySelectorAll('.public-competition-crest[data-crest-path]').forEach((image) => {
+      if (publicCrestObserver) publicCrestObserver.observe(image);
+      else hydratePublicCrest(image);
+    });
   } else if (mount && competitionsStatus === 'ready') {
     const empty = textElement('div', 'public-empty-state', '');
     empty.append(textElement('span', 'public-empty-icon', '◇'));

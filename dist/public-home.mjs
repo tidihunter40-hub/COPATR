@@ -1,6 +1,7 @@
 import { supabaseConfig } from './runtime-config.mjs';
 
 const configured = Boolean(supabaseConfig?.url && supabaseConfig?.anonKey);
+const signedCrests = new Map();
 
 async function readPublic(table, params) {
   const url = new URL(`/rest/v1/${table}`, supabaseConfig.url);
@@ -19,13 +20,43 @@ async function readPublic(table, params) {
   }
 }
 
-export async function getPublicHomepageData() {
+export async function publicCrestUrl(path) {
+  if (typeof path !== 'string' || !/^[0-9a-f-]{36}\/[0-9a-f-]{36}\/(?:original|processed)\/[0-9a-f-]{36}\.(?:png|jpg|webp)$/i.test(path)) return null;
+  const cached = signedCrests.get(path);
+  if (cached && cached.until > Date.now()) return cached.url;
+  try {
+    const url = new URL(`/storage/v1/object/sign/competition-crests/${path}`, supabaseConfig.url);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { apikey: supabaseConfig.anonKey, Authorization: `Bearer ${supabaseConfig.anonKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expiresIn: 3600 }),
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const signedUrl = data.signedURL ? new URL(data.signedURL, supabaseConfig.url).href : null;
+    if (signedUrl) signedCrests.set(path, { url: signedUrl, until: Date.now() + 50 * 60_000 });
+    return signedUrl;
+  } catch { return null; }
+}
+
+async function readPublicCompetitions() {
+  let rows;
+  try { rows = await readPublic('competitions', { select: 'id,name,sport,status,updated_at,crest_path', visibility: 'eq.public', order: 'updated_at.desc', limit: '100' }); }
+  catch { rows = await readPublic('competitions', { select: 'id,name,sport,status,updated_at', visibility: 'eq.public', order: 'updated_at.desc', limit: '100' }); }
+  return rows;
+}
+
+export async function getPublicHomepageData(mode = 'full') {
+  if (mode === 'none') return { competitions: [], seasons: [], entries: [], matches: [], champions: [], competitionsStatus: 'ready', championsStatus: 'ready' };
   if (!configured) return { competitions: [], seasons: [], entries: [], matches: [], champions: [], competitionsStatus: 'unconfigured', championsStatus: 'unconfigured' };
   const [competitions, champions] = await Promise.allSettled([
-    readPublic('competitions', { select: 'id,name,sport,status,updated_at', visibility: 'eq.public', order: 'updated_at.desc', limit: '100' }),
+    readPublicCompetitions(),
     readPublic('competition_titles', { select: 'id,season_id,place,confirmed_at,club:clubs(id,official_name,crest_path),season:competition_seasons(id,label,competition:competitions(id,name,sport))', place: 'in.(1,2)', order: 'confirmed_at.desc', limit: '200' }),
   ]);
   const publicCompetitions = competitions.status === 'fulfilled' && Array.isArray(competitions.value) ? competitions.value : [];
+  const publicChampions = champions.status === 'fulfilled' && Array.isArray(champions.value) ? champions.value.filter((title) => title.place === 1).map((title) => ({ ...title, runnerUp: champions.value.find((other) => other.season_id === title.season_id && other.place === 2)?.club || null })) : [];
+  if (mode === 'summary') return { competitions: publicCompetitions, seasons: [], entries: [], matches: [], champions: publicChampions, competitionsStatus: competitions.status === 'fulfilled' ? 'ready' : 'error', championsStatus: champions.status === 'fulfilled' ? 'ready' : 'error' };
   const competitionIds = publicCompetitions.map((competition) => competition.id).filter(Boolean);
   let seasons = [], entries = [], matches = [];
   if (competitionIds.length) {
@@ -36,6 +67,12 @@ export async function getPublicHomepageData() {
         order: 'created_at.desc',
         limit: '500',
       });
+      const latest = new Map();
+      for (const season of seasons) {
+        const previous = latest.get(season.competition_id);
+        if (!previous || (season.status === 'active' && previous.status !== 'active')) latest.set(season.competition_id, season);
+      }
+      seasons = [...latest.values()];
       const seasonIds = seasons.map((season) => season.id).filter(Boolean);
       if (seasonIds.length) {
         [entries, matches] = await Promise.all([
@@ -53,7 +90,7 @@ export async function getPublicHomepageData() {
     seasons: Array.isArray(seasons) ? seasons : [],
     entries: Array.isArray(entries) ? entries : [],
     matches: Array.isArray(matches) ? matches : [],
-    champions: champions.status === 'fulfilled' && Array.isArray(champions.value) ? champions.value.filter((title) => title.place === 1).map((title) => ({ ...title, runnerUp: champions.value.find((other) => other.season_id === title.season_id && other.place === 2)?.club || null })) : [],
+    champions: publicChampions,
     competitionsStatus: competitions.status === 'fulfilled' ? 'ready' : 'error',
     championsStatus: champions.status === 'fulfilled' ? 'ready' : 'error',
   };

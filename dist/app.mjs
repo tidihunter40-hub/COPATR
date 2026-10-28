@@ -1,11 +1,13 @@
 import { MAX_TEAMS, normalizeName, validateTeamName, generateFixtures, updateResult, calculateStandings } from './engine.mjs';
 import { readCrestFile, safeCrestUrl } from './club.mjs';
+import { prepareSmartShield } from './smart-shield.mjs';
 import { getRealModeStatus } from './supabase-real-mode.mjs';
 import { DEMO_TEAMS } from './demo-teams.mjs';
 
 const STORAGE_KEY = 'tr-campeonatos-demo-v1';
-const emptyState = () => ({ name: '', season: '', sport: 'Futebol', format: 'single', teams: [], fixtures: [] });
+const emptyState = () => ({ name: '', season: '', crest: null, sport: 'Futebol', format: 'single', teams: [], fixtures: [] });
 let state = loadState();
+let pendingCompetitionCrest = null;
 let activeTab = 'config';
 let selectedRound = 1;
 let editingId = null;
@@ -40,8 +42,22 @@ function esc(value) {
   return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
 }
 function crest(team, className = 'club-crest') {
-  const src = safeCrestUrl(team?.crest) || team?.demoAsset;
-  return src ? `<img class="${className}" src="${src}" alt="Escudo de ${esc(team.name)}">` : `<span class="${className} club-crest-empty" aria-label="Sem escudo cadastrado">◇</span>`;
+  const src = safeCrestUrl(team?.crest) || team?.demoAsset || '/assets/official/06_escudo_padrao_tr_campeonatos-256.webp';
+  return `<img class="${className}" src="${esc(src)}" alt="Escudo de ${esc(team?.name || 'equipe')}" loading="lazy" onerror="this.onerror=null;this.src='/assets/official/06_escudo_padrao_tr_campeonatos-256.webp'">`;
+}
+function competitionCrest() {
+  return safeCrestUrl(state.crest) || '/assets/official/06_escudo_padrao_tr_campeonatos-256.webp';
+}
+async function prepareLocalCompetitionCrest(file) {
+  const original = await readCrestFile(file);
+  const prepared = await prepareSmartShield(file);
+  const processed = prepared.processed ? await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(safeCrestUrl(reader.result));
+    reader.onerror = () => reject(new Error('Não foi possível gerar a prévia da imagem.'));
+    reader.readAsDataURL(prepared.processed);
+  }) : null;
+  return { file, original, processed };
 }
 function clubLink(id, label) { return `<a class="club-link" href="#clube-${encodeURIComponent(id)}">${label}</a>`; }
 function teamById(id) { return state.teams.find((team) => team.id === id); }
@@ -137,6 +153,7 @@ function renderConfig() {
     <div class="config-grid">
       <form id="competition-form" class="form-card"><div class="card-heading"><span class="card-index">01</span><div><h4>Informações do campeonato</h4><p>Nome e modalidade da demonstração.</p></div></div>
         <div class="field"><label for="competition-name">Nome do campeonato</label><input id="competition-name" name="name" value="${esc(state.name)}" maxlength="70" placeholder="Ex.: Copa TR de Verão" required></div>
+        <div class="field competition-crest-field"><label for="competition-crest">Escudo do campeonato (opcional)</label><input id="competition-crest" name="crest" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg"><small>PNG ou JPEG, até 300 KB nesta demonstração local.</small><div class="competition-crest-review"><img id="competition-crest-preview" src="${esc(competitionCrest())}" alt="Prévia do escudo do campeonato"><div><label><input type="radio" name="crestVersion" value="processed" checked> Versão otimizada</label><label><input type="radio" name="crestVersion" value="original"> Imagem original</label>${state.crest ? '<label><input type="checkbox" name="removeCrest"> Usar escudo padrão TR</label>' : ''}<p id="competition-crest-status" role="status">${state.crest ? 'Escudo cadastrado.' : 'Escudo padrão TR Campeonatos.'}</p></div></div></div>
         <div class="field"><label for="competition-season">Temporada (opcional)</label><input id="competition-season" name="season" value="${esc(state.season || '')}" maxlength="40" placeholder="Ex.: 2026"></div>
         <div class="field"><label for="competition-sport">Modalidade</label><select id="competition-sport" name="sport">${['Futebol','Futsal','Vôlei','Basquete','E-sports'].map((sport) => `<option ${state.sport === sport ? 'selected' : ''}>${sport}</option>`).join('')}</select></div>
         <div class="card-divider"></div><div class="card-section-heading"><h5>Formato da competição</h5><span>PONTOS CORRIDOS</span></div>
@@ -191,7 +208,7 @@ function renderPortal() {
   const standings = calculateStandings(state.teams, state.fixtures);
   const upcoming = state.fixtures.filter((m) => m.homeScore === null).slice(0, 4);
   const recent = [...state.fixtures].filter((m) => m.homeScore !== null).reverse().slice(0, 4);
-  content.innerHTML = `<div class="lab-title"><div><h3>Prévia do portal público</h3><p>Visualização local dos dados criados neste navegador.</p></div><span class="lab-step">DADOS FICTÍCIOS</span></div><div class="portal-head"><span class="demo-pill">PRÉVIA • NÃO PUBLICADO</span><h3>${esc(state.name || 'Seu campeonato')}</h3><p>${esc(state.sport)} • ${formatName()}${state.season ? ` • ${esc(state.season)}` : ''} • ${state.teams.length} equipes</p></div><div class="portal-grid"><div class="panel-card"><h4>Próximos jogos</h4>${upcoming.map((m) => `<div class="portal-match"><span>R${m.round} · ${clubLabel(m.homeId)} × ${clubLabel(m.awayId)}</span><span>A disputar</span></div>`).join('') || '<p class="inline-note">Nenhuma partida pendente.</p>'}<h4 style="margin-top:24px">Últimos resultados</h4>${recent.map((m) => `<div class="portal-match"><span>${clubLabel(m.homeId)} × ${clubLabel(m.awayId)}</span><span>${m.homeScore} × ${m.awayScore}</span></div>`).join('') || '<p class="inline-note">Nenhum resultado registrado.</p>'}</div><div class="panel-card"><h4>Classificação</h4>${standings.map((row, index) => `<div class="portal-table-row"><span>${index + 1}. ${clubLabel(row.id)}</span><b>${row.points} pts</b></div>`).join('') || '<p class="inline-note">Cadastre equipes para ver a tabela.</p>'}</div></div>`;
+  content.innerHTML = `<div class="lab-title"><div><h3>Prévia do portal público</h3><p>Visualização local dos dados criados neste navegador.</p></div><span class="lab-step">DADOS FICTÍCIOS</span></div><div class="portal-head"><span class="demo-pill">PRÉVIA • NÃO PUBLICADO</span><img class="portal-competition-crest" src="${esc(competitionCrest())}" alt="Escudo do campeonato"><h3>${esc(state.name || 'Seu campeonato')}</h3><p>${esc(state.sport)} • ${formatName()}${state.season ? ` • ${esc(state.season)}` : ''} • ${state.teams.length} equipes</p></div><div class="portal-grid"><div class="panel-card"><h4>Próximos jogos</h4>${upcoming.map((m) => `<div class="portal-match"><span>R${m.round} · ${clubLabel(m.homeId)} × ${clubLabel(m.awayId)}</span><span>A disputar</span></div>`).join('') || '<p class="inline-note">Nenhuma partida pendente.</p>'}<h4 style="margin-top:24px">Últimos resultados</h4>${recent.map((m) => `<div class="portal-match"><span>${clubLabel(m.homeId)} × ${clubLabel(m.awayId)}</span><span>${m.homeScore} × ${m.awayScore}</span></div>`).join('') || '<p class="inline-note">Nenhum resultado registrado.</p>'}</div><div class="panel-card"><h4>Classificação</h4>${standings.map((row, index) => `<div class="portal-table-row"><span>${index + 1}. ${clubLabel(row.id)}</span><b>${row.points} pts</b></div>`).join('') || '<p class="inline-note">Cadastre equipes para ver a tabela.</p>'}</div></div>`;
 }
 
 function resetFixturesWithConfirmation() {
@@ -199,30 +216,6 @@ function resetFixturesWithConfirmation() {
   return window.confirm('Alterar equipes ou formato apagará os confrontos e resultados atuais desta demonstração. Continuar?');
 }
 
-document.querySelector('#menu-toggle').addEventListener('click', (event) => {
-  const nav = document.querySelector('#main-nav');
-  const open = nav.classList.toggle('open');
-  event.currentTarget.setAttribute('aria-expanded', String(open));
-  event.currentTarget.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
-});
-document.querySelectorAll('#main-nav a').forEach((link) => link.addEventListener('click', () => {
-  document.querySelector('#main-nav').classList.remove('open');
-  document.querySelector('#menu-toggle').setAttribute('aria-expanded', 'false');
-  document.querySelector('#menu-toggle').setAttribute('aria-label', 'Abrir menu');
-}));
-const navSections = [...document.querySelectorAll('#main-nav a[href^="#"]')].map((link) => ({ link, section: document.querySelector(link.getAttribute('href')) })).filter(({ section }) => section);
-if ('IntersectionObserver' in window) {
-  const navObserver = new IntersectionObserver((entries) => {
-    const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (!visible) return;
-    navSections.forEach(({ link, section }) => {
-      const active = section === visible.target;
-      link.classList.toggle('nav-active', active);
-      if (active) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
-    });
-  }, { rootMargin: '-15% 0px -65% 0px', threshold: [0, .15, .5] });
-  navSections.forEach(({ section }) => navObserver.observe(section));
-}
 document.querySelectorAll('.lab-tab').forEach((button) => button.addEventListener('click', () => setTab(button.dataset.tab)));
 document.querySelector('#reset-demo').addEventListener('click', () => {
   if (!window.confirm('Apagar todos os dados desta demonstração neste navegador?')) return;
@@ -243,9 +236,18 @@ content.addEventListener('submit', async (event) => {
       const format = String(data.get('format'));
       if (!['Futebol','Futsal','Vôlei','Basquete','E-sports'].includes(sport) || !['single','double'].includes(format)) throw new Error('Selecione uma configuração válida.');
       if (format !== state.format && !resetFixturesWithConfirmation()) return;
+      const file = data.get('crest');
+      const oldCrest = state.crest;
+      if (data.get('removeCrest')) state.crest = null;
+      if (file instanceof File && file.size) {
+        const chosen = pendingCompetitionCrest?.file === file ? pendingCompetitionCrest : await prepareLocalCompetitionCrest(file);
+        state.crest = data.get('crestVersion') === 'original' || !chosen.processed ? chosen.original : chosen.processed;
+      }
       if (format !== state.format) state.fixtures = [];
       state.name = name; state.season = season; state.sport = sport; state.format = format;
-      saveState(); render(); notify('Configuração salva.');
+      if (!saveState()) { state.crest = oldCrest; return; }
+      pendingCompetitionCrest = null;
+      render(); notify('Configuração salva.');
     } else if (form.id === 'team-form') {
       const data = new FormData(form);
       const name = validateTeamName(data.get('team'), state.teams, editingId);
@@ -278,6 +280,23 @@ content.addEventListener('submit', async (event) => {
 
 content.addEventListener('change', (event) => {
   if (event.target.id === 'round-select') { selectedRound = Number(event.target.value); render(); }
+  if (event.target.id === 'competition-crest') {
+    const file = event.target.files?.[0];
+    pendingCompetitionCrest = null;
+    const status = content.querySelector('#competition-crest-status');
+    if (!file) return;
+    status.textContent = 'Preparando prévia…';
+    prepareLocalCompetitionCrest(file).then((result) => {
+      if (content.querySelector('#competition-crest')?.files?.[0] !== file) return;
+      pendingCompetitionCrest = result;
+      content.querySelector('#competition-crest-preview').src = result.processed || result.original;
+      status.textContent = result.processed ? 'Confira o recorte ou escolha a imagem original.' : 'Recorte não confiável. A imagem original será mantida.';
+    }).catch((error) => { status.textContent = error.message; });
+  }
+  if (event.target.name === 'crestVersion' && pendingCompetitionCrest) {
+    const chosen = event.target.value === 'original' ? pendingCompetitionCrest.original : pendingCompetitionCrest.processed || pendingCompetitionCrest.original;
+    content.querySelector('#competition-crest-preview').src = chosen;
+  }
 });
 
 content.addEventListener('click', (event) => {

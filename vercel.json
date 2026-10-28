@@ -23,13 +23,15 @@
     { "source": "/demonstracao/copa-exemplo", "destination": "/complete-demo.html" },
     { "source": "/demonstracao", "destination": "/interactive-demo.html" },
     { "source": "/planejador", "destination": "/competition-planner.html" },
-    { "source": "/funcionalidades", "destination": "/index.html" },
-    { "source": "/como-funciona", "destination": "/index.html" },
-    { "source": "/campeonatos", "destination": "/index.html" },
-    { "source": "/laboratorio", "destination": "/index.html" },
-    { "source": "/planos", "destination": "/index.html" }
+    { "source": "/funcionalidades", "destination": "/site-all.html" },
+    { "source": "/como-funciona", "destination": "/how.html" },
+    { "source": "/campeonatos", "destination": "/catalog.html" },
+    { "source": "/contato", "destination": "/site-all.html" },
+    { "source": "/laboratorio", "destination": "/site-all.html" },
+    { "source": "/planos", "destination": "/site-all.html" }
   ],
   "headers": [
-    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+    { "source": "/assets/:path*", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }] }
   ]
 }

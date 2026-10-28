@@ -1,3 +1,7 @@
+/* Fonte local para a classificação reproduzir a identidade também sem rede. */
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url('/assets/fonts/barlow-condensed-700.woff2') format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;font-display:swap;src:url('/assets/fonts/barlow-condensed-800.woff2') format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:900;font-display:swap;src:url('/assets/fonts/barlow-condensed-900.woff2') format('woff2')}
 /* Classificação oficial: a apresentação usa somente os dados calculados. */
 #classificacao{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#071d32,#020e1d 70%)!important;border-color:#2589bc!important}
 #classificacao::before{content:'';position:absolute;z-index:-1;inset:0 0 auto;height:110px;background:linear-gradient(180deg,#05204366,#02101b00),url('/assets/stadium-night.webp') center top/100% auto;opacity:.35;pointer-events:none}
@@ -81,3 +85,198 @@
 }
 @media(max-width:350px){#classificacao .standings-mobile-head,#classificacao .standing-mobile-row{grid-template-columns:20px minmax(0,1fr) 34px 24px 32px;padding-left:5px;padding-right:5px}#classificacao .standing-crest{width:38px;height:38px}#classificacao .standing-team-label a,#classificacao .standing-team-label strong{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.standing-expanded{animation:none}}
+
+/* Arena de classificação: seis colunas, molduras e hierarquia da referência. */
+#classificacao.panel-card{isolation:isolate;overflow:hidden;padding:clamp(12px,1.6vw,22px) clamp(12px,1.6vw,22px) 88px!important;border:1px solid #29a9ff!important;border-radius:4px;background:linear-gradient(180deg,#0011261a,#010d20a8 45%,#01132255),url('/assets/standings-arena-v2.webp') center top/100% 100% no-repeat!important;box-shadow:0 0 0 2px #06152b,0 0 28px #0074f474,inset 0 0 38px #006fce40}
+@media(min-width:761px){#classificacao.panel-card{width:calc(100% + 2 * clamp(12px,2.6vw,38px));margin-left:calc(-1 * clamp(12px,2.6vw,38px))}}
+#classificacao.panel-card::before{display:none}
+#classificacao:has(>.standings-stage)>.public-section-heading{display:none}
+#classificacao .standings-stage{position:relative;z-index:1}
+#classificacao .standings-hero{position:relative;isolation:isolate;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;min-height:250px;padding:35px 8px 20px}
+#classificacao .standings-hero::before{content:'';position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#02122500 68%,#00101d18);pointer-events:none}
+#classificacao .standings-hero-copy{width:min(61%,760px);padding:0 23px 25px;border:1px solid #3ec2ff;clip-path:polygon(4% 0,97% 0,100% 18%,100% 88%,96% 100%,4% 100%,0 78%,0 20%);background:linear-gradient(110deg,#010813f5,#071b35e9 72%,#001024b0);filter:drop-shadow(0 0 8px #017dfa)}
+#classificacao .standings-kicker{display:inline-block;padding:10px 14px;border-bottom:2px solid #168df2;color:#f5f8ff;font:700 clamp(13px,1.55vw,20px)/1 'DM Sans',Arial,sans-serif;letter-spacing:.18em;white-space:nowrap;text-shadow:0 2px 4px #000}
+#classificacao .standings-kicker em{color:#1aaaff;font-style:normal}
+#classificacao .standings-hero h2{margin:12px 0 18px!important;color:#fff;font:900 clamp(55px,8.5vw,118px)/.88 'Barlow Condensed',Impact,Arial,sans-serif!important;letter-spacing:.025em;white-space:nowrap;background:linear-gradient(#fff 10%,#d2d9e3 40%,#fff 55%,#7f9bb6 87%,#e6f6ff);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(2px 4px 0 #06182b) drop-shadow(0 7px 2px #0089ff)}
+#classificacao .standings-hero p{display:flex;align-items:center;gap:10px;margin:11px 0 0;color:#f1f6ff;font:700 clamp(9px,1.1vw,15px)/1.2 'DM Sans',Arial,sans-serif;letter-spacing:.14em;white-space:nowrap;text-shadow:0 2px 5px #000}
+#classificacao .standings-hero p::before,#classificacao .standings-hero p::after{content:'';height:3px;flex:1;background:#00a7ff;box-shadow:0 0 9px #009cff}
+#classificacao .standings-team-count{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:270px;margin-top:6px;padding:15px 18px;border:1px solid #3cbeff;clip-path:polygon(10% 0,94% 0,100% 18%,100% 80%,92% 100%,0 100%,0 28%);background:linear-gradient(#020b19,#001730);color:#119fff;font:900 clamp(22px,2.7vw,35px)/1 'Barlow Condensed',Impact,Arial,sans-serif;white-space:nowrap;text-shadow:0 2px 4px #000}
+#classificacao .standings-team-count b{color:white;font-size:1.15em}
+#classificacao .standings-team-count svg{width:34px;height:29px;fill:#e9f3ff;filter:drop-shadow(0 2px 3px #000)}
+#classificacao .standings-scroll{overflow:visible;padding:5px;border:2px solid #4cc5ff;border-radius:15px;background:#021124e8;box-shadow:0 0 0 3px #081d39,0 0 25px #007bffbd,inset 0 0 22px #0d5fa58f}
+#classificacao .standings-scroll table{width:100%;min-width:0;table-layout:fixed;border-collapse:separate;border-spacing:0 5px}
+#classificacao .standings-scroll th{height:40px;padding:5px 8px;border:0!important;background:#020e1e!important;color:#f4f8ff!important;font:800 clamp(14px,1.5vw,19px)/1 'Barlow Condensed',Impact,Arial,sans-serif;letter-spacing:.08em;text-align:center;text-transform:uppercase}
+#classificacao .standings-scroll th:nth-child(1){width:8%}
+#classificacao .standings-scroll th:nth-child(2){width:46%;text-align:left;padding-left:40px}
+#classificacao .standings-scroll th:nth-child(3){width:7%}
+#classificacao .standings-scroll th:nth-child(4){width:6%}
+#classificacao .standings-scroll th:nth-child(5){width:7%}
+#classificacao .standings-scroll th:nth-child(6){width:26%;text-align:left;padding-left:40px}
+#classificacao .standings-scroll td{height:127px;padding:7px 5px;border-top:1px solid #2676a6;border-bottom:2px solid #1764a2!important;background:linear-gradient(105deg,#031123ed,#061e36dc 56%,#021020eb);color:#f6faff!important;text-align:center;font-variant-numeric:tabular-nums}
+#classificacao .standings-scroll td:nth-child(2){padding-left:15px}
+#classificacao .standings-scroll td:first-child{border-left:2px solid #3c83af;border-radius:10px 0 0 10px}
+#classificacao .standings-scroll td:last-child{border-right:2px solid #3c83af;border-radius:0 10px 10px 0}
+#classificacao .standings-scroll tr.standing-leader td{border-top-color:#26baff;border-bottom-color:#18abff!important;background:linear-gradient(105deg,#063b75ec,#073464df 53%,#03254be9);box-shadow:inset 0 -2px #108eff,0 0 14px #0077ff66}
+#classificacao .standings-scroll tr.standing-rank-2 td{border-color:#a5bdca}
+#classificacao .standings-scroll tr.standing-rank-3 td{border-color:#bd8b34}
+#classificacao .standings-scroll tr.standing-desktop-expanded td{height:auto;padding:0;border:1px solid #2676a6;border-radius:8px;background:#041b32}
+#classificacao .standing-position{display:grid;place-items:center;width:62px;height:72px;margin:auto;border:1px solid #6d92ae;clip-path:polygon(17% 0,100% 0,100% 82%,80% 100%,0 100%,0 22%);border-radius:0;background:linear-gradient(140deg,#455b6a,#071729 58%);color:#fff;font:900 43px/1 'Barlow Condensed',Impact,Arial,sans-serif;text-shadow:0 3px 5px #000}
+#classificacao .standing-rank-1 .standing-position{border-color:#06d8ff;background:linear-gradient(130deg,#13bbff,#056dd6 53%,#023875);box-shadow:0 0 16px #008dff}
+#classificacao .standing-rank-2 .standing-position{border-color:#e7f6ff;background:linear-gradient(130deg,#a8bdc7,#62788b 50%,#142a40)}
+#classificacao .standing-rank-3 .standing-position{border-color:#ffcb59;background:linear-gradient(130deg,#e8a82b,#895308 56%,#382706)}
+#classificacao .standing-team-cell{display:grid;min-width:0;text-align:left}
+#classificacao .standing-team{display:flex;align-items:center;gap:17px;min-width:0;max-width:100%}
+#classificacao .standing-crest{display:grid;place-items:center;flex:none;width:126px;height:111px;padding:0;border:0;border-radius:0;background:radial-gradient(circle,#0861b447,transparent 71%);box-shadow:none}
+#classificacao .standing-crest .team-shield{width:100%;height:100%}
+#classificacao .standing-crest img{display:block;width:100%!important;height:100%!important;object-fit:contain;filter:drop-shadow(0 4px 3px #000b)!important}
+#classificacao .standing-leader .standing-crest img{filter:drop-shadow(0 0 8px #008cff) drop-shadow(0 4px 4px #000)!important}
+#classificacao .standing-team-label{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+#classificacao .standing-team-label a,#classificacao .standing-team-label strong{color:#fff;font:900 clamp(20px,2.9vw,39px)/.98 'Barlow Condensed',Impact,'Arial Narrow',Arial,sans-serif;text-transform:uppercase;text-shadow:0 3px 4px #000;overflow-wrap:anywhere;text-decoration:none}
+#classificacao .standing-team-label a:hover{text-decoration:underline}
+#classificacao .standing-leader-tag{display:inline-flex;align-items:center;gap:10px;padding:3px 17px;border:1px solid #21bfff;border-radius:18px;background:linear-gradient(#075bb2,#023976);box-shadow:0 0 10px #008aff;color:#fff;font:800 15px/1 'Barlow Condensed',Arial,sans-serif;letter-spacing:.09em}
+#classificacao .standing-leader-tag span{color:#ffd955;font-size:23px;line-height:.6}
+#classificacao .standing-expand{display:inline-flex;align-items:center;gap:9px;margin:-13px 0 0 143px;padding:0;border:0;background:none;color:#6ecaff;font:500 clamp(12px,1.4vw,17px)/1.2 'DM Sans',Arial,sans-serif;text-align:left;text-decoration:none}
+#classificacao .standing-expand:hover,#classificacao .standing-expand:focus-visible{color:white;text-shadow:0 0 7px #17a8ff}
+.standing-chart-icon{display:inline-flex;align-items:end;gap:2px;width:21px;height:20px;flex:none}
+.standing-chart-icon i{display:block;width:5px;height:9px;background:#148eff;box-shadow:0 0 4px #168bff}
+.standing-chart-icon i:nth-child(2){height:17px;background:#40d8ff}
+.standing-chart-icon i:nth-child(3){height:13px}
+#classificacao .standing-points strong,#classificacao .standing-value{display:grid;place-items:center;width:100%;max-width:68px;height:70px;margin:auto;border:1px solid #17669f;border-radius:9px;background:linear-gradient(#06233f,#031326);color:#fff;font:900 clamp(28px,3.4vw,43px)/1 'Barlow Condensed',Impact,Arial,sans-serif;box-shadow:inset 0 1px #6fd1ff14}
+#classificacao .standing-points strong{border-color:#20b4ff;background:linear-gradient(140deg,#10a8ff,#0566ce 58%,#064998);box-shadow:0 0 12px #007cff,inset 0 1px #b2eeff;color:#fff}
+#classificacao .standing-value{font-size:clamp(23px,2.5vw,34px)}
+#classificacao .standing-form-cell{display:flex;align-items:center;justify-content:space-around;gap:6px}
+#classificacao .recent-form{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+#classificacao .recent-form span{display:grid;place-items:center;width:39px;height:39px;border-radius:5px;border:1px solid #547897;color:#f7faff;font:900 27px/1 'Barlow Condensed',Impact,Arial,sans-serif;box-shadow:inset 0 1px #ffffff45,0 3px 7px #0008}
+#classificacao .recent-form span:not(.form-empty){width:39px;height:39px;border-radius:5px;font-size:27px}
+#classificacao .recent-form .form-V{border-color:#47e564;background:linear-gradient(#31df4b,#139b29);box-shadow:0 0 9px #1cb8419e,inset 0 1px #b8ffc4}
+#classificacao .recent-form .form-E{border-color:#ffdc58;background:linear-gradient(#ffca17,#ca8d00);box-shadow:0 0 9px #edaf1f92,inset 0 1px #fff4a0}
+#classificacao .recent-form .form-D{border-color:#ff7568;background:linear-gradient(#ff5c4e,#b51e18);box-shadow:0 0 9px #e7332992,inset 0 1px #ffc3bb}
+#classificacao .recent-form .form-empty{background:linear-gradient(#294158,#132638);color:#dce9f3;font-size:22px}
+#classificacao .standing-chevron.standing-expand{display:grid;place-items:center;flex:none;width:32px;height:46px;margin:0;color:#f3f8ff;font:900 54px/.7 Arial,sans-serif}
+#classificacao .standing-chevron[aria-expanded="true"]{transform:rotate(90deg)}
+#classificacao .standing-expanded{padding:18px;color:#d5e9f6;text-align:left}
+#classificacao .standing-expanded-stats{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}
+#classificacao .standing-expanded-stats>span{min-height:63px;padding:7px;border-color:#286999;background:#061e39}
+#classificacao .standing-expanded-bottom>div{border-color:#286999;background:#061e39}
+#classificacao .standings-note{display:flex;align-items:center;gap:23px;min-height:54px;margin:15px 38px 0;padding:8px 30px;border:1px solid #4da8d8;clip-path:polygon(2% 0,98% 0,100% 30%,100% 100%,0 100%,0 30%);background:#04142bdb;color:#e8f4ff!important;font-size:clamp(11px,1.25vw,16px);line-height:1.3}
+#classificacao .standings-note span{display:grid;place-items:center;width:32px;height:32px;flex:none;border:1px solid #24aaff;border-radius:50%;box-shadow:0 0 9px #007eff;color:#63d5ff;font-size:24px}
+
+@media(max-width:1100px){
+  #classificacao .standings-hero{min-height:220px}
+  #classificacao .standing-crest{width:86px;height:86px}
+  #classificacao .standing-expand{margin-left:99px;margin-top:-7px}
+  #classificacao .standings-scroll td{height:116px}
+  #classificacao .standing-position{width:49px;height:58px;font-size:36px}
+  #classificacao .standing-points strong,#classificacao .standing-value{height:55px}
+  #classificacao .recent-form{gap:4px}
+  #classificacao .recent-form span{width:30px;height:30px;font-size:21px}
+  #classificacao .standing-chevron.standing-expand{width:23px;font-size:42px}
+}
+@media(max-width:760px){
+  #classificacao.panel-card{padding:10px!important}
+  #classificacao .standings-hero{display:grid;grid-template-columns:1fr auto;gap:5px;min-height:0;padding:2px 1px 12px}
+  #classificacao .standings-hero::before{display:none}
+  #classificacao .standings-hero-copy{width:100%;padding:3px 10px 9px}
+  #classificacao .standings-kicker{padding:4px 2px;font-size:clamp(9px,2vw,14px);letter-spacing:.11em}
+  #classificacao .standings-hero h2{margin:6px 0 3px!important;font-size:clamp(35px,8vw,63px)!important}
+  #classificacao .standings-hero p{gap:4px;margin:5px 0 0;font-size:clamp(6px,1.3vw,10px);letter-spacing:.04em}
+  #classificacao .standings-hero p::before,#classificacao .standings-hero p::after{min-width:7px;height:2px}
+  #classificacao .standings-team-count{min-width:0;margin-top:4px;padding:7px 9px;gap:4px;font-size:clamp(15px,3vw,23px)}
+  #classificacao .standings-team-count svg{width:21px;height:19px}
+  #classificacao .standings-scroll{display:none}
+  #classificacao .standings-mobile{display:grid;gap:7px;padding:6px;border:1px solid #31a9ee;border-radius:9px;background:#031324d9;box-shadow:0 0 17px #0076e58a}
+  #classificacao .standing-mobile-row{display:grid;grid-template-columns:39px 62px minmax(0,1fr) 52px;grid-template-rows:auto auto auto;align-items:center;gap:3px 7px;min-width:0;padding:8px;border:1px solid #2372a7;border-radius:8px;background:linear-gradient(110deg,#07192e,#031021);box-shadow:inset 0 1px #80cbff21}
+  #classificacao .standing-mobile-row.standing-leader{border-color:#23bbff;background:linear-gradient(110deg,#074d8f,#052d58 56%,#041d39);box-shadow:0 0 11px #087fff88,inset 0 0 13px #0d79d59c}
+  #classificacao .standing-mobile-row.standing-rank-2{border-color:#9fb8c9}
+  #classificacao .standing-mobile-row.standing-rank-3{border-color:#c68d36}
+  #classificacao .standing-mobile-position{grid-column:1;grid-row:1/3;display:grid;place-items:center;width:36px;height:46px;border:1px solid #7c9bb3;clip-path:polygon(17% 0,100% 0,100% 80%,80% 100%,0 100%,0 20%);background:linear-gradient(#506678,#12283f);color:white;font:900 28px/1 'Barlow Condensed',Arial,sans-serif}
+  #classificacao .standing-rank-1 .standing-mobile-position{border-color:#4fd3ff;background:linear-gradient(#12acfb,#074899)}
+  #classificacao .standing-rank-2 .standing-mobile-position{background:linear-gradient(#bacbd4,#4f6579)}
+  #classificacao .standing-rank-3 .standing-mobile-position{border-color:#ffd875;background:linear-gradient(#e6ac38,#765012)}
+  #classificacao .standing-team{display:contents}
+  #classificacao .standing-crest{grid-column:2;grid-row:1/3;width:62px;height:62px}
+  #classificacao .standing-team-label{grid-column:3;grid-row:1;gap:3px}
+  #classificacao .standing-team-label a,#classificacao .standing-team-label strong{font-size:clamp(17px,4vw,27px);line-height:.98}
+  #classificacao .standing-leader-tag{padding:2px 7px;font-size:11px}
+  #classificacao .standing-leader-tag span{font-size:17px}
+  #classificacao .standing-mobile-row>.standing-points{grid-column:4;grid-row:1/3;display:grid;place-items:center;min-height:47px;border:1px solid #23b7ff;border-radius:6px;background:linear-gradient(#08a2ff,#0656b6);color:white;font:900 32px/1 'Barlow Condensed',Arial,sans-serif;box-shadow:0 0 8px #008dff}
+  #classificacao .standing-played,#classificacao .standing-difference{grid-row:2;color:#c9e9fc;font:700 12px/1 'DM Sans',Arial,sans-serif;white-space:nowrap}
+  #classificacao .standing-played{grid-column:3}
+  #classificacao .standing-difference{grid-column:3;justify-self:end}
+  #classificacao .standing-played b,#classificacao .standing-difference b{color:white;font-size:14px}
+  #classificacao .standing-mobile-form{grid-column:1/5;grid-row:3;justify-self:center;padding-top:4px}
+  #classificacao .recent-form{gap:8px}
+  #classificacao .recent-form span{width:31px;height:31px;font-size:21px}
+  #classificacao .recent-form span:not(.form-empty){width:31px;height:31px;border-radius:5px;font-size:21px}
+  #classificacao .standing-mobile-details{grid-column:1/5;grid-row:4;min-width:0}
+  #classificacao .standing-mobile-details summary{display:flex;align-items:center;justify-content:center;gap:7px;min-height:29px;cursor:pointer;color:#89d7ff;font:600 12px/1 'DM Sans',Arial,sans-serif;list-style:none}
+  #classificacao .standing-mobile-details summary .standing-chart-icon{display:inline-flex;width:21px;height:20px;padding:0;flex:none;align-items:flex-end}
+  #classificacao .standing-mobile-details summary .standing-chart-icon i{display:block;flex:none}
+  #classificacao .standing-mobile-details summary::-webkit-details-marker{display:none}
+  #classificacao .standing-mobile-details[open] summary>span:last-child{transform:rotate(180deg)}
+  #classificacao .standing-expanded{margin-top:6px;padding:8px;border:1px solid #2e7faf;border-radius:6px;background:#061c33}
+  #classificacao .standing-expanded-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+  #classificacao .standing-expanded-stats>span{min-height:51px;padding:3px;font-size:9px}
+  #classificacao .standing-expanded-stats b{font-size:18px}
+  #classificacao .standing-expanded-bottom{grid-template-columns:1fr;gap:6px;margin-top:6px}
+  #classificacao .standing-expanded-bottom>div{padding:8px}
+  #classificacao .standings-note{margin:11px 1px 1px;padding:6px 9px;gap:7px;font-size:10px;clip-path:none;border-radius:6px}
+  #classificacao .standings-note span{width:24px;height:24px;font-size:18px}
+}
+@media(max-width:430px){
+  #classificacao .standings-hero{grid-template-columns:1fr}
+  #classificacao .standings-team-count{position:absolute;right:6px;top:4px;padding:5px 7px;font-size:16px}
+  #classificacao .standings-kicker{max-width:72%}
+  #classificacao .standings-hero-copy{padding-top:27px}
+  #classificacao .standings-hero h2{font-size:clamp(37px,11vw,47px)!important}
+  #classificacao .standings-hero p{font-size:8px}
+  #classificacao .standings-hero p{margin-top:13px}
+}
+@media(max-width:350px){
+  #classificacao .standing-mobile-row{grid-template-columns:31px 49px minmax(0,1fr) 41px;gap:3px 4px;padding:6px}
+  #classificacao .standing-mobile-position{width:29px;height:39px;font-size:24px}
+  #classificacao .standing-crest{width:49px;height:54px}
+  #classificacao .standing-team-label a,#classificacao .standing-team-label strong{font-size:16px}
+  #classificacao .standing-mobile-row>.standing-points{min-height:42px;font-size:28px}
+  #classificacao .standing-played,#classificacao .standing-difference{font-size:10px}
+  #classificacao .standing-played b,#classificacao .standing-difference b{font-size:12px}
+  #classificacao .standings-hero h2{font-size:37px!important}
+}
+
+/* O traço pertence somente ao texto, sem alcançar o escudo ou as estatísticas. */
+#classificacao .standing-team-cell,
+#classificacao .standing-team{width:100%;min-width:0}
+#classificacao .standing-team-cell .standing-expand{margin-top:4px}
+#classificacao .standing-team-label{flex:1;min-width:0;max-width:100%}
+#classificacao .standing-team-label>a,
+#classificacao .standing-team-label>strong{
+  position:relative;
+  display:inline-block;
+  box-sizing:border-box;
+  width:max-content;
+  max-width:100%;
+  min-width:0;
+  padding-bottom:7px;
+  color:#fff;
+  line-height:1.05;
+  text-shadow:0 2px 4px #000b;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+#classificacao .standing-team-label>a::after,
+#classificacao .standing-team-label>strong::after{
+  content:'';
+  position:absolute;
+  inset:auto 0 0;
+  height:3px;
+  border-radius:2px;
+  background:#087fff;
+  box-shadow:0 0 5px #087fff80;
+}
+@media(max-width:760px){
+  #classificacao .standing-team-label{min-width:0;max-width:100%}
+  #classificacao .standing-team-label>a,
+  #classificacao .standing-team-label>strong{padding-bottom:5px;line-height:1.02}
+  #classificacao .standing-team-label>a::after,
+  #classificacao .standing-team-label>strong::after{height:2px}
+}

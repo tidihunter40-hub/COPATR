@@ -1,0 +1,35 @@
+/* Approved stadium images supplied by the owner. All demo cards and match details use these exact PNG files. */
+.demo-arena-original{margin:0 0 18px;text-align:right}.demo-arena-original a{display:inline-block;padding:9px 13px;border:1px solid #2b8ed0;border-radius:7px;background:#073358;color:#eaf8ff;font-weight:800;text-decoration:none}.demo-arena-original a:hover{background:#0a548c}
+.public-competition .public-fixture.match-arena.demo-arena{background-position:center bottom!important}
+.public-competition .public-fixtures .public-fixture.match-arena.demo-arena::before{background:linear-gradient(90deg,#010a1455,transparent 24%,transparent 76%,#010a1455),linear-gradient(180deg,#010b1510 0%,transparent 58%,#010b1460 100%)}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena{background-position:center bottom!important}
+.public-competition .public-fixture.match-arena.demo-arena--1{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/1.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--1{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/1.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--2{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/2.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--2{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/2.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--3{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/3.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--3{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/3.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--4{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/4.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--4{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/4.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--5{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/5.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--5{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/5.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--6{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/6.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--6{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/6.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--7{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/7.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--7{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/7.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--8{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/8.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--8{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/8.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--9{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/9.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--9{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/9.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--10{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/10.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--10{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/10.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--11{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/11.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--11{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/11.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--12{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/12.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--12{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/12.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--13{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/13.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--13{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/13.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--14{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/14.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--14{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/14.png')!important}
+.public-competition .public-fixture.match-arena.demo-arena--15{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/15.png')!important}
+.public-competition .public-detail-page>.public-fixture.match-arena.demo-arena--15{background-image:linear-gradient(180deg,#020c1850 0%,#020b1470 100%),url('/assets/tr-stadiums/selected/15.png')!important}

@@ -5,7 +5,7 @@
 .home-device-toolbar span{font-size:10px}
 .home-device-body{grid-template-columns:168px minmax(0,1fr)}
 .home-device-nav{padding:18px 9px;background:linear-gradient(180deg,#081c34,#06162b 75%,#0a2541);border-right:1px solid #637b93;box-shadow:inset -1px 0 #adc0d638}
-.home-device-nav:before{content:"";display:block;height:55px;margin:0 7px 14px;background:url('/assets/official/02_simbolo_sem_bola_transparente.png') center/contain no-repeat;border-bottom:1px solid #b4c4d738}
+.home-device-nav:before{content:"";display:block;height:55px;margin:0 7px 14px;background:url('/assets/official/02_simbolo_sem_bola_transparente.webp') center/contain no-repeat;border-bottom:1px solid #b4c4d738}
 .home-device-nav a{min-height:40px;color:#edf4fc}
 .home-device-nav a span{color:#b6c9da}
 .home-device-nav a.selected{border-color:#77beff;background:#087cff;box-shadow:inset 0 1px #d8efff70,0 3px 10px #003c7991}

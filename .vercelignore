@@ -1,0 +1,7 @@
+/artifacts/
+/captures/
+/.codex-verification/
+/*.png
+/.env.local
+/.vercel/
+/node_modules/

@@ -17,13 +17,13 @@ type Fixture = {
   awayScore: number | null;
   history?: unknown[];
 };
-type DemoState = { name: string; season?: string; sport: string; format: string; teams: Team[]; fixtures: Fixture[] };
+type DemoState = { name: string; season?: string; crest?: string | null; sport: string; format: string; teams: Team[]; fixtures: Fixture[] };
 type Standing = ReturnType<typeof calculateStandings>[number];
 type TabKey = 'dashboard' | 'championships' | 'matches' | 'standings' | 'statistics';
 type GlyphName = 'trophy' | 'team' | 'calendar' | 'chart' | 'ball' | 'basket' | 'volley' | 'handball' | 'gamepad' | 'portal';
 
 const STORAGE_KEY = 'tr-campeonatos-demo-v1';
-const OFFICIAL_SYMBOL = '/assets/official/02_simbolo_sem_bola_transparente.png';
+const OFFICIAL_SYMBOL = '/assets/official/02_simbolo_sem_bola_transparente.webp';
 const SAMPLE_TEAMS: Team[] = DEMO_TEAMS.map((team) => ({ ...team }));
 const sampleSchedule = generateFixtures(SAMPLE_TEAMS) as Fixture[];
 const SAMPLE_FIXTURES = updateResult(
@@ -44,6 +44,7 @@ function readLocalDemo(): DemoState {
       return {
         name: typeof data.name === 'string' ? data.name : '',
         season: typeof data.season === 'string' ? data.season : '',
+        crest: safeCrestUrl(data.crest) || null,
         sport: typeof data.sport === 'string' ? data.sport : 'Futebol',
         format: data.format === 'double' ? 'double' : 'single',
         teams: data.teams as Team[], fixtures: data.fixtures as Fixture[],
@@ -150,7 +151,7 @@ function DashboardPanel({ data, standings, hasLocal }: { data: DemoState; standi
 
 function ChampionshipsPanel({ data, hasLocal }: { data: DemoState; hasLocal: boolean }) {
   if (hasLocal && !data.name) return <EmptyPanel icon="trophy" title="Nomeie sua competição">Salve as informações básicas para ver o campeonato nesta área.</EmptyPanel>;
-  return <div className="competition-layout"><div className="showcase-competition"><div className="competition-emblem"><Glyph name="trophy" size={36}/></div><div className="competition-copy"><span className="showcase-chip">{hasLocal ? 'Demonstração local' : 'Exemplo fictício'}</span><h3>{data.name}</h3><p>{data.sport} · {data.format === 'double' ? 'Turno e returno' : 'Turno único'} · {data.teams.length} equipes</p><small>Status: {data.fixtures.length ? 'confrontos gerados' : 'aguardando confrontos'}</small></div><LabLink tab="portal" className="button button-outline">Ver detalhes ↗</LabLink></div><div className="showcase-roster"><div className="showcase-subhead"><h3>Equipes participantes</h3><LabLink tab="config">Gerenciar ↗</LabLink></div><div className="roster-items">{data.teams.length ? data.teams.slice(0, 8).map((team) => <span key={team.id}><ClubName team={team} hasLocal={hasLocal}/></span>) : <p>Cadastre equipes no laboratório.</p>}</div></div></div>;
+  return <div className="competition-layout"><div className="showcase-competition"><div className="competition-emblem"><img src={safeCrestUrl(data.crest) || "/assets/official/06_escudo_padrao_tr_campeonatos-256.webp"} alt={`Escudo de ${data.name}`} onError={(event) => { event.currentTarget.src = "/assets/official/06_escudo_padrao_tr_campeonatos-256.webp"; }}/></div><div className="competition-copy"><span className="showcase-chip">{hasLocal ? 'Demonstração local' : 'Exemplo fictício'}</span><h3>{data.name}</h3><p>{data.sport} · {data.format === 'double' ? 'Turno e returno' : 'Turno único'} · {data.teams.length} equipes</p><small>Status: {data.fixtures.length ? 'confrontos gerados' : 'aguardando confrontos'}</small></div><LabLink tab="portal" className="button button-outline">Ver detalhes ↗</LabLink></div><div className="showcase-roster"><div className="showcase-subhead"><h3>Equipes participantes</h3><LabLink tab="config">Gerenciar ↗</LabLink></div><div className="roster-items">{data.teams.length ? data.teams.map((team) => <span key={team.id}><ClubName team={team} hasLocal={hasLocal}/></span>) : <p>Cadastre equipes no laboratório.</p>}</div></div></div>;
 }
 
 function StatisticsPanel({ data, standings }: { data: DemoState; standings: Standing[] }) {

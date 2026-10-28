@@ -47,5 +47,5 @@ test('laboratório preserva criação, confrontos e classificação após a nova
     await new Promise((resolveWait) => setTimeout(resolveWait, 20));
   }
   assert.match(document.querySelector('#power-root').textContent, /Dados da demonstração neste navegador/);
-  assert.doesNotMatch(document.querySelector('#featured-root').textContent, /Campeonato Integrado/);
+  assert.doesNotMatch(document.querySelector('#galeria').textContent, /Campeonato Integrado/);
 });

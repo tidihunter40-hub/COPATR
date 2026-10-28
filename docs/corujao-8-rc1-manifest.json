@@ -1,0 +1,30 @@
+{
+  "version": "corujao-8-rc1",
+  "preview": {
+    "id": "dpl_CUZsU4XpXNVNEWzhr1bQbS4gqjRR",
+    "url": "https://copatr-aew1ubkiw-ogaitjunior-sudos-projects.vercel.app"
+  },
+  "currentProductionId": "dpl_DW8z1XUyEbscWEM1mDBqvG7EXYtx",
+  "migration": "202610270004_corujao_eight_progression.sql",
+  "distFileCount": 388,
+  "distTreeSha256": "82d3ed2f5ecfa148c29e9d114fc79a33e5b068225908fa8464a36bf3337c7c7c",
+  "changedFileSha256": {
+    ".gitignore": "ad93d6fb6763959fd89c57f184e62e4f414d10d53cafe1678557707ede4f4017",
+    "package.json": "ed7bae0000abc2e51291ec8f16fb58fb5d6ed7b2b7ee5d4d4867d95ce409da1f",
+    "package-lock.json": "3e91c426ab4c8247b9a952ff632dda3ce7c3115f9a118c1f521bd10b2866af75",
+    "src/real-app.ts": "81e1fa9e43b03cab1584f9bf090b3344fbc8d1fd6db2a4d341f66f4c477c0be2",
+    "src/graphics-mode.css": "7eb5df6232c38826081b1ae85dc3b75f18889f9e9e0bd702e80111cf6f4811b6",
+    "dist/real-app.js": "52ef2544cd321a15bea09b7ed30456fb081efddb596bb4c66c244fb8679eda63",
+    "dist/real-app.css": "ab5f4c3cb7abbda3455d0de0871008ca73f8945afdf3ea7769f40523c75bd8c7",
+    "dist/graphics-mode.css": "5abebdd5b1e5257b82152e7220dc44112235840490b7c013ac95ba02746493ac",
+    "dist/competition.html": "62e5593767cdd61cb4a21fd69de9af2fb3e1e9331d18e3f5f0c33ef67d7e9c7b",
+    "dist/assets/stadium-night-800.avif": "52b6c54d8ada9a4f442da0dcc441c6ee7545f75415f47cf10fb58223810b3152",
+    "dist/assets/stadium-night-1600.avif": "f4c735c059c82faca6ebc071b8a588e3b340db543844a2e560b57aeb7b8ce31c",
+    "supabase/migrations/202610270004_corujao_eight_progression.sql": "32b81ab3c16362b5d15480f69a142795bd8030df8dcabf290f7b7a1953f980e9",
+    "supabase/VERIFY_202610270004_READ_ONLY.sql": "07ce03716bcedfb313a06a6b8eaba7c584207871c9d3b3ef18dca6060c3896af",
+    "tests/corujao-progression.test.mjs": "5f137f64c7423fb61cf8d77f281c724d69166f012dd5782825503f9aa0303dd7",
+    "scripts/verify-corujao-advance-ui.mjs": "019d4faeb8b886adca3ac5a422e42cc5cad97e5861c97946e71ee889485fbd26",
+    "scripts/verify-organization-isolation.mjs": "9de87c3db7caccf01e4a69e0a808849472a481bcc353c11bc477ccdc9f22a8cf",
+    "scripts/performance-audit.mjs": "7d08e82afac5d82fff81172d924ccc7d3bf245cd55beba1910d4de5f35066fc4"
+  }
+}

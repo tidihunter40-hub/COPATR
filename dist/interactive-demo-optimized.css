@@ -1,0 +1,6 @@
+.demo-hero{background-image:linear-gradient(90deg,#03101ff2 0%,#041529d4 55%,#03101fb8 100%),image-set(url('/assets/stadium-night-1600.avif') type('image/avif'),url('/assets/stadium-night-1600.webp') type('image/webp'))}
+.team-strip:empty{min-height:58px}
+#upcoming-matches:empty{min-height:497px}
+#recent-matches:empty{min-height:157px}
+#standings-rows:empty{min-height:396px}
+@media(max-width:700px){.demo-hero{background-image:linear-gradient(90deg,#03101ff2 0%,#041529d4 55%,#03101fb8 100%),image-set(url('/assets/stadium-night-800.avif') type('image/avif'),url('/assets/stadium-night-800.webp') type('image/webp'))}.team-strip:empty{min-height:50px}#standings-rows:empty{min-height:330px}}

@@ -109,6 +109,7 @@ try {
       await page.screenshot({ path: resolve(captures, 'interactive-demo-public-390.png'), fullPage: true });
       await page.getByRole('link', { name: /Voltar à demonstração interativa/ }).first().click();
       assert.match(page.url(), /\/demonstracao$/);
+      await page.locator('.simulate-button').first().waitFor();
       assert.equal(await page.locator('.simulate-button').count(), 2);
       await page.locator('#reset-demo').click();
       assert.equal(await page.locator('.simulate-button').count(), 3);

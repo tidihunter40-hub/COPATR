@@ -1,9 +1,10 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { join, extname, resolve, sep } from 'node:path';
+import { brotliCompressSync, constants as zlibConstants } from 'node:zlib';
 
 const root = resolve('dist');
-const types = { '.html': 'text/html', '.css': 'text/css', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.jpe': 'image/jpeg', '.webp': 'image/webp' };
+const types = { '.html': 'text/html', '.css': 'text/css', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.jpe': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif', '.woff2': 'font/woff2' };
 const port = Number(process.env.PORT || 45321);
 const envFile = resolve('.env.local');
 
@@ -18,7 +19,8 @@ async function localEnv() {
 }
 
 const runtimeEnv = await localEnv();
-const appRoutes = new Set(['/', '/funcionalidades', '/como-funciona', '/campeonatos', '/laboratorio', '/planos', '/entrar']);
+const compressedStatic = new Map();
+const appRoutes = new Set(['/', '/funcionalidades', '/como-funciona', '/campeonatos', '/laboratorio', '/planos', '/contato', '/entrar']);
 const escapeMeta = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 
 async function competitionMetadata(id, request) {
@@ -71,12 +73,12 @@ createServer(async (request, response) => {
     return;
   }
   const route = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
-  const panelRoute = /^\/painel(?:\/campeonatos(?:\/novo|\/[0-9a-f-]{36}(?:\/resultados)?)?)?$/i.test(route);
+  const panelRoute = route === '/painel' || route.startsWith('/painel/');
   const publicRoute = /^\/c\/[0-9a-f-]{36}$/i.test(route);
   const clubRoute = /^\/clubes\/[0-9a-f-]{36}$/i.test(route);
   const demoCompetitionRoute = route === '/demonstracao/copa-tr-esports';
   const completeDemoRoute = route === '/demonstracao/copa-exemplo';
-  const pageFile = route === '/demonstracao' ? 'interactive-demo.html' : route === '/planejador' ? 'competition-planner.html' : route === '/minha-conta' ? 'account.html' : appRoutes.has(route) ? 'index.html' : panelRoute ? 'panel.html' : publicRoute ? 'competition.html' : clubRoute ? 'club.html' : demoCompetitionRoute ? 'demo-competition.html' : completeDemoRoute ? 'complete-demo.html' : pathname.slice(1);
+  const pageFile = route === '/demonstracao' ? 'interactive-demo.html' : route === '/planejador' ? 'competition-planner.html' : route === '/minha-conta' ? 'account.html' : route === '/campeonatos' ? 'catalog.html' : route === '/como-funciona' ? 'how.html' : appRoutes.has(route) ? route === '/' ? 'index.html' : 'site-all.html' : panelRoute ? 'panel.html' : publicRoute ? 'competition.html' : clubRoute ? 'club.html' : demoCompetitionRoute ? 'demo-competition.html' : completeDemoRoute ? 'complete-demo.html' : pathname.slice(1);
   const target = resolve(join(root, pageFile));
   if (target !== root && !target.startsWith(root + sep)) { response.writeHead(403).end(); return; }
   try {
@@ -100,7 +102,24 @@ createServer(async (request, response) => {
         contents = Buffer.from(html);
       }
     }
-    response.writeHead(200, { 'Content-Type': `${types[extname(target)] || 'application/octet-stream'}; charset=utf-8`, 'Cache-Control': 'no-store', 'Referrer-Policy': route === '/entrar' ? 'no-referrer' : 'strict-origin-when-cross-origin' });
+    const extension = extname(target);
+    const mime = types[extension] || 'application/octet-stream';
+    const staticAsset = route.startsWith('/assets/');
+    const staticCode = ['.css', '.js', '.mjs'].includes(extension) && route !== '/sw.js';
+    const cacheControl = staticAsset ? 'public, max-age=86400, stale-while-revalidate=86400'
+      : staticCode ? 'public, max-age=3600, stale-while-revalidate=86400' : 'no-store';
+    const textResource = /^(?:text\/|application\/(?:json|manifest))/i.test(mime);
+    const headers = { 'Content-Type': textResource ? `${mime}; charset=utf-8` : mime, 'Cache-Control': cacheControl, 'Referrer-Policy': route === '/entrar' ? 'no-referrer' : 'strict-origin-when-cross-origin' };
+    if (textResource && contents.length > 1024 && /\bbr\b/.test(request.headers['accept-encoding'] || '')) {
+      const key = `${target}:${file.mtimeMs}:${file.size}`;
+      if (staticAsset || staticCode) {
+        if (!compressedStatic.has(key)) compressedStatic.set(key, brotliCompressSync(contents, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } }));
+        contents = compressedStatic.get(key);
+      } else contents = brotliCompressSync(contents, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } });
+      headers['Content-Encoding'] = 'br';
+      headers.Vary = 'Accept-Encoding';
+    }
+    response.writeHead(200, headers);
     response.end(contents);
   } catch { response.writeHead(404).end('Not found'); }
 }).listen(port, '127.0.0.1', () => console.log(`TR Campeonatos: http://127.0.0.1:${port}`));

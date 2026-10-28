@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root{color-scheme:dark;--deep:#04111e;--navy:#09243a;--panel:#0b2940;--line:#2a5671;--blue:#168bd5;--electric:#61caff;--silver:#b7cedc;--white:#f4f9fc}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--deep);color:var(--white);font-family:Inter,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}[hidden]{display:none!important}:focus-visible{outline:2px solid #79d5ff;outline-offset:3px}
 .planner-header{height:76px;display:flex;justify-content:space-between;align-items:center;gap:18px;padding:0 max(20px,calc((100vw - 1240px)/2));border-bottom:1px solid #23506d;background:#061827}.planner-header img{display:block;width:143px;height:68px;object-fit:contain}.planner-header nav{display:flex;gap:25px;font-size:13px;font-weight:700}.planner-header nav a:hover{color:var(--electric)}

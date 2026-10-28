@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { DEFAULT_TEAM_SHIELD, filterTeamDirectory, normalizeTeamSearch, refreshEntryCrests, teamShieldMarkup } from '../dist/real-app.js';
 
 test('escudo padrão é reutilizado para clubes sem imagem e imagem inválida pode cair no padrão', () => {
-  assert.equal(DEFAULT_TEAM_SHIELD, '/assets/official/06_escudo_padrao_tr_campeonatos.png');
-  assert.match(teamShieldMarkup(null, 'Bonoco City'), /06_escudo_padrao_tr_campeonatos\.png/);
+  assert.equal(DEFAULT_TEAM_SHIELD, '/assets/official/06_escudo_padrao_tr_campeonatos.webp');
+  assert.match(teamShieldMarkup(null, 'Bonoco City'), /06_escudo_padrao_tr_campeonatos\.webp/);
   assert.match(teamShieldMarkup('https://example.test/crest.png', 'Bonoco City'), /https:\/\/example\.test\/crest\.png/);
   assert.match(teamShieldMarkup(null, 'Bonoco City'), /alt="Escudo de Bonoco City"/);
 });
@@ -26,13 +26,14 @@ test('fundo público escolhido segue a identidade permanente da equipe', async (
 
 test('cadastro e edição oferecem uma única escolha de fundo vinculada ao clube', () => {
   const source = readFileSync('src/real-app.ts', 'utf8');
-  const migration = readFileSync('supabase/migrations/202610260003_team_public_backgrounds_expand.sql', 'utf8');
+  const initialMigration = readFileSync('supabase/migrations/202610260002_team_public_background.sql', 'utf8');
+  const expansionMigration = readFileSync('supabase/migrations/202610260003_team_public_backgrounds_expand.sql', 'utf8');
   assert.match(source, /name="public_background_id"/);
   assert.match(source, /teamBackgroundChoiceMarkup\(team\.public_background_id\)/);
   assert.match(source, /public_background_id\s*\}\)\.select\('id'\)/);
   assert.match(source, /backgroundStyle/);
-  assert.match(migration, /public_background_id integer/);
-  assert.match(migration, /between 1 and 20/);
+  assert.match(initialMigration, /public_background_id integer/);
+  assert.match(expansionMigration, /between 1 and 20/);
 });
 
 test('pesquisa de equipes ignora maiúsculas, acentos e não oferece arquivadas', () => {

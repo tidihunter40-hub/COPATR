@@ -5,6 +5,7 @@ node_modules/
 .env.*
 !.env.example
 .vercel/
+.codex-verification/
 vercel-dist/
 captures/
 artifacts/

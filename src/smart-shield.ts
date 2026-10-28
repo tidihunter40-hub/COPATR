@@ -115,8 +115,14 @@ function canvas(width: number, height: number) {
   return { element, context };
 }
 
-function blobFrom(canvasElement: HTMLCanvasElement) {
-  return new Promise<Blob>((resolve, reject) => canvasElement.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Não foi possível gerar o PNG do escudo.')), 'image/png'));
+function encode(canvasElement: HTMLCanvasElement, mime: 'image/webp' | 'image/png', quality?: number) {
+  return new Promise<Blob>((resolve, reject) => canvasElement.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Não foi possível otimizar o escudo.')), mime, quality));
+}
+
+async function blobFrom(canvasElement: HTMLCanvasElement) {
+  const webp = await encode(canvasElement, 'image/webp', .9);
+  const png = await encode(canvasElement, 'image/png');
+  return webp.type === 'image/webp' && webp.size < png.size ? webp : png;
 }
 
 export async function prepareSmartShield(file: File): Promise<SmartShieldResult> {
@@ -146,7 +152,7 @@ export async function prepareSmartShield(file: File): Promise<SmartShieldResult>
     const masked = removeUniformBorderBackground(pixels.data, width, height);
     if (masked.removed && masked.data && masked.bounds) {
       pixels.data.set(masked.data); sourceCanvas.context.putImageData(pixels, 0, 0); bounds = masked.bounds; mode = 'uniform_border_removed'; confidence = masked.confidence;
-    } else { mode = 'opaque_preserved'; confidence = 0; }
+    } else { bounds = { left: 0, top: 0, right: width - 1, bottom: height - 1 }; mode = 'background_preserved'; confidence = 0; }
   }
   if (!bounds) return { status: 'original_fallback', processed: null, source, meta: { version: 1, mode: 'original_fallback', reason: 'empty_or_unsafe_image' } };
   const target = canvas(SMART_SHIELD_SIZE, SMART_SHIELD_SIZE);
@@ -155,6 +161,7 @@ export async function prepareSmartShield(file: File): Promise<SmartShieldResult>
   target.context.imageSmoothingEnabled = true;
   target.context.imageSmoothingQuality = 'high';
   target.context.drawImage(sourceCanvas.element, fit.sx, fit.sy, fit.sw, fit.sh, fit.dx, fit.dy, fit.dw, fit.dh);
-  const processed = new File([await blobFrom(target.element)], `tr-smart-shield-${crypto.randomUUID()}.png`, { type: 'image/png' });
-  return { status: 'processed', processed, source, meta: { version: 1, mode, confidence, output: { width: SMART_SHIELD_SIZE, height: SMART_SHIELD_SIZE, mime: 'image/png' }, source_extension: extensionFor(mime) } };
+  const output = await blobFrom(target.element);
+  const processed = new File([output], `tr-smart-shield-${crypto.randomUUID()}.${output.type === 'image/webp' ? 'webp' : 'png'}`, { type: output.type });
+  return { status: 'processed', processed, source, meta: { version: 1, mode, confidence, output: { width: SMART_SHIELD_SIZE, height: SMART_SHIELD_SIZE, mime: output.type, bytes: output.size }, source_extension: extensionFor(mime) } };
 }

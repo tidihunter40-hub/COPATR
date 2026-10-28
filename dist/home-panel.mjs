@@ -32,10 +32,10 @@ function readDemo() {
 
 function crest(team) {
   const src = safeCrestUrl(team?.crest);
-  if (src) return `<img class="home-crest" src="${esc(src)}" alt="Escudo de ${esc(team.name)}">`;
-  if (team?.demoAsset && /^\/assets\/demo-(?:esports|teams)\/[A-Za-z0-9_-]+\.(?:png|jpe|jpeg|webp)$/.test(team.demoAsset)) return `<img class="home-crest home-crest-esports" src="${team.demoAsset}" alt="Escudo de ${esc(team.name)}">`;
+  if (src) return `<img class="home-crest" src="${esc(src)}" alt="Escudo de ${esc(team.name)}" loading="lazy" decoding="async" width="128" height="128">`;
+  if (team?.demoAsset && /^\/assets\/demo-(?:esports|teams)\/[A-Za-z0-9_-]+\.(?:png|jpe|jpeg|webp)$/.test(team.demoAsset)) return `<img class="home-crest home-crest-esports" src="${team.demoAsset}" alt="Escudo de ${esc(team.name)}" loading="lazy" decoding="async" width="128" height="128">`;
   const illustrative = demoCrestPath(team);
-  if (illustrative) return `<span class="home-crest home-crest-demo" role="img" aria-label="Escudo fictício demonstrativo para ${esc(team.name)}; nenhum escudo cadastrado"><img src="${illustrative}" alt="" aria-hidden="true"><small>DEMO</small></span>`;
+  if (illustrative) return `<span class="home-crest home-crest-demo" role="img" aria-label="Escudo fictício demonstrativo para ${esc(team.name)}; nenhum escudo cadastrado"><img src="${illustrative}" alt="" aria-hidden="true" loading="lazy" decoding="async" width="128" height="128"><small>DEMO</small></span>`;
   return '<span class="home-crest home-crest-placeholder" role="img" aria-label="Equipe removida, sem escudo">?</span>';
 }
 

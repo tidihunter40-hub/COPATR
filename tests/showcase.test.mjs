@@ -58,6 +58,20 @@ test('painel e campeonato refletem dados locais sem alterar o motor', async () =
   assert.doesNotMatch(document.querySelector('#featured-root').textContent, /Taça de Teste Local/);
 });
 
+test('apresentação usa escudo da competição e mostra todos os participantes', async () => {
+  const crest = 'data:image/png;base64,iVBORw0KGgo=';
+  const teams = Array.from({ length: 12 }, (_, index) => ({ id: `equipe-${index}`, name: `Equipe ${index + 1}` }));
+  localStorage.setItem('tr-campeonatos-demo-v1', JSON.stringify({ name: 'Copa Completa', crest, sport: 'Futebol', format: 'single', teams, fixtures: [] }));
+  window.dispatchEvent(new Event('tr:demo-updated'));
+  await settle();
+  document.querySelectorAll('.showcase-source-switch button')[1].click();
+  [...document.querySelectorAll('[role="tab"]')][1].click();
+  await settle();
+  assert.equal(document.querySelector('.competition-emblem img')?.getAttribute('src'), crest);
+  assert.equal(document.querySelectorAll('.roster-items > span').length, 12);
+  assert.match(document.querySelector('#showcase-panel').textContent, /12 equipes/);
+});
+
 test('modalidade futura é identificada e cards respondem ao clique', async () => {
   const volleyball = [...document.querySelectorAll('.sport-atlas-card')].find((card) => card.textContent.includes('Vôlei'));
   assert.ok(volleyball);

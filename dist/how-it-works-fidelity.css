@@ -1,0 +1,120 @@
+/* Page-specific reconstruction of the approved Como funciona composition. */
+html[data-page="como-funciona"] .site-header{width:100%;max-width:none;height:54px;padding-inline:max(24px,calc((100vw - 1400px)/2));gap:22px;background:#020913;border-bottom:1px solid #0876b88c;box-shadow:0 4px 25px #0009}
+html[data-page="como-funciona"] .brand{width:104px;min-width:104px;height:53px;transform:none}
+html[data-page="como-funciona"] .brand-image{width:104px;height:53px;object-fit:contain}
+html[data-page="como-funciona"] .main-nav{height:100%;gap:clamp(16px,1.65vw,30px)}
+html[data-page="como-funciona"] .main-nav a{display:flex;align-items:center;height:100%;font:750 11px Inter,Arial,sans-serif}
+html[data-page="como-funciona"] .main-nav a[data-route="como-funciona"]{position:relative;color:#13bfff}
+html[data-page="como-funciona"] .main-nav a[data-route="como-funciona"]:after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;background:#08b9ff;box-shadow:0 0 12px 3px #009dff8c}
+html[data-page="como-funciona"] .header-actions{display:flex;align-items:center;gap:9px}
+html[data-page="como-funciona"] .header-login,html[data-page="como-funciona"] .header-cta{min-height:34px;border-radius:6px;font:800 10px Inter,Arial,sans-serif}
+html[data-page="como-funciona"] .header-login{min-width:82px;border-color:#8aa7bd;background:#06111f}
+html[data-page="como-funciona"] .header-cta{min-width:143px;padding:8px 14px;background:linear-gradient(110deg,#0877ec,#08a8fa);box-shadow:0 0 15px #008cff57}
+.how-hero{min-height:176px;background:radial-gradient(circle at 0 110%,#0077ed8c,transparent 23%),linear-gradient(90deg,#020a18,#031328 56%,#04121f)}
+.how-hero:before{content:"";position:absolute;inset:0 0 0 auto;width:min(1007px,64vw);background:url('/assets/home/how-reference-hero-art.webp') right center/cover no-repeat}
+.how-hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#020a18 0%,#020a18aa 36%,transparent 56%)}
+.how-hero-copy{position:relative;z-index:1;padding-block:17px 20px}
+.how-hero h1{margin:5px 0 8px;font-size:clamp(44px,4vw,60px)}
+.how-hero p{max-width:510px;font-size:15px;line-height:1.3}
+.how-steps{min-height:244px;padding:19px 0 11px;background:linear-gradient(180deg,#020a16e8,#020a16cb 45%,#020a16c9),url('/assets/stadium-night.webp') center bottom/cover}
+.how-steps .how-shell{width:min(1200px,calc(100% - 48px))}
+.how-hero-copy{width:min(1400px,calc(100% - 48px))}
+.how-section-heading{gap:24px;margin-bottom:17px}
+.how-section-heading h2{margin-top:5px;font-size:clamp(28px,2.7vw,38px)}
+.how-section-heading>p{margin-right:30px;font-size:11px}
+.how-step-grid{gap:28px}
+.how-step{padding-top:27px}
+.how-step:before{top:18px;left:30px;right:-39px}
+.how-step-arrow{top:5px}
+.how-step article{grid-template-columns:79px minmax(0,1fr);align-items:center;gap:15px;min-height:108px;padding:13px;border-color:#1585c8;border-radius:9px;box-shadow:inset 0 1px #b5e9ff23,0 10px 26px #0007,0 0 12px #006dba44}
+.how-step-icon{width:77px;height:77px;border-color:#239bdd;background:radial-gradient(circle at 45% 23%,#3abaff8c,transparent 49%),#061a2c}
+.how-step-icon svg{width:47px;height:47px}
+.how-step h3{margin:0 0 7px;font-size:11px}
+.how-step p{font-size:10px;line-height:1.28}
+html[data-page="como-funciona"] .faq-section{min-height:250px;background:#020b17;border-bottom:1px solid #1784c6}
+.how-faq-art{width:min(420px,24vw);opacity:1;background:url('/assets/home/how-reference-trophy-art.webp') center/cover no-repeat}
+.how-faq-art img{display:none}
+.how-faq-art:after{background:linear-gradient(90deg,transparent 55%,#020b17 100%)}
+.how-faq-content{width:76vw;max-width:none;margin:0 0 0 24vw;padding:0 max(24px,calc((100vw - 1240px)/2)) 10px 0}
+.how-faq-content .how-section-heading,.how-faq-list{margin-left:0}
+.how-faq-content .how-section-heading{margin-bottom:13px}
+.how-faq-content .how-section-heading>p{max-width:270px}
+.how-faq-list{gap:6px}
+.how-faq-list summary{min-height:35px;padding:0 12px;font-size:12px}
+.how-faq-list p{padding:0 12px 11px;font-size:11px}
+html[data-page="como-funciona"] .site-footer{padding:15px max(24px,calc((100vw - 1240px)/2)) 8px!important;border-top:2px solid #0797ed!important;background:radial-gradient(ellipse at 2% 85%,#0057af42,transparent 30%),radial-gradient(ellipse at 100% 80%,#006fd859,transparent 29%),#020b18!important;box-shadow:0 -5px 18px #009bff33}
+html[data-page="como-funciona"] .site-footer .footer-main{max-width:1240px;grid-template-columns:1.15fr .8fr .9fr 1.5fr;gap:34px;padding-bottom:14px}
+html[data-page="como-funciona"] .footer-logo{width:132px!important;height:58px;object-fit:contain;object-position:left center;margin:0!important}
+html[data-page="como-funciona"] .footer-identity p{margin:0;color:#e3edf8;font:500 10px/1.2 Inter,Arial,sans-serif}
+html[data-page="como-funciona"] .footer-identity{padding-left:55px}
+html[data-page="como-funciona"] .footer-identity p strong{font-weight:500}
+html[data-page="como-funciona"] .footer-nav strong{margin:3px 0 8px;color:#1eb8ff;font:850 10px Inter,Arial,sans-serif}
+html[data-page="como-funciona"] .footer-nav a{margin:4px 0!important;color:#dbe9f4!important;font:500 10px/1.2 Inter,Arial,sans-serif!important}
+html[data-page="como-funciona"] .footer-cta{grid-template-columns:40px 1fr;gap:4px 10px;padding:9px 12px;border-color:#087ff0;border-radius:8px;background:#04172ae8}
+html[data-page="como-funciona"] .footer-cta>span{width:37px;height:37px;border-color:#13bcff;border-radius:8px;font-size:23px}
+html[data-page="como-funciona"] .footer-cta b{font:800 11px Inter,Arial,sans-serif}
+html[data-page="como-funciona"] .footer-cta p{margin:3px 0 0;font:500 10px/1.25 Inter,Arial,sans-serif!important}
+html[data-page="como-funciona"] .footer-cta .button{grid-column:1/-1;min-height:30px;padding:5px;border-color:#167dde;background:linear-gradient(90deg,#06346b,#0668ce);font:750 10px Inter,Arial,sans-serif}
+html[data-page="como-funciona"] .site-footer .footer-bottom{max-width:1240px;padding-top:8px;color:#b4c9d9!important;font:500 9px Inter,Arial,sans-serif}
+@media(max-width:1240px){
+ html[data-page="como-funciona"] .site-header{padding-inline:24px;gap:14px}
+ html[data-page="como-funciona"] .main-nav{gap:14px}
+ .how-step-grid{gap:16px}.how-step:before{right:-26px}
+ .how-step article{grid-template-columns:62px minmax(0,1fr);gap:10px;padding:10px}
+ .how-step-icon{width:61px;height:65px}.how-step-icon svg{width:39px;height:39px}
+}
+@media(max-width:1050px){
+ html[data-page="como-funciona"] .site-header .main-nav{top:54px}
+ .how-steps{padding-bottom:24px}.how-step-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 25px}
+ .how-steps .how-shell{width:min(100% - 48px,1200px)}
+ .how-step:nth-child(2):before,.how-step:nth-child(2) .how-step-arrow{display:none}
+ .how-step:nth-child(3):before{display:block}
+ .how-step article{grid-template-columns:75px minmax(0,1fr)}.how-step-icon{width:72px;height:72px}
+ .how-faq-content{width:72vw;margin-left:28vw;padding-right:24px}.how-faq-art{width:28vw}
+ html[data-page="como-funciona"] .site-footer .footer-main{grid-template-columns:1fr 1fr 1fr}
+ html[data-page="como-funciona"] .footer-cta{grid-column:1/-1;grid-template-columns:45px 1fr auto;align-items:center}
+ html[data-page="como-funciona"] .footer-cta .button{grid-column:auto;min-width:180px}
+}
+@media(max-width:760px){
+ html[data-page="como-funciona"] .site-header{height:64px;padding-inline:16px}
+ html[data-page="como-funciona"] .brand,html[data-page="como-funciona"] .brand-image{width:100px;min-width:100px;height:62px}
+ html[data-page="como-funciona"] .site-header .main-nav{top:64px;height:auto;gap:0}
+ html[data-page="como-funciona"] .main-nav a{min-height:43px}
+ html[data-page="como-funciona"] .main-nav a[data-route="como-funciona"]:after{right:auto;width:75px}
+ .how-hero{min-height:345px;align-items:flex-start}
+ .how-hero:before{inset:auto 0 0;width:100%;height:210px;background-size:auto 210px;background-position:62% bottom}
+ .how-hero:after{background:linear-gradient(#020a18 2%,#020a18d9 37%,transparent 78%)}
+ .how-hero-copy{margin-block:0;padding-top:30px}.how-hero h1{font-size:clamp(38px,11.7vw,56px)}.how-hero p{max-width:480px;font-size:13px}
+ .how-section-heading{display:block;margin-bottom:15px}.how-section-heading>p{max-width:480px;margin:10px 0 0}
+ .how-faq-art{position:relative;width:100%;max-width:none;height:170px;background-size:auto 170px}
+ .how-faq-art:after{background:linear-gradient(0deg,#020b17,transparent 65%)}
+ .how-faq-content{width:min(100% - 32px,1240px);margin-inline:auto;padding:12px 0 25px}
+ html[data-page="como-funciona"] .site-footer .footer-main{grid-template-columns:repeat(2,minmax(0,1fr));gap:19px 25px}
+ html[data-page="como-funciona"] .footer-identity{padding-left:0}
+ html[data-page="como-funciona"] .footer-identity,html[data-page="como-funciona"] .footer-cta{grid-column:1/-1}
+ html[data-page="como-funciona"] .site-footer .footer-bottom{display:grid;gap:5px}
+}
+@media(max-width:600px){
+ .how-step-grid{grid-template-columns:1fr;gap:12px}
+ .how-step{padding:0 0 0 54px}
+ .how-step:before{top:38px;bottom:-24px;left:20px;right:auto;width:2px;height:auto;background:linear-gradient(#06a7ff,#0874e8 85%,transparent)}
+ .how-step:nth-child(2):before{display:block}.how-step:last-child:before{display:none}
+ .how-step-number{top:17px}.how-step-arrow{display:none}
+ .how-step article{min-height:100px;grid-template-columns:65px minmax(0,1fr)}
+ .how-step-icon{width:64px;height:64px}.how-step-icon svg{width:39px;height:39px}
+ html[data-page="como-funciona"] .footer-cta{grid-template-columns:45px 1fr}
+ html[data-page="como-funciona"] .footer-cta .button{grid-column:1/-1;width:100%}
+}
+@media(max-width:390px){
+ html[data-page="como-funciona"] .site-header{padding-inline:8px;gap:4px}
+ html[data-page="como-funciona"] .brand,html[data-page="como-funciona"] .brand-image{width:82px;min-width:82px}
+ html[data-page="como-funciona"] .header-actions{gap:4px}
+ html[data-page="como-funciona"] .header-login{min-width:0;padding-inline:5px}
+ html[data-page="como-funciona"] .menu-toggle{width:36px;min-width:36px;padding-inline:6px}
+ .how-hero{min-height:355px}.how-hero h1{font-size:38px}
+ .how-step article{grid-template-columns:57px minmax(0,1fr);gap:10px;padding:10px}
+ .how-step-icon{width:56px;height:60px}.how-step-icon svg{width:35px;height:35px}
+ .how-step h3,.how-step p{font-size:10px}
+ html[data-page="como-funciona"] .header-cta{min-width:74px}
+}
+@media(prefers-reduced-motion:reduce){.how-step article{transition:none}}

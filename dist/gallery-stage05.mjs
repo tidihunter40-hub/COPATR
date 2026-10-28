@@ -1,5 +1,34 @@
 import { getSignedCrestUrl } from './supabase-real-mode.mjs';
 
+const signedCrests = new Map();
+const crestUrl = (path) => {
+  const cached = signedCrests.get(path);
+  if (cached && cached.until > Date.now()) return cached.promise;
+  const promise = getSignedCrestUrl(path).catch(() => null).then((url) => {
+    if (!url) signedCrests.delete(path);
+    return url;
+  });
+  signedCrests.set(path, { promise, until: Date.now() + 50 * 60_000 });
+  return promise;
+};
+const hydrateCrest = (crest) => {
+  crestUrl(crest.dataset.crestPath).then((url) => {
+    if (!url || !crest.isConnected) return;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = crest.dataset.crestAlt;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    crest.replaceWith(img);
+  });
+};
+const crestObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  for (const entry of entries) if (entry.isIntersecting) {
+    crestObserver.unobserve(entry.target);
+    hydrateCrest(entry.target);
+  }
+}, { rootMargin: '300px' }) : null;
+
 const byText = (tag, className, text) => {
   const node = document.createElement(tag);
   node.className = className;
@@ -39,15 +68,8 @@ function championCard(title) {
   crest.setAttribute('aria-label', 'Escudo público indisponível; identidade textual do clube');
   crestStage.append(crest);
   if (title.club?.crest_path) {
-    getSignedCrestUrl(title.club.crest_path).then((url) => {
-      if (!url || !crest.isConnected) return;
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = `Escudo original de ${title.club.official_name}`;
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      crest.replaceWith(img);
-    }).catch(() => {});
+    crest.dataset.crestPath = title.club.crest_path;
+    crest.dataset.crestAlt = `Escudo original de ${title.club.official_name}`;
   }
   const medal = document.createElement('img');
   medal.className = 'champion-card-medal';
@@ -84,8 +106,13 @@ export function renderChampionGallery(champions, status) {
   filters.hidden = false;
   gallery.classList.add('has-champions');
   const render = () => {
+    crestObserver?.disconnect();
     const visible = champions.filter((title) => Object.entries(selects).every(([key, select]) => !select.value || fields[key](title) === select.value));
     gallery.replaceChildren(...visible.map(championCard));
+    gallery.querySelectorAll('.champion-crest-placeholder[data-crest-path]').forEach((crest) => {
+      if (crestObserver) crestObserver.observe(crest);
+      else hydrateCrest(crest);
+    });
     if (!visible.length) gallery.append(byText('p', 'champions-filter-empty', 'Nenhuma conquista confirmada corresponde a estes filtros.'));
     count.textContent = `${visible.length} ${visible.length === 1 ? 'conquista confirmada' : 'conquistas confirmadas'}${visible.length !== champions.length ? ` de ${champions.length} disponíveis` : ''}.`;
   };

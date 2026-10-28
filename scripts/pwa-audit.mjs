@@ -33,6 +33,11 @@ try {
   await page.reload({ waitUntil: 'networkidle' });
   report.registration = await page.evaluate(async () => ({ controller: Boolean(navigator.serviceWorker.controller), scope: (await navigator.serviceWorker.ready).scope }));
   assert.ok(report.registration.controller);
+  // The service worker caches public routes on use; visit them before checking offline access.
+  for (const path of ['/funcionalidades', '/demonstracao', '/demonstracao/copa-tr-esports', '/demonstracao/copa-exemplo']) {
+    await page.goto(base + path, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(300);
+  }
   report.cache = await page.evaluate(async () => {
     const keys = await caches.keys();
     const cache = await caches.open(keys.find(key => key.startsWith('tr-campeonatos-public-')));

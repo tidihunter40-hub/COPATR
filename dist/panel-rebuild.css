@@ -1,0 +1,77 @@
+/* Organizer overview and competition management. The official data stays on white surfaces. */
+body.real-panel{background:#eef3f8}
+body.real-panel [hidden]{display:none!important}
+body.real-panel .panel-content{background:linear-gradient(#f5f8fc,#edf3f9)}
+body.real-panel .panel-header{box-shadow:0 3px 18px #071b3510}
+body.real-panel .panel-heading{padding:26px 28px;border:1px solid #1b5b9b;border-radius:18px;background:linear-gradient(100deg,#04162bea,#073569b8),url('/assets/stadium-night.webp') center 48%/cover;box-shadow:0 14px 34px #05224725}
+body.real-panel .panel-heading span{color:#60c4ff}
+body.real-panel .panel-heading h1,body.real-panel .panel-heading p{color:#fff}
+body.real-panel .panel-heading .primary-action{flex:none}
+body.real-panel .metric-grid{grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:30px}
+body.real-panel .metric{min-height:120px;padding:18px;border-color:#c7d6e5;border-top:3px solid #057bed;box-shadow:0 9px 24px #10375d12}
+body.real-panel .metric span{font-size:12px;line-height:1.35}
+body.real-panel .metric strong{color:#0756aa;font-size:34px}
+.competition-section>.card-head{margin:30px 0 15px}
+.competition-section>.card-head h2{margin:0;color:#122c48;font:800 25px Sora,Inter,Arial,sans-serif;text-transform:uppercase}
+.competition-section>.card-head p{margin:6px 0 0;color:#587086}
+.competition-section>.card-head>a{color:#006acb;font-weight:800}
+body.real-panel .competition-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+body.real-panel .competition-card{position:relative;min-width:0;padding:0;overflow:visible;border-color:#a9c2d9;box-shadow:0 10px 25px #0826421c}
+.competition-card-art{display:grid;place-items:center;height:146px;overflow:hidden;border-radius:13px 13px 0 0;background:radial-gradient(circle at 50% 15%,#0b7df766,transparent 58%),linear-gradient(125deg,#031022,#0b3c78 56%,#06172b)}
+.competition-card-art img{width:100px;height:105px;object-fit:contain;filter:drop-shadow(0 3px 11px #2da8ff85)}
+.competition-card-body{padding:16px}
+.competition-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:31px}
+.competition-card h3{min-height:2.4em;margin:8px 0 4px;color:#102c4b;font:800 18px/1.2 Sora,Inter,Arial,sans-serif;overflow-wrap:anywhere}
+.competition-card p{margin:0 0 12px;color:#506781;font-size:13px}
+.competition-team-count{display:block;padding:10px 0;border-top:1px solid #e0e8f0;color:#315371;font-size:12px;font-weight:800}
+.competition-open{display:flex;width:100%;margin-top:5px;text-align:center}
+.competition-menu-toggle{display:grid;place-items:center;width:32px;height:32px;border:1px solid #c0d6ec;border-radius:8px;background:#fff;color:#12457b;font-size:25px;line-height:1}
+.competition-menu-toggle:hover,.competition-menu-toggle[aria-expanded=true]{background:#0878e8;color:#fff}
+.competition-menu{position:absolute;z-index:10;top:153px;right:9px;display:grid;width:min(218px,calc(100vw - 36px));padding:7px;border:1px solid #2a69ae;border-radius:11px;background:#071e3e;box-shadow:0 17px 36px #00152b77}
+.competition-menu[hidden]{display:none!important}
+.competition-menu a,.competition-menu button{display:block;width:100%;padding:10px 11px;border:0;border-radius:6px;background:transparent;color:#fff;text-align:left;text-decoration:none;font-size:13px;font-weight:700}
+.competition-menu a:hover,.competition-menu button:hover:not(:disabled),.competition-menu a:focus-visible,.competition-menu button:focus-visible{background:#0b5ba9;outline:0}
+.competition-menu button:disabled{color:#8497ae;cursor:not-allowed;opacity:1}
+.competition-menu-danger{margin-top:5px;padding-top:5px;border-top:1px solid #436185}
+.competition-menu-danger button:not(:disabled){color:#ff717d}
+.competition-toolbar{display:flex;gap:12px;align-items:end;margin-bottom:18px}
+.competition-toolbar label{display:grid;gap:5px;color:#244765;font-size:12px;font-weight:800}
+.competition-toolbar label:first-child{flex:1}
+.competition-toolbar input,.competition-toolbar select{min-height:44px;padding:10px 12px;border:1px solid #b6cada;border-radius:9px;background:#fff;color:#173d5d}
+.competition-dialog{width:min(610px,calc(100vw - 28px));max-height:min(90dvh,850px);padding:25px;border:1px solid #63a9ea;border-radius:18px;background:#fff;color:#142e49;box-shadow:0 25px 85px #00182db0}
+.competition-dialog::backdrop{background:#001326bc;backdrop-filter:blur(5px)}
+.competition-dialog h2{margin:6px 0 8px;font:800 clamp(23px,3vw,30px) Sora,Inter,Arial,sans-serif}
+.competition-dialog>p{margin:0 0 20px;color:#54718a}
+.dialog-heading{display:flex;align-items:center;justify-content:space-between;color:#0878e8;font-size:11px;font-weight:900;letter-spacing:.12em}
+.dialog-heading button{width:35px;height:35px;border:0;border-radius:50%;background:#edf4fb;color:#123b63;font-size:22px}
+.competition-kind-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0 20px}
+.competition-kind-grid button{display:grid;align-content:start;gap:10px;min-height:185px;padding:19px;border:2px solid #c6d8e8;border-radius:12px;background:#f7faff;color:#173554;text-align:left}
+.competition-kind-grid button:hover,.competition-kind-grid button:focus-visible{border-color:#0878e8;background:#eaf5ff;outline:0}
+.competition-kind-grid strong{font-size:17px}.competition-kind-grid span{font-size:13px}.competition-kind-grid small{color:#5b7288;line-height:1.45}
+.competition-dialog form{display:grid;gap:15px}
+.competition-dialog form>label,.competition-dialog details label{display:grid;gap:6px;color:#26415d;font-weight:800}
+.competition-dialog input:not([type=radio]),.competition-dialog select{width:100%;min-height:45px;padding:10px;border:1px solid #acc5d9;border-radius:8px;background:#fff;color:#142e49}
+.phase-choice{display:grid;gap:8px;margin:0;padding:0;border:0}.phase-choice legend{margin-bottom:9px;font-weight:800}
+.phase-choice label{display:flex;gap:11px;align-items:center;padding:10px;border:1px solid #c6d8e8;border-radius:8px;cursor:pointer}
+.phase-choice label:has(input:checked){border-color:#0878e8;background:#edf6ff}
+.phase-choice input{accent-color:#0878e8}
+.phase-choice span{display:grid;gap:2px}.phase-choice small{color:#61778d}
+.competition-dialog details{padding:9px 0}.competition-dialog details summary{color:#006acb;font-weight:800;cursor:pointer}.competition-dialog details label{margin-top:11px}
+.dialog-actions{display:flex;justify-content:end;gap:10px}.competition-dialog #form-message{margin:0;color:#a13030}
+@media(max-width:1300px){body.real-panel .competition-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1050px){body.real-panel .metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}body.real-panel .competition-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){body.real-panel .panel-heading{padding:20px}body.real-panel .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.real-panel .competition-grid{grid-template-columns:1fr 1fr}.competition-card-art{height:112px}.competition-card-art img{width:78px;height:80px}.competition-card h3{font-size:15px}.competition-card-body{padding:12px}.competition-menu{top:119px}.competition-toolbar{flex-direction:column;align-items:stretch}.competition-kind-grid{grid-template-columns:1fr}.competition-kind-grid button{min-height:120px}.competition-dialog{padding:18px}}
+@media(max-width:430px){body.real-panel .competition-grid{grid-template-columns:1fr}body.real-panel .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.real-panel .metric{min-height:96px;padding:13px}body.real-panel .metric strong{font-size:27px}.competition-card-art{height:130px}.competition-menu{top:137px}.dialog-actions{flex-wrap:wrap}.dialog-actions>*{flex:1}}
+.selected-team-list{display:grid;gap:6px;margin:10px 0 18px}
+.selected-team{display:flex;align-items:center;gap:9px;min-width:0;padding:8px 10px;border:1px solid #d1e0ec;border-radius:8px;background:#f6faff}
+.selected-team strong{flex:1;min-width:0;overflow-wrap:anywhere;font-size:13px}
+.selected-team button{padding:7px 9px;border:1px solid #bcd1e4;border-radius:6px;background:#fff;color:#a23d44;font-size:12px;font-weight:800}
+.team-select-result{display:flex;align-items:center;gap:9px}
+.team-select-result span:not(.team-shield){flex:1;text-align:left}
+.team-select-result .team-shield,.selected-team .team-shield{width:35px;height:35px;flex:none}
+.competition-settings h3{margin:10px 0 0;padding-top:14px;border-top:1px solid #dde7f0;color:#16416b;font-size:16px}
+.competition-settings textarea{width:100%;padding:10px 11px;border:1px solid #aebfd0;border-radius:7px;background:#fff;color:#112c46;font:inherit;resize:vertical}
+.competition-settings textarea:focus{outline:2px solid #1689ff}
+.competition-settings input[type=color]{width:80px;height:45px;padding:3px;cursor:pointer}
+.settings-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:430px){.settings-two{grid-template-columns:1fr}}

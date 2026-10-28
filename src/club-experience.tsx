@@ -23,8 +23,9 @@ const played = (match: Match) => match.homeScore !== null && match.awayScore !==
 const score = (match: Match) => played(match) ? `${match.homeScore} × ${match.awayScore}` : 'VS';
 
 function Crest({ team, className = '' }: { team?: Club; className?: string }) {
-  const src = safeCrestUrl(team?.crest) || team?.demoAsset || (team?.publicCrest && /^https:\/\//.test(team.publicCrest) ? team.publicCrest : null);
-  return src ? <img className={`profile-crest ${className}`} src={src} alt={`Escudo de ${team?.name}`}/> : <span className={`profile-crest profile-crest-empty ${className}`} role="img" aria-label={`Escudo indisponível de ${team?.name || 'equipe'}`}>◇</span>;
+  const fallback = '/assets/official/06_escudo_padrao_tr_campeonatos.webp';
+  const src = safeCrestUrl(team?.crest) || team?.demoAsset || (team?.publicCrest && /^https:\/\//.test(team.publicCrest) ? team.publicCrest : null) || fallback;
+  return <img className={`profile-crest ${className}`} src={src} alt={`Escudo de ${team?.name || 'equipe'}`} onError={(event) => { if (event.currentTarget.src !== new URL(fallback, location.href).href) event.currentTarget.src = fallback; }}/>
 }
 
 function Field({ match, teams, clubId }: { match: Match; teams: Club[]; clubId: string }) {

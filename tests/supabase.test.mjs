@@ -6,6 +6,7 @@ import { resolve } from 'node:path';
 const migration = readFileSync(resolve('supabase/migrations/202610220001_sports_memory.sql'), 'utf8');
 const smartShieldMigration = readFileSync(resolve('supabase/migrations/202610250004_tr_smart_shield.sql'), 'utf8');
 const teamDirectoryMigration = readFileSync(resolve('supabase/migrations/202610250005_team_directory_and_access.sql'), 'utf8');
+const competitionCrestMigration = readFileSync(resolve('supabase/migrations/202610260001_competition_crests.sql'), 'utf8');
 const realMode = await import('../dist/supabase-real-mode.mjs');
 
 test('migration preserva identidade, participações, auditoria e políticas de acesso', () => {
@@ -35,6 +36,14 @@ test('TR Smart Shield mantém original, derivado e trilha de auditoria sob RLS',
   assert.match(smartShieldMigration, /alter table public\.club_crest_jobs enable row level security/);
   assert.match(smartShieldMigration, /historical competition snapshot/i);
   assert.doesNotMatch(smartShieldMigration, /service_role/i);
+});
+
+test('escudos de campeonatos ficam em bucket separado com acesso por organização', () => {
+  assert.match(competitionCrestMigration, /add column if not exists crest_path text/);
+  assert.match(competitionCrestMigration, /competition-crests/);
+  assert.match(competitionCrestMigration, /file_size_limit, allowed_mime_types/);
+  assert.match(competitionCrestMigration, /c\.organization_id::text = \(storage\.foldername\(name\)\)\[1\]/);
+  assert.match(competitionCrestMigration, /public\.is_organization_member\(c\.organization_id, 'editor'\)/);
 });
 
 test('catálogo de equipes é separado por organização e protege participações cruzadas', () => {

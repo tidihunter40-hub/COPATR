@@ -5,6 +5,7 @@ const pages = {
   campeonatos: ['VITRINE PÚBLICA', 'Campeonatos', 'Competições publicadas, resultados e conquistas confirmadas.'],
   demonstracao: ['LABORATÓRIO INTERATIVO', 'Demonstração', 'Experimente uma competição fictícia neste navegador, sem alterar dados oficiais.'],
   planos: ['PLANOS E ASSINATURAS', 'Planos', 'Conheça o estágio atual dos planos da TR Campeonatos.'],
+  contato: ['FALE COM A GENTE', 'Contato', 'Converse com a equipe da TR Campeonatos sobre sua competição.'],
   entrar: ['ACESSO DO ORGANIZADOR', 'Entrar', 'Acesse as competições vinculadas à sua conta.'],
 };
 const page = document.documentElement.dataset.page;
@@ -25,8 +26,16 @@ const destinations = {
   inicio: '/', funcionalidades: '/funcionalidades', modalidades: '/funcionalidades', historia: '/funcionalidades',
   'como-funciona': '/como-funciona', campeonatos: '/campeonatos', galeria: '/campeonatos',
   planos: '/planos', demonstracao: '/demonstracao', 'previa-sistema': '/demonstracao', plataforma: '/demonstracao',
-  classificacao: '/demonstracao', contato: '/',
+  classificacao: '/demonstracao', contato: '/contato',
 };
+const redirectLegacyHomeHash = () => {
+  if (page !== 'inicio' || !location.hash) return;
+  const id = decodeURIComponent(location.hash.slice(1));
+  const destination = destinations[id];
+  if (destination && destination !== '/') location.replace(`${destination}${id === 'contato' || id === 'galeria' ? '' : location.hash}`);
+};
+redirectLegacyHomeHash();
+window.addEventListener('hashchange', redirectLegacyHomeHash);
 document.addEventListener('click', (event) => {
   const anchor = event.target.closest?.('a[href^="#"]');
   if (!anchor || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -38,7 +47,7 @@ document.addEventListener('click', (event) => {
   const current = location.pathname.replace(/\/$/, '') || '/';
   if (current === destination) return;
   event.preventDefault();
-  location.assign(`${destination}${hash}`);
+  location.assign(`${destination}${id === 'contato' || id === 'galeria' ? '' : hash}`);
 }, true);
 
 if (page === 'entrar') {

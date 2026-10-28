@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
+<head><script>try{var trGraphicsMode=localStorage.getItem('tr-campeonatos-graphics-mode');document.documentElement.dataset.graphics=trGraphicsMode==='performance'?'performance':'ultra'}catch{document.documentElement.dataset.graphics='ultra'}</script>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#061426">
   <meta name="description" content="Monte grupos e confrontos com o planejador do TR Campeonatos.">
-  <link rel="icon" href="/assets/official/03_icone_app_transparente.png" type="image/png">
-  <link rel="stylesheet" href="/competition-planner-v3.css">
+  <link rel="icon" href="/assets/official/03_icone_app_favicon_64.png" type="image/png">
+  <link rel="stylesheet" href="/local-fonts.css"><link rel="stylesheet" href="/competition-planner-v3.css">
   <link rel="stylesheet" href="/auth-header.css">
   <title>Montar campeonato | TR Campeonatos</title>
-<link rel="manifest" href="/manifest.webmanifest"><script type="module" src="/pwa-register.mjs"></script></head>
+<link rel="manifest" href="/manifest.webmanifest"><script type="module" src="/pwa-register.mjs"></script><link rel="stylesheet" href="/graphics-mode.css"></head>
 <body>
-  <header class="planner-header"><a href="/" aria-label="TR Campeonatos, início"><img src="/assets/official/01_logo_principal_transparente.png" alt="TR Campeonatos"></a><nav aria-label="Navegação"><a href="/demonstracao">Demonstração</a><a href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">Painel do organizador</a></nav></header>
+  <header class="planner-header"><a href="/" aria-label="TR Campeonatos, início"><img src="/assets/official/01_logo_principal_transparente.webp" alt="TR Campeonatos"></a><nav aria-label="Navegação"><a href="/demonstracao">Demonstração</a><a href="/entrar?retorno=%2Fpainel%2Fcampeonatos%2Fnovo">Painel do organizador</a></nav></header>
   <main class="planner-shell">
     <div class="planner-layout">
       <form id="planner-form" class="planner-panel">
@@ -34,5 +34,5 @@
   </main>
   <script type="module" src="/competition-planner-v2.mjs"></script>
   <script type="module" src="/auth-header-bootstrap.mjs"></script>
-</body>
+<script type="module" src="/graphics-mode.mjs"></script></body>
 </html>

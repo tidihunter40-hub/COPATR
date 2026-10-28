@@ -20,15 +20,28 @@ test('classificação premium preserva escudos e mostra estatísticas calculadas
   const html = publicStandingsView(rows, entries, crests, matches, id => `/c/teste?jogo=${id}`);
   assert.match(html, /src="\/original\/azul.png"/);
   assert.match(html, /Escudo de Clube Azul/);
-  assert.match(html, /<th scope="col">Apr\.<\/th>/);
-  assert.match(html, /<td>100%<\/td>/);
-  assert.match(html, /standing-leader-tag">Líder/);
+  assert.match(html, /<th scope="col">Últimos jogos<\/th>/);
+  assert.match(html, /<b>100%<\/b> Aproveitamento/);
+  assert.match(html, /<b>2<\/b> EQUIPES/);
+  assert.match(html, /standing-leader-tag">LÍDER/);
   assert.match(html, /form-V/);
   assert.match(html, /form-D/);
   assert.match(html, /Histórico disponível/);
   assert.match(html, /jogo=confirmed/);
   assert.doesNotMatch(html, /jogo=pending/);
   assert.match(html, /standing-mobile-details/);
+  assert.match(html, /form-V[^]*?form-empty[^]*?form-empty[^]*?form-empty/);
+});
+
+test('últimos quatro resultados seguem a data e deixam partidas futuras vazias', () => {
+  const games = [
+    { id: 'late', status: 'confirmed', phase: 'league', scheduled_at: '2026-10-20T21:00:00Z', home_entry_id: 'a', away_entry_id: 'b', home_score: 0, away_score: 2 },
+    { id: 'early', status: 'confirmed', phase: 'league', scheduled_at: '2026-10-10T21:00:00Z', home_entry_id: 'a', away_entry_id: 'b', home_score: 2, away_score: 0 },
+    ...matches.filter(match => match.status === 'scheduled'),
+  ];
+  const html = publicStandingsView(rows, entries, crests, games, id => `/c/teste?jogo=${id}`);
+  const firstRow = html.match(/<tr class="standing-row[^]*?<\/tr>/)?.[0] || '';
+  assert.match(firstRow, /form-V[^]*?form-D[^]*?form-empty[^]*?form-empty/);
 });
 
 test('sem partida confirmada não anuncia líder ou aproveitamento inventado', () => {

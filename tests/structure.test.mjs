@@ -13,7 +13,7 @@ test('navegação e ações locais apontam para seções existentes', () => {
     if (target.startsWith('clube-')) { assert.ok(document.getElementById('club-profile-root'), 'Rota de clube sem perfil'); continue; }
     assert.ok(document.getElementById(target), `Destino ausente: #${target}`);
   }
-  for (const id of ['power-root', 'features-root', 'sports-root', 'steps-root', 'featured-root', 'plans-root', 'lab-content']) {
+  for (const id of ['power-root', 'features-root', 'sports-root', 'steps-root', 'galeria', 'plans-root', 'lab-content']) {
     assert.ok(document.getElementById(id), `Componente ausente: ${id}`);
   }
 });

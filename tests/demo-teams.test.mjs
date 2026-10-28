@@ -6,22 +6,24 @@ import { ESPORTS_DEMO } from '../dist/esports-demo.mjs';
 import { calculateStandings } from '../dist/engine.mjs';
 
 const expected = [
-  ['BONOCO CITY', '/assets/demo-teams/01_Bonoco_City.png'],
-  ['RESENHA CLUBE', '/assets/demo-teams/02_Resenha_Clube.png'],
-  ['IRMANDADE ES', '/assets/demo-teams/03_Irmandade_ES.png'],
-  ['ÁGUIA ES', '/assets/demo-teams/04_Aguia_ES.png'],
-  ['OS SUPERSTAIS', '/assets/demo-teams/05_Os_Superstais.png'],
-  ['GAROTOS DE POMBAL', '/assets/demo-teams/06_Garotos_de_Pombal.png'],
+  ['BONOCO CITY', '/assets/demo-teams/01_Bonoco_City-256.webp'],
+  ['RESENHA CLUBE', '/assets/demo-teams/02_Resenha_Clube-256.webp'],
+  ['IRMANDADE ES', '/assets/demo-teams/03_Irmandade_ES-256.webp'],
+  ['ÁGUIA ES', '/assets/demo-teams/04_Aguia_ES-256.webp'],
+  ['OS SUPERSTAIS', '/assets/demo-teams/05_Os_Superstais-256.webp'],
+  ['GAROTOS DE POMBAL', '/assets/demo-teams/06_Garotos_de_Pombal-256.webp'],
 ];
 
-test('escudos fornecidos são PNGs RGBA e a identidade demonstrativa é centralizada', () => {
+test('escudos demonstrativos usam WebP menor que os originais sem trocar identidade', () => {
   assert.deepEqual(DEMO_TEAMS.map(({ name, demoAsset }) => [name, demoAsset]), expected);
   for (const team of DEMO_TEAMS) {
     const localPath = `dist${team.demoAsset}`;
     assert.equal(existsSync(localPath), true, `${team.name}: arquivo ausente`);
-    const png = readFileSync(localPath);
-    assert.deepEqual([...png.subarray(1, 4)], [80, 78, 71], `${team.name}: não é PNG`);
-    assert.equal(png[25], 6, `${team.name}: PNG precisa preservar canal alfa RGBA`);
+    const webp = readFileSync(localPath);
+    const original = readFileSync(localPath.replace(/-256\.webp$/, '.png'));
+    assert.equal(webp.toString('ascii', 0, 4), 'RIFF', `${team.name}: contêiner WebP inválido`);
+    assert.equal(webp.toString('ascii', 8, 12), 'WEBP', `${team.name}: não é WebP`);
+    assert.ok(webp.length < original.length / 5, `${team.name}: versão de exibição pesada`);
   }
   assert.equal(ESPORTS_DEMO.teams, DEMO_TEAMS);
 });

@@ -1,10 +1,15 @@
+/* Same approved artwork in responsive display formats; original files remain available. */
+.public-competition{--tr-stadium-image:url('/assets/stadium-night-1600.webp');--tr-trophy-image:url('/assets/gallery-silver-trophy-1600.webp')}
+@supports (background-image:image-set(url('/assets/stadium-night-1600.avif') type('image/avif'))){.public-competition{--tr-stadium-image:image-set(url('/assets/stadium-night-1600.avif') type('image/avif'),url('/assets/stadium-night-1600.webp') type('image/webp'));--tr-trophy-image:image-set(url('/assets/gallery-silver-trophy-1600.avif') type('image/avif'),url('/assets/gallery-silver-trophy-1600.webp') type('image/webp'))}}
+@media(max-width:700px){.public-competition{--tr-stadium-image:url('/assets/stadium-night-800.webp');--tr-trophy-image:url('/assets/gallery-silver-trophy-800.webp')}}
+@supports (background-image:image-set(url('/assets/stadium-night-800.avif') type('image/avif'))){@media(max-width:700px){.public-competition{--tr-stadium-image:image-set(url('/assets/stadium-night-800.avif') type('image/avif'),url('/assets/stadium-night-800.webp') type('image/webp'));--tr-trophy-image:image-set(url('/assets/gallery-silver-trophy-800.avif') type('image/avif'),url('/assets/gallery-silver-trophy-800.webp') type('image/webp'))}}}
 /* Vitrine pública: a arena compartilha a mesma composição nas quatro telas. */
 .public-competition{background:#010814;color:#f5fbff}
 .public-competition .public-header{max-width:1510px;margin:auto;padding:12px clamp(16px,3vw,44px);background:#020c1b;border-bottom-color:#156ca9}
 .public-competition .public-header img{width:154px;height:68px}
 .public-competition .public-header nav a{font-weight:700;color:#b9daf2}
 .public-competition .public-shell{max-width:1510px;padding:0 clamp(12px,2.6vw,38px) 105px}
-.public-competition .public-hero{margin:0 calc(-1 * clamp(12px,2.6vw,38px)) 0;min-height:315px;padding:36px clamp(20px,4vw,56px);background:linear-gradient(180deg,#010916b8 0%,#03122655 45%,#01101ccd 100%),url('/assets/stadium-night.webp') center center/100% 100%;box-shadow:inset 0 -32px 40px #020b14;border-bottom:1px solid #00a5ff}
+.public-competition .public-hero{margin:0 calc(-1 * clamp(12px,2.6vw,38px)) 0;min-height:315px;padding:36px clamp(20px,4vw,56px);background:linear-gradient(180deg,#010916b8 0%,#03122655 45%,#01101ccd 100%),var(--tr-stadium-image) center center/100% 100%;box-shadow:inset 0 -32px 40px #020b14;border-bottom:1px solid #00a5ff}
 .public-competition .public-hero h1{font-size:clamp(34px,4.6vw,70px);line-height:.98;letter-spacing:-.025em;text-wrap:balance;text-shadow:0 4px 10px #000,0 0 24px #117ace}
 .public-competition .public-hero>span{letter-spacing:.11em;font-weight:900;text-shadow:0 2px 8px #000}
 .public-competition .public-hero p{font-weight:650;text-shadow:0 2px 8px #000}
@@ -22,7 +27,7 @@
 .public-section-heading>div>span{letter-spacing:.12em}
 .public-section-heading>a{border:1px solid #1289d5;border-radius:6px;padding:7px 10px;background:#032b51;color:#a8e6ff;text-transform:uppercase;font-size:10px}
 .public-section{scroll-margin-top:16px}
-.public-fixture.match-arena{isolation:isolate;min-height:228px;margin:0;padding:10px 13px 12px;border:1px solid #039fed!important;border-radius:11px;background:linear-gradient(180deg,#00122680 0%,#00112552 44%,#02101ce8 82%,#00200ba3 100%),url('/assets/stadium-night.webp') center center/100% 100%!important;box-shadow:inset 0 0 0 1px #71d6ff26,inset 0 0 26px #0061cc6b,0 5px 17px #000b}
+.public-fixture.match-arena{isolation:isolate;min-height:228px;margin:0;padding:10px 13px 12px;border:1px solid #039fed!important;border-radius:11px;background:linear-gradient(180deg,#00122680 0%,#00112552 44%,#02101ce8 82%,#00200ba3 100%),var(--tr-stadium-image) center center/100% 100%!important;box-shadow:inset 0 0 0 1px #71d6ff26,inset 0 0 26px #0061cc6b,0 5px 17px #000b}
 .public-fixture.match-arena::before{inset:auto 0 0;height:24%;background:linear-gradient(#082a0800,#06410a59);z-index:-1}
 .public-fixture.match-arena::after{content:'';position:absolute;z-index:-1;left:12%;right:12%;top:29%;height:28%;background:radial-gradient(ellipse,#0466c45e,transparent 70%);pointer-events:none}
 .fixture-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#d9f1ff;font-size:11px;text-transform:uppercase}
@@ -55,7 +60,7 @@
 .public-upcoming .fixture-crest-frame{width:clamp(75px,7vw,100px);height:clamp(75px,7vw,100px)}
 .public-upcoming .fixture-score{min-width:82px;font-size:clamp(34px,3.2vw,45px)}
 .upcoming-all{display:block;margin:10px 2px 0;color:#8dddff;text-align:right;text-transform:uppercase;text-decoration:none;font-size:11px;font-weight:900}
-.public-upcoming .upcoming-row{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;min-height:113px;margin:0 0 8px;padding:11px;border:1px solid #12699e;border-radius:9px;background:linear-gradient(180deg,#011121a9,#05273c94),url('/assets/stadium-night.webp') center/100% 100%;color:#fff;text-decoration:none;box-shadow:inset 0 0 19px #006bba55}
+.public-upcoming .upcoming-row{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;min-height:113px;margin:0 0 8px;padding:11px;border:1px solid #12699e;border-radius:9px;background:linear-gradient(180deg,#011121a9,#05273c94),var(--tr-stadium-image) center/100% 100%;color:#fff;text-decoration:none;box-shadow:inset 0 0 19px #006bba55}
 .public-upcoming .upcoming-row::before{content:'VS';grid-column:2;grid-row:1/4;align-self:center;padding:7px;border:1px solid #3bbcff;border-radius:6px;background:#075cc4;color:white;font-family:Impact,Arial,sans-serif;font-size:23px;box-shadow:0 0 10px #087cff}
 .upcoming-row .upcoming-team{grid-row:1/4;display:grid;justify-items:center;gap:3px;min-width:0;text-align:center;font-family:Impact,'Arial Narrow',Arial,sans-serif;font-size:12px;text-transform:uppercase;line-height:1.1}
 .upcoming-row .upcoming-team:last-of-type{grid-column:3}
@@ -76,7 +81,7 @@
 .public-competition .public-team-card{background:linear-gradient(#092747,#03101e);border-color:#126a9b;box-shadow:inset 0 1px #c0ecff19}
 @media(max-width:430px){.public-competition .public-team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.public-competition .public-team-card strong{font-size:12px;overflow-wrap:normal}}
 .public-detail-page>.back-link{margin:13px 0}
-.public-competition .public-detail-hero{min-height:115px!important;padding-top:18px;padding-bottom:20px;background:linear-gradient(180deg,#021020d9,#071c32a8),url('/assets/stadium-night.webp') center/100% 100%}
+.public-competition .public-detail-hero{min-height:115px!important;padding-top:18px;padding-bottom:20px;background:linear-gradient(180deg,#021020d9,#071c32a8),var(--tr-stadium-image) center/100% 100%}
 .public-competition .public-detail-hero h1{font-size:clamp(24px,3vw,40px)}
 .public-detail-page>.match-arena{max-width:980px;min-height:375px;margin:12px auto}
 .public-detail-page .fixture-crest-frame{width:clamp(110px,13vw,175px);height:clamp(110px,13vw,175px)}
@@ -92,13 +97,53 @@
 @media(max-width:350px){.public-competition .fixture-crest-frame{width:75px;height:75px}.public-featured .fixture-crest-frame{width:82px;height:82px}.public-competition .fixture-score{min-width:68px;font-size:30px}.public-competition .fixture-team-name a,.public-competition .fixture-team-name strong{font-size:10px}.public-competition .public-header nav a:last-child{display:none}}
 @media(prefers-reduced-motion:reduce){.public-competition .fixture-winner .fixture-crest-frame{transition:none}}
 
+/* Placas dos nomes: o escudo e o placar mantêm suas dimensões e posições. */
+.public-competition .match-arena .fixture-team-name{
+  width:min(100%,clamp(132px,14vw,220px));
+  min-height:0;
+  margin-top:-2px;
+  align-items:stretch;
+}
+.public-competition .match-arena .fixture-team-name>a,
+.public-competition .match-arena .fixture-team-name>strong{
+  box-sizing:border-box;
+  display:grid;
+  place-items:center;
+  width:100%;
+  min-height:34px;
+  padding:5px 9px;
+  border:1px solid #36bfff;
+  border-radius:8px;
+  background:linear-gradient(180deg,#07366d 0%,#031a42 52%,#03132f 100%);
+  box-shadow:inset 0 1px #a4eaff55,0 0 9px #078dff70;
+  color:#fff;
+  text-align:center;
+  text-decoration:none;
+  text-shadow:0 2px 3px #001024;
+  overflow-wrap:anywhere;
+}
+.public-competition .match-arena .fixture-team-name>a:hover,
+.public-competition .match-arena .fixture-team-name>a:focus-visible{
+  border-color:#91e1ff;
+  box-shadow:inset 0 1px #a4eaff55,0 0 12px #168fff;
+}
+@media(max-width:430px){
+  .public-competition .match-arena .fixture-team-name{width:100%}
+  .public-competition .match-arena .fixture-team-name>a,
+  .public-competition .match-arena .fixture-team-name>strong{min-height:29px;padding:4px 3px;border-radius:6px;font-size:clamp(10px,2.9vw,12px);line-height:1.08}
+}
+@media(max-width:350px){
+  .public-competition .match-arena .fixture-team-name>a,
+  .public-competition .match-arena .fixture-team-name>strong{padding-inline:2px;font-size:10px}
+}
+
 /* Premium public sections: teams, season metrics, and confirmed titles. */
 .public-competition .premium-teams,
 .public-competition .premium-stats,
 .public-competition .premium-champions{position:relative;isolation:isolate;overflow:hidden;border-color:#347da8;background:#061322;box-shadow:inset 0 1px #d5f1ff20,0 16px 38px #000b}
 .public-competition .premium-teams::before,
 .public-competition .premium-stats::before,
-.public-competition .premium-champions::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(100deg,#020a14f2 0%,#031326cc 45%,#03101ce8 100%),url('/assets/stadium-night.webp') center 54%/cover;opacity:.9}
+.public-competition .premium-champions::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(100deg,#020a14f2 0%,#031326cc 45%,#03101ce8 100%),var(--tr-stadium-image) center 54%/cover;opacity:.9}
 .premium-section-heading{position:relative;display:flex;align-items:center;gap:14px;min-height:88px;margin:-2px 0 20px;padding:8px 6px 15px;border-bottom:1px solid #30baff;box-shadow:0 8px 20px -18px #27baff}
 .premium-section-heading::after{content:"";position:absolute;bottom:-2px;left:0;width:min(190px,34%);height:3px;background:linear-gradient(90deg,#7be4ff,#078cff,transparent);box-shadow:0 0 14px #00aaff}
 .premium-heading-icon{display:grid;place-items:center;flex:none;width:58px;height:58px;border:1px solid #36bfff;border-radius:12px;background:linear-gradient(145deg,#0b3d68,#06172a);color:#53d2ff;font-size:32px;text-shadow:0 0 12px #079dff;box-shadow:inset 0 1px #c9f1ff66,0 0 20px #078eff55}
@@ -110,7 +155,7 @@
 .premium-heading-count strong{grid-row:span 2;color:#58ceff;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:42px;line-height:1;text-shadow:0 0 16px #009fff}
 .premium-teams .public-team-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
 .public-team-card{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:0;min-height:clamp(228px,20vw,294px);padding:0;overflow:hidden;border:1px solid #3889b8;border-radius:11px;background:#061526;color:#fff;text-align:center;text-decoration:none;box-shadow:inset 0 1px #c8edff33,0 12px 24px #0009;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.public-team-card::before{content:"";position:absolute;z-index:-2;inset:0;background:linear-gradient(180deg,#020b1699 0%,#03182a44 35%,#020b16e8 78%,#020a14f5 100%),url('/assets/stadium-night.webp') center/cover}
+.public-team-card::before{content:"";position:absolute;z-index:-2;inset:0;background:linear-gradient(180deg,#020b1699 0%,#03182a44 35%,#020b16e8 78%,#020a14f5 100%),var(--tr-stadium-image) center/cover}
 .public-team-card::after{content:"";position:absolute;z-index:-1;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px #bdeeff17,inset 0 -32px 40px #007bff16;pointer-events:none}
 .public-team-card:hover,.public-team-card:focus-visible{transform:translateY(-4px);border-color:#54d5ff;outline:none;box-shadow:inset 0 1px #e4faff66,0 0 0 1px #168fffa8,0 0 24px #078eff83,0 15px 32px #000b}
 .public-team-card-art{display:grid;place-items:center;flex:1;min-height:0;padding:22px 10px 12px;background:radial-gradient(ellipse at 50% 55%,#0c77c35c,transparent 64%)}
@@ -119,7 +164,7 @@
 .public-team-card-name strong{max-width:100%;color:#f3f8fd;font-family:'Barlow Condensed','Arial Narrow',Impact,sans-serif;font-size:clamp(16px,1.35vw,20px);font-weight:900;line-height:1.05;letter-spacing:.035em;text-transform:uppercase;text-shadow:0 2px 6px #000;overflow-wrap:anywhere}
 .public-team-card-name small{color:#7ed8ff;font-size:9px;font-weight:900;letter-spacing:.16em}
 .public-team-card-profile{position:absolute;right:8px;top:8px;padding:5px 7px;border:1px solid #55caff77;border-radius:4px;background:#02172bd9;color:#bcecff;font-size:9px;font-weight:900;text-transform:uppercase}
-.premium-stats::before{background:linear-gradient(90deg,#020a14e8,#031326b8 50%,#03101ce8),url('/assets/stadium-night.webp') center 46%/cover}
+.premium-stats::before{background:linear-gradient(90deg,#020a14e8,#031326b8 50%,#03101ce8),var(--tr-stadium-image) center 46%/cover}
 .premium-stats .premium-section-heading{margin-bottom:18px}
 .public-competition .premium-stats .public-stats-grid{gap:14px}
 .premium-stats .public-stats-grid>div{position:relative;display:grid;justify-items:center;align-content:center;gap:8px;min-height:158px;padding:18px 14px;border-color:#347da8;border-radius:9px;background:linear-gradient(155deg,#071d32e8,#03101eed);box-shadow:inset 0 1px #c8edff22,0 9px 22px #0008;text-align:center}
@@ -127,7 +172,7 @@
 .public-competition .premium-stats .public-stats-grid strong{color:#63d1ff;font-family:'Barlow Condensed','Arial Narrow',Impact,sans-serif;font-size:clamp(42px,5vw,62px);font-weight:900;line-height:.9;text-shadow:0 0 17px #078cffbb}
 .premium-stats .public-stats-grid>div>span:last-child{color:#d6e9f5;font-size:12px;font-weight:800;letter-spacing:.04em}
 .premium-stats .data-note{margin:14px 0 0;color:#aac5d8}
-.premium-champions::before{background:linear-gradient(90deg,#020a14ec,#0313269f 50%,#03101ce8),url('/assets/stadium-night.webp') center 58%/cover}
+.premium-champions::before{background:linear-gradient(90deg,#020a14ec,#0313269f 50%,#03101ce8),var(--tr-stadium-image) center 58%/cover}
 .premium-champions .premium-section-heading{margin-bottom:15px}
 .premium-champion-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:12px}
 .premium-champion{display:flex;align-items:center;gap:16px;min-height:100px;padding:14px 17px;border:1px solid #3983a9;border-radius:8px;background:linear-gradient(115deg,#08203aeb,#03101eed);box-shadow:inset 0 1px #dbf5ff20,0 7px 18px #0008}
@@ -144,7 +189,7 @@
 
 /* Composition pass matched to the approved master reference. */
 .public-competition .premium-teams,.public-competition .premium-stats,.public-competition .premium-champions{padding:12px;border:1px solid #18bfff;border-radius:7px;background:linear-gradient(145deg,#061426,#020b15);box-shadow:inset 0 0 0 1px #a5e8ff36,inset 0 0 26px #087bff35,0 0 12px #058cff67,0 12px 28px #000a}
-.premium-section-heading{min-height:86px;margin:-12px -12px 10px;padding:11px 18px;border:0;border-bottom:2px solid #08aaff;background:linear-gradient(90deg,#021020eb 0%,#021020a6 42%,#02102033 100%),url('/assets/stadium-night.webp') center 52%/cover;box-shadow:0 8px 22px -18px #42d7ff}
+.premium-section-heading{min-height:86px;margin:-12px -12px 10px;padding:11px 18px;border:0;border-bottom:2px solid #08aaff;background:linear-gradient(90deg,#021020eb 0%,#021020a6 42%,#02102033 100%),var(--tr-stadium-image) center 52%/cover;box-shadow:0 8px 22px -18px #42d7ff}
 .premium-section-heading::after{bottom:-2px;left:125px;width:min(360px,35%);height:3px;background:linear-gradient(90deg,#e1faff,#07b7ff,transparent);box-shadow:0 0 13px #00aeff}
 .premium-heading-icon{width:76px;height:65px;border:0;border-radius:0;background:none;color:#39d2ff;box-shadow:none}
 .premium-heading-icon svg{width:56px;height:56px;stroke-width:2.3;filter:drop-shadow(0 0 6px #09aaff)}
@@ -156,7 +201,7 @@
 .premium-heading-count small{grid-column:1/-1;grid-row:2;color:#eff8ff;font-size:10px;letter-spacing:.05em;white-space:nowrap}
 .premium-teams .public-team-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 .public-team-card{min-height:clamp(225px,18vw,270px);border:1px solid #31bfff;border-radius:6px;box-shadow:inset 0 0 0 1px #d0f7ff55,inset 0 0 20px #078eff55,0 0 9px #00aaffb0,0 9px 18px #000b}
-.public-team-card::before{background:linear-gradient(180deg,#02081222 0%,#030b1550 55%,#020812dd 100%),var(--team-card-image,url('/assets/stadium-night.webp')) center/cover}
+.public-team-card::before{background:linear-gradient(180deg,#02081222 0%,#030b1550 55%,#020812dd 100%),var(--team-card-image,var(--tr-stadium-image)) center/cover}
 .public-team-card::after{border-radius:inherit;box-shadow:inset 0 0 0 2px #51d4ff45,inset 0 -5px 0 #00b7ff,0 0 15px #009fff77}
 .public-team-card:hover,.public-team-card:focus-visible{transform:translateY(-3px);border-color:#a4f2ff;box-shadow:inset 0 0 0 1px #e1fcff,inset 0 0 20px #078eff77,0 0 15px #04baff,0 13px 22px #000b}
 .public-team-card-art{padding:8px 5px 4px;background:radial-gradient(ellipse at 50% 56%,#00101f0a,transparent 70%)}
@@ -164,8 +209,8 @@
 .public-team-card-name{min-height:42px;padding:7px 5px 8px;border-top:1px solid #3ccaff;background:linear-gradient(90deg,#020a14dd,#041b30dd,#020a14dd);box-shadow:0 -3px 13px #04aaff70}
 .public-team-card-name strong{font-size:clamp(15px,1.28vw,19px);letter-spacing:0}
 .public-team-card-name small{display:none}
-.premium-stats .premium-section-heading{min-height:92px;margin-bottom:10px;background:linear-gradient(90deg,#020d1dF2,#021326a8 44%,#0213264d 100%),url('/assets/stadium-night.webp') center 48%/cover}
-.premium-stats .premium-section-heading::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 35%,#03112633 60%,#03112600),url('/assets/stadium-night.webp') center/cover;opacity:.22;pointer-events:none}
+.premium-stats .premium-section-heading{min-height:92px;margin-bottom:10px;background:linear-gradient(90deg,#020d1dF2,#021326a8 44%,#0213264d 100%),var(--tr-stadium-image) center 48%/cover}
+.premium-stats .premium-section-heading::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 35%,#03112633 60%,#03112600),var(--tr-stadium-image) center/cover;opacity:.22;pointer-events:none}
 .premium-season-slot{display:flex;align-items:center;justify-content:flex-end;min-width:210px;margin-left:auto}
 .premium-season-slot .season-bar{display:grid;gap:5px;min-width:220px;margin:0;padding:8px 12px;border:1px solid #09b9f3;border-radius:8px;background:#020c19e8;box-shadow:0 0 11px #009de955}
 .premium-season-slot .season-bar label{display:grid;grid-template-columns:auto minmax(110px,1fr);align-items:center;gap:8px;color:#ecf8ff;font-size:10px;letter-spacing:0;text-transform:uppercase}
@@ -173,7 +218,7 @@
 .premium-season-slot .season-bar>span{color:#78c9ed;font-size:9px;text-align:right}
 .public-competition .premium-stats .public-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .premium-stats .public-stats-grid>div{position:relative;isolation:isolate;grid-template-columns:88px 70px minmax(0,1fr);grid-template-rows:auto auto;justify-items:start;align-content:center;column-gap:10px;row-gap:2px;min-height:132px;padding:12px 15px;overflow:hidden;border-color:#39baff;border-radius:6px;background:#03101e;box-shadow:inset 0 0 0 1px #b2edff31,inset 0 0 18px #058bff50,0 0 10px #009ff877}
-.premium-stats .public-stats-grid>div::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#020b14b5,#020b1466 58%,#020b1488),var(--stat-image,url('/assets/stadium-night.webp')) center/cover;opacity:.96}
+.premium-stats .public-stats-grid>div::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#020b14b5,#020b1466 58%,#020b1488),var(--stat-image,var(--tr-stadium-image)) center/cover;opacity:.96}
 .premium-stats .public-stats-grid>div:nth-child(1){--stat-image:url('/assets/tr-stadiums/selected/7.png')}
 .premium-stats .public-stats-grid>div:nth-child(2){--stat-image:url('/assets/tr-stadiums/selected/8.png')}
 .premium-stats .public-stats-grid>div:nth-child(3){--stat-image:url('/assets/tr-stadiums/selected/9.png')}
@@ -184,9 +229,9 @@
 .premium-stats .public-stats-grid>div>small{grid-column:2/4;grid-row:2;color:#f0f5fa;font-size:11px;text-shadow:0 1px 3px #000}
 .premium-stats .data-note{display:flex;gap:10px;align-items:center;margin:8px 0 0;padding:8px 12px;border:1px solid #137cad;border-radius:6px;background:#020c19a8;color:#e3f3fc;font-size:11px}
 .premium-stats .data-note span{color:#31d9ff;font-size:17px}
-.premium-champions .premium-section-heading{min-height:96px;margin-bottom:0;background:linear-gradient(90deg,#020a16f2,#021326b8 54%,#02132624 100%),url('/assets/gallery-silver-trophy.webp') right 42%/auto 180% no-repeat,url('/assets/stadium-night.webp') center/cover}
+.premium-champions .premium-section-heading{min-height:96px;margin-bottom:0;background:linear-gradient(90deg,#020a16f2,#021326b8 54%,#02132624 100%),var(--tr-trophy-image) right 42%/auto 180% no-repeat,var(--tr-stadium-image) center/cover}
 .premium-champions .premium-section-heading h2{font-size:clamp(31px,3.4vw,47px)!important}
-.premium-champion-empty{position:relative;min-height:90px;grid-template-columns:auto auto auto;justify-content:center;gap:12px;padding:9px;background:linear-gradient(90deg,#020b16f0,#020b16b8 55%,#020b1677),url('/assets/gallery-silver-trophy.webp') right 50%/auto 160% no-repeat}
+.premium-champion-empty{position:relative;min-height:90px;grid-template-columns:auto auto auto;justify-content:center;gap:12px;padding:9px;background:linear-gradient(90deg,#020b16f0,#020b16b8 55%,#020b1677),var(--tr-trophy-image) right 50%/auto 160% no-repeat}
 .premium-champion-empty .premium-trophy{width:36px;height:36px;border:0;background:none;font-size:24px;filter:grayscale(1);opacity:.9}
 .premium-champion-empty p{font-size:13px}
 .premium-champion-empty small{color:#c6d7e2;font-size:11px}
@@ -219,7 +264,7 @@
   flex-direction: column;
   min-height: 278px;
   padding: 11px 13px 12px;
-  background: linear-gradient(180deg,#001226a3 0%,#0011258c 43%,#02101ce8 80%,#00200bbb 100%),url('/assets/stadium-night.webp') center center/100% 100% !important;
+  background: linear-gradient(180deg,#001226a3 0%,#0011258c 43%,#02101ce8 80%,#00200bbb 100%),var(--tr-stadium-image) center center/100% 100% !important;
 }
 .public-competition .public-upcoming .fixture-meta { flex: none; }
 .public-competition .public-upcoming .fixture-main {
@@ -401,7 +446,7 @@
 .public-competition #jogos.panel-card{padding:clamp(14px,1.6vw,20px);border-color:#195b82;background:linear-gradient(145deg,#04111e,#020b15)}
 .public-competition #jogos .public-section-heading{border-bottom-color:#164969}
 .public-competition .public-fixtures{gap:14px}
-.public-competition .public-fixtures .public-fixture.match-arena{min-height:244px;padding:10px 13px 11px;border-color:#1c739f!important;background:linear-gradient(180deg,#02111dbd 0%,#03111ba8 47%,#020b13e8 78%,#04180fb8 100%),url('/assets/stadium-night.webp') center/cover!important;box-shadow:inset 0 1px #9adfff14,0 7px 18px #0008}
+.public-competition .public-fixtures .public-fixture.match-arena{min-height:244px;padding:10px 13px 11px;border-color:#1c739f!important;background:linear-gradient(180deg,#02111dbd 0%,#03111ba8 47%,#020b13e8 78%,#04180fb8 100%),var(--tr-stadium-image) center/cover!important;box-shadow:inset 0 1px #9adfff14,0 7px 18px #0008}
 .public-competition .public-fixtures .public-fixture.match-arena::after{left:22%;right:22%;top:33%;height:20%;background:radial-gradient(ellipse,#0d6fa026,transparent 72%)}
 .public-competition .public-fixtures .fixture-meta{padding-bottom:2px}
 .public-competition .public-fixtures .fixture-meta span:first-child{padding:5px 8px;border-color:#3e7d9e;background:#071b2d;box-shadow:none;color:#e7f5ff}

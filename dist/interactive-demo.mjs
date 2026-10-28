@@ -1,17 +1,48 @@
 import { ESPORTS_DEMO } from './esports-demo.mjs';
 import { calculateStandings } from './engine.mjs';
+import { safeCrestUrl } from './club.mjs';
 import { demoDateForRound, getInteractiveFixtures, hasInteractiveResult, resetInteractiveResults, saveInteractiveResult, undoInteractiveResult } from './interactive-demo-state.mjs';
 
-const teams = new Map(ESPORTS_DEMO.teams.map((team) => [team.id, team]));
+function readLocalCompetition() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('tr-campeonatos-demo-v1') || 'null');
+    if (saved && typeof saved.name === 'string' && saved.name.trim() && Array.isArray(saved.teams) && saved.teams.length && Array.isArray(saved.fixtures)) {
+      const teams = saved.teams.filter((team) => typeof team.id === 'string' && typeof team.name === 'string');
+      const ids = new Set(teams.map((team) => team.id));
+      const fixtures = saved.fixtures.filter((fixture) => ids.has(fixture.homeId) && ids.has(fixture.awayId));
+      return { ...saved, teams, fixtures };
+    }
+  } catch { /* Keep the sample competition available when local data is damaged. */ }
+  return null;
+}
+const localCompetition = readLocalCompetition();
+const competition = localCompetition || ESPORTS_DEMO;
+const teams = new Map(competition.teams.map((team) => [team.id, team]));
+let localFixtures = localCompetition ? structuredClone(localCompetition.fixtures) : null;
+const fixturesForDemo = () => localFixtures || getInteractiveFixtures();
+const hasDemoResult = (id) => localCompetition ? Boolean(localFixtures.find((fixture) => fixture.id === id)?.homeScore !== localCompetition.fixtures.find((fixture) => fixture.id === id)?.homeScore) : hasInteractiveResult(id);
+const saveDemoResult = (id, home, away) => {
+  if (!localCompetition) return saveInteractiveResult(id, home, away);
+  const homeScore = Number(home), awayScore = Number(away);
+  if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore) || homeScore < 0 || awayScore < 0 || homeScore > 99 || awayScore > 99) throw new Error('Informe placares inteiros de 0 a 99.');
+  localFixtures = localFixtures.map((fixture) => fixture.id === id ? { ...fixture, homeScore, awayScore } : fixture);
+};
+const undoDemoResult = (id) => { if (localCompetition) localFixtures = localFixtures.map((fixture) => fixture.id === id ? { ...fixture, homeScore: null, awayScore: null } : fixture); else undoInteractiveResult(id); };
+const resetDemoResults = () => { if (localCompetition) localFixtures = structuredClone(localCompetition.fixtures); else resetInteractiveResults(); };
 const $ = (selector) => document.querySelector(selector);
 const escape = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-const crest = (team, className = '') => `<img class="${className}" src="${escape(team.demoAsset)}" alt="Escudo de ${escape(team.name)}" loading="lazy">`;
+const crest = (team, className = '') => `<img class="${className}" src="${escape(safeCrestUrl(team?.crest) || team?.demoAsset || '/assets/official/06_escudo_padrao_tr_campeonatos.webp')}" alt="Escudo de ${escape(team?.name || 'equipe')}" loading="lazy">`;
 const dateLabel = (round) => new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(demoDateForRound(round));
 const scoreLabel = (score) => score > 0 ? `+${score}` : String(score);
 let activeMatchId = null;
 let expandedTeamId = null;
 
-$('#team-strip').innerHTML = ESPORTS_DEMO.teams.map((team) => `<div class="strip-team" title="${escape(team.name)}">${crest(team)}<span>${escape(team.name)}</span></div>`).join('');
+$('.cup-emblem').setAttribute('role', 'img');
+$('.cup-emblem').setAttribute('aria-label', `Escudo de ${competition.name || 'Copa TR Demonstração'}`);
+$('.cup-emblem').innerHTML = `<img src="${escape(safeCrestUrl(competition.crest) || '/assets/official/06_escudo_padrao_tr_campeonatos.webp')}" alt="">`;
+$('.hero-cup strong').textContent = competition.name || 'Copa TR Demonstração 2026';
+$('.hero-cup>div:last-child>span').textContent = `${competition.teams.length} equipes · ${competition.format === 'double' ? 'turno e returno' : 'pontos corridos'} · ${new Set(competition.fixtures.map((fixture) => fixture.round)).size} rodadas`;
+$('#team-strip').innerHTML = competition.teams.map((team) => `<div class="strip-team" title="${escape(team.name)}">${crest(team)}<span>${escape(team.name)}</span></div>`).join('');
 
 function matchCard(fixture) {
   const home = teams.get(fixture.homeId);
@@ -31,7 +62,7 @@ function matchCard(fixture) {
 function compactResult(fixture) {
   const home = teams.get(fixture.homeId);
   const away = teams.get(fixture.awayId);
-  return `<article class="result-row"><div class="result-meta"><span>RODADA ${String(fixture.round).padStart(2, '0')} <span class="result-date">· ${dateLabel(fixture.round)}</span></span>${hasInteractiveResult(fixture.id) ? '<span class="simulated-tag">SIMULADO</span>' : '<span class="result-final">RESULTADO FINAL</span>'}</div><div class="result-main"><div class="result-team"><span class="result-crest">${crest(home)}</span><span class="result-name">${escape(home.name)}</span></div><strong class="result-score" aria-label="Placar ${fixture.homeScore} a ${fixture.awayScore}"><span>${fixture.homeScore}</span><i>×</i><span>${fixture.awayScore}</span></strong><div class="result-team result-away"><span class="result-crest">${crest(away)}</span><span class="result-name">${escape(away.name)}</span></div></div></article>`;
+  return `<article class="result-row"><div class="result-meta"><span>RODADA ${String(fixture.round).padStart(2, '0')} <span class="result-date">· ${dateLabel(fixture.round)}</span></span>${hasDemoResult(fixture.id) ? '<span class="simulated-tag">SIMULADO</span>' : '<span class="result-final">RESULTADO FINAL</span>'}</div><div class="result-main"><div class="result-team"><span class="result-crest">${crest(home)}</span><span class="result-name">${escape(home.name)}</span></div><strong class="result-score" aria-label="Placar ${fixture.homeScore} a ${fixture.awayScore}"><span>${fixture.homeScore}</span><i>×</i><span>${fixture.awayScore}</span></strong><div class="result-team result-away"><span class="result-crest">${crest(away)}</span><span class="result-name">${escape(away.name)}</span></div></div></article>`;
 }
 
 function standingRow(row, index) {
@@ -44,12 +75,14 @@ function standingRow(row, index) {
 }
 
 function render() {
-  const fixtures = getInteractiveFixtures();
-  const nextRound = fixtures.filter((fixture) => fixture.round === 2);
+  const fixtures = fixturesForDemo();
+  const openRound = localCompetition ? fixtures.find((fixture) => fixture.homeScore === null)?.round || fixtures[0]?.round : 2;
+  const nextRound = fixtures.filter((fixture) => fixture.round === openRound);
+  $('.round-pill').textContent = openRound ? `RODADA ${openRound}` : 'SEM PARTIDAS';
   const recent = fixtures.filter((fixture) => fixture.homeScore !== null).sort((a, b) => b.round - a.round);
-  $('#upcoming-matches').innerHTML = nextRound.map(matchCard).join('');
-  $('#recent-matches').innerHTML = recent.map(compactResult).join('');
-  $('#standings-rows').innerHTML = calculateStandings(ESPORTS_DEMO.teams, fixtures).map(standingRow).join('');
+  $('#upcoming-matches').innerHTML = nextRound.length ? nextRound.map(matchCard).join('') : '<p class="demo-empty">Gere confrontos no laboratório para simular uma rodada.</p>';
+  $('#recent-matches').innerHTML = recent.length ? recent.map(compactResult).join('') : '<p class="demo-empty">Os resultados aparecerão aqui após os jogos.</p>';
+  $('#standings-rows').innerHTML = calculateStandings(competition.teams, fixtures).map(standingRow).join('');
 }
 
 function explain(title, message) {
@@ -63,8 +96,8 @@ function explain(title, message) {
 }
 
 function openScoreDialog(id) {
-  const fixture = getInteractiveFixtures().find((match) => match.id === id);
-  if (!fixture || !ESPORTS_DEMO.fixtures.some((match) => match.id === id && match.homeScore === null)) return;
+  const fixture = fixturesForDemo().find((match) => match.id === id);
+  if (!fixture || (!localCompetition && !ESPORTS_DEMO.fixtures.some((match) => match.id === id && match.homeScore === null))) return;
   activeMatchId = id;
   const home = teams.get(fixture.homeId);
   const away = teams.get(fixture.awayId);
@@ -72,7 +105,7 @@ function openScoreDialog(id) {
   $('#home-label').textContent = home.name;
   $('#away-label').textContent = away.name;
   $('#score-form').reset();
-  $('#dialog-heading').textContent = hasInteractiveResult(id) ? 'Alterar resultado' : 'Simular resultado';
+  $('#dialog-heading').textContent = hasDemoResult(id) ? 'Alterar resultado' : 'Simular resultado';
   $('#home-score').value = fixture.homeScore ?? '';
   $('#away-score').value = fixture.awayScore ?? '';
   $('#form-error').textContent = '';
@@ -83,7 +116,7 @@ function openScoreDialog(id) {
 $('#upcoming-matches').addEventListener('click', (event) => {
   const undoButton = event.target.closest('button[data-undo-match-id]');
   if (undoButton) {
-    undoInteractiveResult(undoButton.dataset.undoMatchId);
+    undoDemoResult(undoButton.dataset.undoMatchId);
     render();
     explain('Resultado desfeito', 'A partida voltou a ficar sem placar e a classificação foi recalculada.');
     $('#upcoming-matches').querySelector(`[data-fixture-id="${undoButton.dataset.undoMatchId}"] .simulate-button`)?.focus();
@@ -102,7 +135,7 @@ $('#standings-rows').addEventListener('click', (event) => {
 $('#score-form').addEventListener('submit', (event) => {
   event.preventDefault();
   try {
-    saveInteractiveResult(activeMatchId, $('#home-score').value, $('#away-score').value);
+    saveDemoResult(activeMatchId, $('#home-score').value, $('#away-score').value);
     $('#score-dialog').close();
     activeMatchId = null;
     render();
@@ -112,7 +145,7 @@ $('#score-form').addEventListener('submit', (event) => {
 for (const selector of ['#close-dialog', '#cancel-dialog']) $(selector).addEventListener('click', () => $('#score-dialog').close());
 $('#score-dialog').addEventListener('close', () => { activeMatchId = null; });
 $('#reset-demo').addEventListener('click', () => {
-  resetInteractiveResults();
+  resetDemoResults();
   expandedTeamId = null;
   render();
   $('#demo-explain').innerHTML = '<span class="explain-icon" aria-hidden="true">✦</span><div><strong>Demonstração reiniciada</strong><p>Escolha um confronto e simule um novo resultado.</p></div>';

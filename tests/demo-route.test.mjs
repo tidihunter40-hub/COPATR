@@ -14,5 +14,5 @@ test('the sports demo has a separate navigable route and clear fictional disclos
   assert.match(page, /name="robots" content="noindex"/);
   assert.match(script, /publicPage\(client, competitionId, true\)/);
   assert.doesNotMatch(script, /createClient\(/);
-  assert.match(serviceWorker, /'\/demo-competition\.html', '\/demo-competition\.mjs'/);
+  assert.match(serviceWorker, /'\/demonstracao\/copa-tr-esports' \? '\/demo-competition\.html'/);
 });

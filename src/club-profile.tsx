@@ -18,8 +18,9 @@ function readDemo(): Demo {
 }
 
 function ClubCrest({ team, className = '' }: { team?: Club; className?: string }) {
-  const src = safeCrestUrl(team?.crest) || team?.demoAsset;
-  return src ? <img className={`profile-crest ${className}`} src={src} alt={`Escudo de ${team?.name}`}/> : <span className={`profile-crest profile-crest-empty ${className}`} role="img" aria-label="Sem escudo cadastrado">◇</span>;
+  const fallback = '/assets/official/06_escudo_padrao_tr_campeonatos.webp';
+  const src = safeCrestUrl(team?.crest) || team?.demoAsset || fallback;
+  return <img className={`profile-crest ${className}`} src={src} alt={`Escudo de ${team?.name || 'equipe'}`} onError={(event) => { if (event.currentTarget.src !== new URL(fallback, location.href).href) event.currentTarget.src = fallback; }}/>;
 }
 
 function Profile() {

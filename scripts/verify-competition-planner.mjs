@@ -37,6 +37,7 @@ try {
     });
     assert.ok(width > 900 ? opening.fieldLeft >= opening.formRight - 1 : opening.fieldTop >= opening.formBottom - 1);
     await page.screenshot({ path: resolve(captures, `inicio-${width}.png`), fullPage: true });
+    await page.locator('#planner-count').fill('8');
     await page.getByRole('button', { name: /MONTAR CAMPEONATO/ }).click();
     assert.equal(await page.locator('.planner-layout.has-plan').count(), 1);
     assert.equal(await page.locator('.group-card').count(), 2);
@@ -45,14 +46,12 @@ try {
     await page.getByRole('button', { name: /SORTEAR EQUIPES/ }).click();
     assert.notDeepEqual(await page.locator('.team-tile strong').allTextContents(), before);
     assert.equal(await page.locator('.group-card').count(), 2);
-    await page.getByRole('button', { name: /CONFIRMAR GRUPOS/ }).click();
-    await page.getByRole('button', { name: /GERAR CONFRONTOS/ }).click();
-    assert.equal(await page.locator('.fixture-card').count(), 12);
     await page.getByRole('button', { name: /REFAZER SORTEIO/ }).click();
     assert.equal(await page.locator('.fixture-card').count(), 0);
     assert.equal(await page.getByRole('button', { name: /CONFIRMAR GRUPOS/ }).count(), 1);
     await page.getByRole('button', { name: /CONFIRMAR GRUPOS/ }).click();
     await page.getByRole('button', { name: /GERAR CONFRONTOS/ }).click();
+    assert.equal(await page.locator('.fixture-card').count(), 12);
     await page.screenshot({ path: resolve(captures, `grupos-${width}.png`), fullPage: true });
     await page.locator('#planner-count').fill('12');
     await page.getByRole('button', { name: /MONTAR CAMPEONATO/ }).click();

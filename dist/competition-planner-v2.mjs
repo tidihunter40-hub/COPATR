@@ -30,9 +30,8 @@ function demoTeams(size, sport) {
 }
 
 function crest(team) {
-  return team.crest
-    ? `<span class="team-crest"><img src="${escape(team.crest)}" alt="Escudo de ${escape(team.name)}" loading="lazy"></span>`
-    : `<span class="team-crest team-crest-placeholder" style="--team-color:${escape(team.color || '#2888c6')}" aria-label="Escudo demonstrativo de ${escape(team.name)}">${escape(initials(team.name))}</span>`;
+  const source = team.crest || '/assets/official/06_escudo_padrao_tr_campeonatos.webp';
+  return `<span class="team-crest"><img src="${escape(source)}" alt="Escudo de ${escape(team.name)}" loading="lazy" onerror="this.onerror=null;this.src='/assets/official/06_escudo_padrao_tr_campeonatos.webp'"></span>`;
 }
 
 function teamTile(team) { return `<li class="team-tile">${crest(team)}<strong>${escape(team.name)}</strong></li>`; }
@@ -43,6 +42,9 @@ function currentConfig() {
   if (!Number.isInteger(size) || size < 2 || size > 32) throw new Error('Informe entre 2 e 32 participantes.');
   if (official && size !== official.teams.length) throw new Error('A quantidade precisa corresponder às equipes cadastradas na temporada.');
   const format = String(fields.get('format'));
+  if (official && format === 'corujao' && ![8, 10, 12, 16, 20, 24, 32].includes(size)) {
+    throw new Error('O sorteio oficial do Corujão aceita 8, 10, 12, 16, 20, 24 ou 32 equipes. Ajuste as inscrições antes de confirmar.');
+  }
   const stations = fields.get('stations') === '' ? null : Number(fields.get('stations'));
   return {
     sport: sportInput.value, size, format,
@@ -149,7 +151,7 @@ function renderStructure() {
   const groups = structure.groups.length ? structure.groups : [{ id: 'participants', name: config.format === 'knockout' ? 'Ordem de entrada' : 'Participantes', teams: participants }];
   layout.classList.add('has-plan');
   result.className = '';
-  result.innerHTML = `<div class="stage-head"><span class="planner-kicker">${official ? 'EQUIPES DA TEMPORADA' : 'DEMONSTRAÇÃO · EQUIPES FICTÍCIAS'}</span><h2>${escape(formatNames[config.format])}</h2><p>${escape(structure.summary)}</p></div><div class="stage-note">${escape(structure.note)}</div><div class="group-grid ${structure.groups.length ? '' : 'single-group'}">${groups.map((group) => `<article class="group-card"><div class="group-head"><span>${escape(group.name)}</span><b>${group.teams.length} equipes</b></div><ul>${group.teams.map(teamTile).join('')}</ul></article>`).join('')}</div><div class="stage-actions"><button class="draw-button" type="button" data-action="draw">🎲 ${state.draws ? 'REFAZER SORTEIO' : 'SORTEAR EQUIPES'}</button>${state.confirmed ? '<span class="confirmed-mark">✓ Distribuição confirmada</span>' : '<button class="secondary-button" type="button" data-action="confirm">CONFIRMAR GRUPOS</button>'}${state.confirmed && !state.generated ? '<button class="primary-button" type="button" data-action="generate">GERAR CONFRONTOS →</button>' : ''}</div>${state.generated ? renderFixtures() : ''}<p class="preview-disclosure">${official ? 'Prévia com equipes cadastradas. A confirmação e os confrontos desta tela não são gravados no banco.' : 'Demonstração fictícia. Nenhum dado é salvo no banco.'}</p>`;
+  result.innerHTML = `<div class="stage-head"><span class="planner-kicker">${official ? 'EQUIPES DA TEMPORADA' : 'DEMONSTRAÇÃO · EQUIPES FICTÍCIAS'}</span><h2>${escape(formatNames[config.format])}</h2><p>${escape(structure.summary)}</p></div><div class="stage-note">${escape(structure.note)}</div><div class="group-grid ${structure.groups.length ? '' : 'single-group'}">${groups.map((group) => `<article class="group-card"><div class="group-head"><span>${escape(group.name)}</span><b>${group.teams.length} equipes</b></div><ul>${group.teams.map(teamTile).join('')}</ul></article>`).join('')}</div><div class="stage-actions">${state.confirmed ? '<span class="confirmed-mark">✓ Sorteio confirmado</span>' : `<button class="draw-button" type="button" data-action="draw">🎲 ${state.draws ? 'REFAZER SORTEIO' : 'SORTEAR EQUIPES'}</button><button class="secondary-button" type="button" data-action="confirm">${official ? 'CONFIRMAR SORTEIO E CONFRONTOS' : 'CONFIRMAR GRUPOS'}</button>`}${!official && state.confirmed && !state.generated ? '<button class="primary-button" type="button" data-action="generate">GERAR CONFRONTOS →</button>' : ''}${official && state.confirmed ? `<a class="primary-button" href="/painel/campeonatos/${escape(official.season.competition_id)}/resultados?temporada=${escape(official.season.id)}">ABRIR PARTIDAS →</a>` : ''}</div>${state.generated ? renderFixtures() : ''}<p class="preview-disclosure">${official ? state.confirmed ? 'Sorteio e confrontos oficiais gravados no banco.' : 'Prévia oficial. Revise os grupos e os confrontos antes de confirmar; a confirmação grava ambos no banco.' : 'Demonstração fictícia. Nenhum dado é salvo no banco.'}</p>`;
 }
 
 function showError(message) { errorBox.textContent = message; errorBox.hidden = false; }
@@ -177,26 +179,49 @@ form.addEventListener('submit', (event) => {
   event.preventDefault(); clearError();
   try {
     const config = currentConfig();
+    if (official && (official.existingMatchCount || official.season.draw_confirmed_at)) throw new Error('Esta temporada já tem confrontos. Revise as partidas no painel antes de gerar outro sorteio.');
+    if (official && config.format !== official.season.format && !(config.format === 'corujao' && official.season.format === 'groups_knockout')) throw new Error('O formato escolhido precisa corresponder ao formato desta temporada.');
     const participants = official ? official.teams : demoTeams(config.size, config.sport);
     if (participants.length !== config.size) throw new Error('Cadastre as equipes antes de montar o campeonato.');
     const structure = makeStructure(participants, config);
-    state = { config, participants, structure, draws: 0, confirmed: false, generated: false, showAll: false };
+    state = { config, participants, structure, draws: 0, confirmed: false, generated: Boolean(official), showAll: false };
     renderStructure();
   } catch (error) { showError(error.message); }
 });
 
-result.addEventListener('click', (event) => {
+result.addEventListener('click', async (event) => {
   const button = event.target.closest('button[data-action]');
   if (!button || !state) return;
   try {
     if (button.dataset.action === 'draw') {
       const participants = shuffleTeams(state.participants);
-      state = { ...state, participants, structure: makeStructure(participants, state.config), draws: state.draws + 1, confirmed: false, generated: false, showAll: false };
-    } else if (button.dataset.action === 'confirm') state.confirmed = true;
+      state = { ...state, participants, structure: makeStructure(participants, state.config), draws: state.draws + 1, confirmed: false, generated: Boolean(official), showAll: false };
+    } else if (button.dataset.action === 'confirm') {
+      if (official) {
+        button.disabled = true;
+        button.textContent = 'SALVANDO SORTEIO…';
+        const kind = state.config.format;
+        const phase = kind === 'round_robin' ? 'league' : kind === 'knockout'
+          ? ({ 2: 'final', 4: 'semifinal', 8: 'quarterfinal', 16: 'round_of_16' })[state.participants.length] : 'groups';
+        if (!phase) throw new Error('O primeiro confronto deste mata-mata ainda não pode ser gravado neste formato.');
+        const schedule = kind === 'corujao' && state.config.start && state.config.stations
+          ? scheduleFixtures(state.structure.fixtures, { startAt: new Date(state.config.start).toISOString(), matchMinutes: state.config.duration, intervalMinutes: state.config.interval, stations: state.config.stations, synchronizedRounds: true }) : null;
+        const scheduled = new Map(schedule?.fixtures.map((match) => [match.id, match.scheduledAt]) || []);
+        const groups = state.structure.groups.map((group) => ({ name: group.name, entryIds: group.teams.map((team) => team.id) }));
+        const fixtures = state.structure.fixtures.map((match) => ({
+          homeId: match.homeId, awayId: match.awayId, round: match.round || 1, leg: match.leg || 1,
+          phase, scheduledAt: scheduled.get(match.id) || null,
+        }));
+        const [{ supabaseConfig }, { confirmOfficialDraw }] = await Promise.all([import('./runtime-config.mjs'), import('./planner-official.js')]);
+        await confirmOfficialDraw(official.season.id, kind, groups, fixtures, supabaseConfig);
+        official.existingMatchCount = fixtures.length;
+      }
+      state.confirmed = true;
+    }
     else if (button.dataset.action === 'generate') { if (!state.confirmed) return; state.generated = true; }
     else if (button.dataset.action === 'show-all') state.showAll = true;
     renderStructure();
-  } catch (error) { showError(error.message); }
+  } catch (error) { button.disabled = false; button.textContent = official ? 'CONFIRMAR SORTEIO E CONFRONTOS' : 'CONFIRMAR GRUPOS'; showError(error.message); }
 });
 
 sportInput.addEventListener('change', updateFormatOptions);
@@ -216,10 +241,12 @@ if (seasonId) {
     sportInput.disabled = true;
     countInput.value = String(official.teams.length);
     countInput.readOnly = true;
-    if (['round_robin', 'knockout', 'groups_knockout'].includes(official.season.format)) formatInput.value = official.season.format;
     updateFormatOptions();
-    result.innerHTML = `<span class="planner-kicker">${escape(official.competition.name)} · ${escape(official.season.label)}</span><h2>${official.teams.length} equipes cadastradas.</h2><p>Monte a estrutura com os participantes oficiais desta temporada.</p>`;
-    form.querySelector('.primary-button').disabled = false;
+    formatInput.value = official.competition.setup_mode === 'corujao' ? 'corujao' : official.season.format;
+    updateFormatOptions();
+    const unavailable = official.existingMatchCount || official.season.draw_confirmed_at || official.competition.status === 'archived';
+    result.innerHTML = `<span class="planner-kicker">${escape(official.competition.name)} · ${escape(official.season.label)}</span><h2>${official.teams.length} equipes cadastradas.</h2><p>${unavailable ? 'Esta temporada já possui confrontos ou está arquivada. Confira as partidas oficiais no painel.' : 'Monte a estrutura, revise os confrontos e confirme o sorteio oficial.'}</p>${unavailable ? `<a class="secondary-button" href="/painel/campeonatos/${escape(official.season.competition_id)}/resultados?temporada=${escape(official.season.id)}">Abrir partidas</a>` : ''}`;
+    form.querySelector('.primary-button').disabled = Boolean(unavailable);
   } catch (error) {
     result.innerHTML = `<span class="planner-kicker">TEMPORADA INDISPONÍVEL</span><h2>Não foi possível carregar as equipes.</h2><p>${escape(error.message)}</p><a class="secondary-button" href="/entrar?retorno=%2Fpainel">Abrir painel</a>`;
   }

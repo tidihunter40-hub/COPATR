@@ -99,3 +99,4 @@ body{background:var(--landing-night);overflow-x:clip}
 @media(max-width:390px){.hero{padding:38px 16px}.hero h1{font-size:31px}.hero-actions{flex-direction:column}.hero-actions .button{width:100%}.hero-sports-grid a{min-height:65px;font-size:9px}.strip-item{padding:8px 5px}.strip-item b,.strip-item small{font-size:9px}}
 @media(max-width:700px){.public-competition-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.hero-sports-grid a,.button{transition:none!important;animation:none!important}.live-match-head i{animation:none}}
+.brand picture,.hero-brand picture{display:block;width:100%}

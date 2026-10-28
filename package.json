@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild src/showcase.tsx --bundle --minify --sourcemap --format=esm --target=es2022 --jsx=automatic --outfile=dist/showcase.js && esbuild src/smart-shield.ts --bundle --minify --format=esm --target=es2022 --outfile=dist/smart-shield.mjs && esbuild src/real-app.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/real-app.js && esbuild src/auth-header.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/auth-header.js && esbuild src/planner-official.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/planner-official.js",
+    "build": "esbuild src/showcase.tsx --bundle --minify --sourcemap --format=esm --target=es2022 --jsx=automatic --outfile=dist/showcase.js && esbuild src/smart-shield.ts --bundle --minify --format=esm --target=es2022 --outfile=dist/smart-shield.mjs && esbuild src/real-app.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/real-app.js && esbuild src/auth-header.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/auth-header.js && esbuild src/planner-official.ts --bundle --minify --sourcemap --format=esm --target=es2022 --outfile=dist/planner-official.js && node scripts/copy-sw.mjs && node scripts/build-optimized-css.mjs && node scripts/build-site-css.mjs && node scripts/build-site-pages.mjs && node scripts/install-graphics-mode.mjs",
+    "images:optimize": "python scripts/optimize-images.py",
     "typecheck": "tsc --noEmit",
     "visual:qa": "node scripts/visual-qa.mjs",
     "pretest": "npm run build",
@@ -17,6 +18,7 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.12",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "esbuild": "^0.28.2",
