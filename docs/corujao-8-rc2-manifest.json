@@ -2,7 +2,11 @@
   "version": "corujao-8-rc2",
   "previousPreviewId": "dpl_CUZsU4XpXNVNEWzhr1bQbS4gqjRR",
   "previouslyRecordedProductionId": "dpl_DW8z1XUyEbscWEM1mDBqvG7EXYtx",
-  "preview": null,
+  "preview": {
+    "deploymentId": "dpl_ECN6bRwYVvWiA3Pri6jqogTnpBeo",
+    "url": "https://copatr-am8xuhlt9-ogaitjunior-sudos-projects.vercel.app",
+    "sourceCommit": "a5d593e"
+  },
   "deploymentFileCount": 383,
   "deploymentTreeSha256": "d47e401fb0cade22b007ad22c3119feeae417227d373d25b848d8264801e7209",
   "sourceSha256": {
